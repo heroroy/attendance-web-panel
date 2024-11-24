@@ -4,6 +4,7 @@ import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {getSubjectThunk} from "../redux/subjectSlice.ts";
 import _ from 'lodash'
 import SubjectCard from "../Component/SubjectCard.tsx";
+import Department, {getDepartmentLabel} from "../Model/Department.ts";
 
 export function HomePage() {
     const [open, setOpen] = useState<boolean>(false)
@@ -16,48 +17,42 @@ export function HomePage() {
     const groupedSubjects = _.groupBy(subjects, 'department')
 
     useEffect(() => {
-        if(profile?.id == null) return
-        dispatch(getSubjectThunk({ userId: profile.id }))
+        if (profile?.id == null) return
+        dispatch(getSubjectThunk({userId: profile.id}))
     }, [profile])
 
 
-    console.log(groupedSubjects)
+    console.log(JSON.stringify(groupedSubjects))
 
     return (
-        <div className="border-2 ">
-            <div className="border-2 p-4 flex flex-nowrap ">
-                <h3 className="text-xl font-bold mx-auto ">
-                    Attend
-                    <span className="text-2xl text-blue-500 font-extrabold">Ease</span>
-                </h3>
-                <img className="h-10 w-10 rounded-full justify-self-end mx-2" src={profile?.profilePic}/>
-            </div>
-            <div className=" m-7 mx-16">
-                <h3 className="flex flex-col">
-                    <span className="text-gray-500 text-xl">Welcome Back</span>
-                    <span className="text-3xl font-bold">{profile?.name}</span>
-                </h3>
+        <div className="w-full h-full flex flex-col gap-32 relative">
+            <div className='flex flex-row justify-between items-center'>
+                <div className="flex flex-col">
+                    <span className="text-gray-500 text-2xl">Welcome Back</span>
+                    <span className="text-5xl font-bold">{profile?.name}</span>
+                </div>
+                <button
+                    onClick={() => setOpen(true)}
+                    className="px-8 py-4 z-10 rounded-full text-lg text-white bg-blue-600"
+                >
+                    + Subject
+                </button>
             </div>
 
-            <div className="border-2 p-16">
+            <div className="">
                 {Object.keys(groupedSubjects).map(dept => (
                     <div className="flex flex-col gap-8">
-                        <span>{dept}</span>
+                        <span className='text-xl font-medium'>{getDepartmentLabel(Department[dept])}</span>
                         <div className="flex flex-row flex-wrap gap-4">
+                            {groupedSubjects[dept].map(subject => <SubjectCard subject={subject}/>)}
+                            {groupedSubjects[dept].map(subject => <SubjectCard subject={subject}/>)}
                             {groupedSubjects[dept].map(subject => <SubjectCard subject={subject}/>)}
                         </div>
                     </div>
                 ))}
             </div>
 
-            <button
-                onClick={() => setOpen(true)}
-                className="px-7 py-3 z-10 rounded-full text-lg text-white bg-blue-600 fixed bottom-3 left-1/2"
-            >
-                + Subject
-            </button>
-
-            {open && <CreateSubjectModal profile={profile} onDismiss={() => setOpen(false)}/>}
+            {open && <CreateSubjectModal onDismiss={() => setOpen(false)}/>}
         </div>
     );
 }

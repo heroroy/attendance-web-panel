@@ -1,14 +1,11 @@
 import {TextInput} from "./textInput.tsx";
-import {useEffect , useState} from "react";
-import {FaArrowDown} from "react-icons/fa";
-import {MdArrowDropDown} from "react-icons/md";
+import {useEffect, useState} from "react";
 import {DropDown} from "./DropDown.tsx";
-import {useAppDispatch , useAppSelector} from "../redux/store.ts";
+import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {subjectAddThunk} from "../redux/subjectSlice.ts";
-import {Initials , ProfileName} from "../Util/Naming_Conv.ts";
-import {Department} from "./Department.tsx";
 import Section from "../Model/Section.ts";
 import Subject from "../Model/Subject.ts";
+import Department, {getDepartmentLabel} from "../Model/Department.ts";
 
 interface inputModal {
     name: string,
@@ -31,22 +28,10 @@ export function CreateSubjectModal({ onDismiss }) {
     } )
     const profile = useAppSelector(state => state.auth.profile)
     const [ roll, setRoll] = useState([])
-    const dept = Object.keys(Department)
-        .map(dept => {
-            switch(dept){
-                case "IT":
-                    return "Information Technology"
-                case "CS":
-                    return "Computer Science"
-                case "EE":
-                    return "Electrical"
-                case "EC":
-                    return "Electronics"
-                default:
-                    return ""
-            }
-        })
-    const sect = Object.keys(Section)
+
+    const dept = Object.values(Department)
+        .map(dept => getDepartmentLabel(dept))
+    const sect = Object.values(Section)
 
     const fileReader = new FileReader()
     const csvFileToArray = (text : any) => {
@@ -115,7 +100,8 @@ export function CreateSubjectModal({ onDismiss }) {
                 studentsEnrolled : roll.slice(0,roll.length-1),
                 title : input.name,
                 id : input.name + "-" + input.department + "-" + input.sec,
-                createdBy : profile?.name
+                createdBy : profile?.name,
+                created: new Date().getTime()
             } as Subject ))
 
         }catch (error){

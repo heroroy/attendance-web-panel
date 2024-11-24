@@ -28,11 +28,11 @@ export function Loginpage() {
 
     useEffect(() => {
         if (profile == null) return
-        navigate("/home")
+        navigate("/home", { replace: true })
     }, [navigate, profile]);
 
     return (
-        <div className='flex flex-row justify-center items-center'>
+        <div className='w-full h-full flex flex-row justify-center items-center'>
             <button onClick={handleLogin}>Login</button>
         </div>
     );

@@ -9,7 +9,8 @@ export const store = configureStore({
         auth : profileSlice.reducer,
         subject : subjectSlice.reducer,
         class : classesSlice.reducer,
-    }
+    },
+    devTools: true
 })
 
 export type RootState = ReturnType<typeof store.getState>

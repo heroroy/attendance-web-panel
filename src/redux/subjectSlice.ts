@@ -47,6 +47,10 @@ export const getSubjectThunk = createAsyncThunk<
             .orderBy('created', 'desc')
             .get()
             .then(result => result.docs.map(doc =>doc.data() as Subject))
+            .then(subjects => {
+                console.log("Subjects = " + JSON.stringify(subjects))
+                return subjects
+            })
             .catch(e => rejectWithValue(e))
     }
 )

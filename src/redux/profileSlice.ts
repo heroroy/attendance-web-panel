@@ -10,7 +10,7 @@ interface ProfileState {
 }
 
 const initialState: ProfileState = {
-    profile: null,
+    profile: getProfileFromStorage(),
     loading: false,
     error: null
 }
@@ -50,16 +50,42 @@ export const loginThunk = createAsyncThunk<
                 localStorage.setItem('user', JSON.stringify(user))
                 return user
             })
-            .catch(e => rejectWithValue(e))
+            .catch(e => {
+                auth.signOut()
+                return rejectWithValue(e.message)
+            })
     }
 )
+
+export const getProfileThunk = createAsyncThunk<User, void, { rejectValue: string }>(
+    'profile/get',
+    async (_, {rejectWithValue}) => {
+        try {
+            const userStr = localStorage.getItem('user')
+            if (userStr == null) return rejectWithValue('User not found')
+            return JSON.parse(userStr)
+        } catch (e) {
+            return rejectWithValue(e.message)
+        }
+    }
+)
+
+function getProfileFromStorage(){
+    const userStr = localStorage.getItem('user')
+    if (userStr == null) return null
+    try {
+        return JSON.parse(userStr)
+    } catch(e){
+        return null
+    }
+}
 
 export const profileSlice = createSlice({
     name: 'profile',
     initialState,
     reducers: {
         display(initialState) {
-            initialState
+            getProfileThunk()
         }
     },
     extraReducers: (builder) => {
@@ -74,6 +100,19 @@ export const profileSlice = createSlice({
                 state.profile = action.payload
             })
             .addCase(loginThunk.rejected, (state: ProfileState, action: PayloadAction<string | undefined>) => {
+                state.loading = false;
+                state.error = action.payload || "cannot load profile";
+            })
+            .addCase(getProfileThunk.pending, (state: ProfileState) => {
+                state.loading = true;
+                state.error = null
+            })
+            .addCase(getProfileThunk.fulfilled, (state: ProfileState, action: PayloadAction<User>) => {
+                state.loading = false;
+                state.error = null;
+                state.profile = action.payload
+            })
+            .addCase(getProfileThunk.rejected, (state: ProfileState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
                 state.error = action.payload || "cannot load profile";
             })
