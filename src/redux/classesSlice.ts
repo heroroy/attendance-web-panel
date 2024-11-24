@@ -68,9 +68,7 @@ export const getClassesThunk= createAsyncThunk<
             const querySnapshot_class = await database.collection("classes").get();
             // querySnapshot.forEach((doc)=>{
                 querySnapshot_class.forEach((doc_class)=>{
-                    Object.entries(doc_class.data()).map(item=>{
-                        const key = item[0]
-                        const value = item[1]
+                    Object.entries(doc_class.data()).map(([key, value])=>{
                         if(key==="subjectId"){
                             if(value===id){
                                 classArray.push(doc_class.data())

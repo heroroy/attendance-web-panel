@@ -7,14 +7,14 @@ export function SubjectPage() {
 
     const params = useParams()
 
-    console.log(params.id)
-
     const { classArray } = useAppSelector(state => state.class)
 
     const dispatch = useAppDispatch()
     useEffect ( () => {
         dispatch(getClassesThunk({id : `${params.id}`}))
     } , [] );
+
+    console.log(classArray)
 
     return (
         <>
@@ -25,8 +25,10 @@ export function SubjectPage() {
                 </div>
             </div>
             <div>
-
                 <h3>{params.id}</h3>
+                {classArray.map(item=>(
+                    <div>{item.createdAt}</div>
+                ))}
             </div>
         </>
     );
