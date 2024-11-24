@@ -1,10 +1,8 @@
-import {auth} from "../firebase.ts";
-import {GoogleAuthProvider} from "firebase/auth"
-import {useState} from "react";
-import {useAppDispatch , useAppSelector} from "../redux/store.ts";
+import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 
-import { loginThunk} from "../redux/profileSlice.ts"
-import {Navigate } from "react-router-dom";
+import {loginThunk} from "../redux/profileSlice.ts"
+import {useNavigate} from "react-router-dom";
+import {useEffect} from "react";
 
 export function Loginpage() {
 
@@ -14,43 +12,28 @@ export function Loginpage() {
     // })
 
     const dispatch = useAppDispatch()
+    const navigate = useNavigate()
 
-    const { profile, loading, error  } = useAppSelector(state => state.auth)
+    const {profile, loading, error} = useAppSelector(state => state.auth)
 
     // const navigate = useNavigate()
 
     const handleLogin = async () => {
-        try{
-
+        try {
             dispatch(loginThunk())
-
-            // const provider = new GoogleAuthProvider()
-            // provider.addScope("https://www.googleapis.com/auth/youtube.force-ssl")
-            //
-            // const res = await auth.signInWithPopup(provider)
-            // const token = await res?.credential?.accessToken;
-            // const user = res?.additionalUserInfo?.profile;
-            //
-            // setProfile({
-            //     name : user?.name,
-            //     pfp : user?.picture
-            // })
-
-            // console.log("res",res)
-        }catch (error){
+        } catch (error) {
             console.log(error)
         }
     }
 
-    if(profile) localStorage.setItem("profile", JSON.stringify(profile))
+    useEffect(() => {
+        if (profile == null) return
+        navigate("/home")
+    }, [navigate, profile]);
 
     return (
-        <>
-            <div>
-                {profile ? <Navigate to="/home"/> :
-                    <button onClick={ handleLogin }>Login</button>
-                }
-            </div>
-        </>
+        <div className='flex flex-row justify-center items-center'>
+            <button onClick={handleLogin}>Login</button>
+        </div>
     );
 }

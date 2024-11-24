@@ -1,68 +1,79 @@
-import {createAsyncThunk , createSlice , PayloadAction} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {GoogleAuthProvider} from "firebase/auth";
-import {auth} from "../firebase.ts";
+import {auth, database} from "../firebase.ts";
+import User from "../Model/User.ts";
 
 interface ProfileState {
-    profile : {name : string,
-        picture : string}
-    loading : boolean,
-    error : null | string
+    profile: User | null
+    loading: boolean,
+    error: null | string
 }
 
-const initialState : ProfileState = {
-    profile : {name : "",
-        picture : ""},
-    loading : false,
-    error : null
+const initialState: ProfileState = {
+    profile: null,
+    loading: false,
+    error: null
 }
 
 export const loginThunk = createAsyncThunk<
-    {profile : {name : string ,picture : string }},
+    User,
     void,
-    {rejectValue : string}
+    { rejectValue: string }
 >(
     'profile/login',
-    async (_,{rejectWithValue}) => {
-        try{
-            const provider = new GoogleAuthProvider()
-            provider.addScope("https://www.googleapis.com/auth/youtube.force-ssl")
+    async (_, {rejectWithValue}) => {
+        const provider = new GoogleAuthProvider()
+        provider.addScope("https://www.googleapis.com/auth/youtube.force-ssl")
 
-            const res = await auth.signInWithPopup(provider)
-            const token = await res?.credential?.accessToken;
-            const user = res?.additionalUserInfo?.profile;
-
-            const profile = {
-                name : user?.name as String,
-                pfp : user?.picture as String
-            }
-        return {profile : profile}
-            // console.log("res",res)
-        }catch (error){
-            return rejectWithValue(error)
-        }
+        return await auth.signInWithPopup(provider)
+            .then(result => result.user)
+            .then(user => {
+                if (!user) throw new Error("User is null")
+                return user
+            })
+            .then(user => {
+                if (user.email?.split('@')[1] !== 'rcciit.org.in')
+                    throw new Error('Only RCC IIT domains are allowed to sign in')
+                return user
+            })
+            .then(user => ({
+                id: user.email?.split('@')[0],
+                email: user.email,
+                name: user.displayName,
+                profilePic: user.photoURL,
+            } as User))
+            .then(user => (
+                database.collection('users').doc(user.id).set(user)
+                    .then(() => user)
+            ))
+            .then(user => {
+                localStorage.setItem('user', JSON.stringify(user))
+                return user
+            })
+            .catch(e => rejectWithValue(e))
     }
 )
 
 export const profileSlice = createSlice({
-    name : 'profile' ,
+    name: 'profile',
     initialState,
-    reducers : {
-        display(initialState){
+    reducers: {
+        display(initialState) {
             initialState
         }
     },
-    extraReducers : (builder) => {
+    extraReducers: (builder) => {
         builder
-            .addCase(loginThunk.pending,(state : ProfileState) => {
+            .addCase(loginThunk.pending, (state: ProfileState) => {
                 state.loading = true;
                 state.error = null
             })
-            .addCase(loginThunk.fulfilled, (state : ProfileState , action : PayloadAction<{profile : {name : string ,picture : string }}>) => {
+            .addCase(loginThunk.fulfilled, (state: ProfileState, action: PayloadAction<User>) => {
                 state.loading = false;
                 state.error = null;
-                state.profile = action.payload.profile
+                state.profile = action.payload
             })
-            .addCase(loginThunk.rejected, (state : ProfileState , action : PayloadAction<String | undefined>) => {
+            .addCase(loginThunk.rejected, (state: ProfileState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
                 state.error = action.payload || "cannot load profile";
             })

@@ -1,5 +1,5 @@
-import {useEffect , useState} from "react";
-import {useAppDispatch , useAppSelector} from "../redux/store.ts";
+import {useEffect} from "react";
+import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {getClassesThunk} from "../redux/classesSlice.ts";
 import {useParams} from "react-router-dom";
 

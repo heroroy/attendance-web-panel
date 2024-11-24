@@ -6,6 +6,9 @@ import {DropDown} from "./DropDown.tsx";
 import {useAppDispatch , useAppSelector} from "../redux/store.ts";
 import {subjectAddThunk} from "../redux/subjectSlice.ts";
 import {Initials , ProfileName} from "../Util/Naming_Conv.ts";
+import {Department} from "./Department.tsx";
+import Section from "../Model/Section.ts";
+import Subject from "../Model/Subject.ts";
 
 interface inputModal {
     name: string,
@@ -18,7 +21,7 @@ interface inputModal {
 //     card : inputModal
 // }
 
-export function AddEditModal({ onDismiss, profile }) {
+export function CreateSubjectModal({ onDismiss }) {
 
     const [input , setInput] = useState<inputModal> ( {
         name : "",
@@ -26,9 +29,24 @@ export function AddEditModal({ onDismiss, profile }) {
         sec : "",
         department : ""
     } )
+    const profile = useAppSelector(state => state.auth.profile)
     const [ roll, setRoll] = useState([])
-    const dept = ['Information Technology', 'Computer Science', 'Electrical',"Electronics"]
-    const sect = ['A', 'B']
+    const dept = Object.keys(Department)
+        .map(dept => {
+            switch(dept){
+                case "IT":
+                    return "Information Technology"
+                case "CS":
+                    return "Computer Science"
+                case "EE":
+                    return "Electrical"
+                case "EC":
+                    return "Electronics"
+                default:
+                    return ""
+            }
+        })
+    const sect = Object.keys(Section)
 
     const fileReader = new FileReader()
     const csvFileToArray = (text : any) => {
@@ -96,9 +114,9 @@ export function AddEditModal({ onDismiss, profile }) {
                 section : input.sec,
                 studentsEnrolled : roll.slice(0,roll.length-1),
                 title : input.name,
-                id : input.name,
+                id : input.name + "-" + input.department + "-" + input.sec,
                 createdBy : profile?.name
-            }))
+            } as Subject ))
 
         }catch (error){
             alert(error)
