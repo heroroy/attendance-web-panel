@@ -42,13 +42,13 @@ export const getClassesThunk= createAsyncThunk<
                             console.log(result.data())
                             // return result.data()
 
-                            classes[0].department = result.data().department
-                            classes[0].section = result.data().section
-                            classes[0].title = result.data().title
-
-                            console.log(classes)
-                            return  classes as Classes
+                            const classArray = classes.map(item=>(
+                                {...item,department  : result.data().department,section : result.data().section, title : result.data().title }
+                            ))
+                            console.log(classArray)
+                            return classArray
                         })
+                    // return classes
                 })
                 .then((classes)=>{
                     console.log(classes)
