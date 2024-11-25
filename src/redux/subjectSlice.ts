@@ -3,6 +3,11 @@ import {GoogleAuthProvider} from "firebase/auth";
 import {auth, database} from "../firebase.ts";
 import {useState} from "react";
 import Subject from "../Model/Subject.ts";
+import {Simulate} from "react-dom/test-utils";
+import error = Simulate.error;
+
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import {isArray , result} from "lodash";
 
 interface subjectState {
     subjects: Subject[]
@@ -42,16 +47,70 @@ export const getSubjectThunk = createAsyncThunk<
 >(
     "subject/get",
     async ({ userId }, {rejectWithValue}) => {
-        return await database.collection("subjects")
-            .where('createdBy', '==', userId)
-            .orderBy('created', 'desc')
-            .get()
-            .then(result => result.docs.map(doc =>doc.data() as Subject))
-            .then(subjects => {
-                console.log("Subjects = " + JSON.stringify(subjects))
+        const fetchSubjects = async (): Promise<Subject[]> => {
+            return new Promise((resolve, reject) => {
+
+                database.collection("subjects")
+                    .where('createdBy', '==', `${userId}`)
+                    .onSnapshot((querySnapshot)=>{
+                        let sub: Subject[] = [];
+                        querySnapshot.forEach((doc) => {
+                            sub.push(doc.data() as Subject);
+                        });
+                        // console.log("Current subjects:", sub);
+                        resolve(sub);
+                    },(error) => {
+                        console.error("Error fetching subjects:", error);
+                        reject(error);
+                    })
+            });
+        };
+
+
+        // return await database.collection("subjects")
+        //     .where('createdBy', '==', `${ userId }`)
+        //     .orderBy('created', 'desc')
+        //     .fetchSubjects()
+        //     .then(result => result.docs.map(doc =>doc.data() as Subject))
+        //     .then(subjects => {
+        //         console.log("Subjects = " + JSON.stringify(subjects))
+        //         console.log(typeof subjects)
+        //         return subjects
+        //     })
+        //     .catch(e => rejectWithValue(e))
+
+            // .onSnapshot((snapshot)=>{
+            //     sub  = []
+            //     snapshot.forEach((doc) =>{
+            //          sub.push(doc.data() as Subject);
+            //     })
+            //
+            //     console.log(sub)
+            // },(error)=>{
+            //     return rejectWithValue(error)
+            // })
+            // console.log(sub)
+
+        // const q = query(collection(database, "subjects"), where('createdBy', '==', `${ userId }`));
+        // await onSnapshot(q, (querySnapshot) => {
+        //     sub = [];
+        //     querySnapshot.forEach((doc) => {
+        //         sub.push(doc.data() as Subject);
+        //         console.log(doc.data() as Subject)
+        //     });
+        //     console.log("Current cities in CA: ", sub);
+        //     return sub
+        // })
+
+        return await fetchSubjects()
+            .then((subjects)=>{
+                // console.log("Subjects = " + JSON.stringify(subjects))
                 return subjects
             })
-            .catch(e => rejectWithValue(e))
+            .catch(error=>{
+                rejectWithValue(error())
+            })
+
     }
 )
 

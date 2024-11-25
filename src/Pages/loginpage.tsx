@@ -1,5 +1,4 @@
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
-
 import {loginThunk} from "../redux/profileSlice.ts"
 import {useNavigate} from "react-router-dom";
 import {useEffect} from "react";
