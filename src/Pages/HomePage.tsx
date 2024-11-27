@@ -15,6 +15,7 @@ export function HomePage() {
 
     const {profile} = useAppSelector(state => state.auth)
     const {subjects} = useAppSelector(state => state.subject)
+    console.log(subjects)
     const groupedSubjects = _.groupBy(subjects, 'department')
 
     useEffect(() => {
@@ -23,7 +24,7 @@ export function HomePage() {
     }, [profile])
 
 
-    // console.log(JSON.stringify(groupedSubjects))
+    console.log(JSON.stringify(groupedSubjects))
 
     return (
         <div  className="w-full h-full flex flex-col gap-32 relative">

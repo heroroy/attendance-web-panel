@@ -35,21 +35,6 @@ export const getClassesThunk= createAsyncThunk<
                 .then((result)=>{
                     return result.docs.map(doc=>doc.data() as Classes)
                 })
-                .then(classes=>{
-                    return database.collection("subjects").doc(`${id}`)
-                        .get()
-                        .then((result)=> {
-                            console.log(result.data())
-                            // return result.data()
-
-                            const classArray = classes.map(item=>(
-                                {...item,department  : result.data().department,section : result.data().section, title : result.data().title }
-                            ))
-                            console.log(classArray)
-                            return classArray
-                        })
-                    // return classes
-                })
                 .then((classes)=>{
                     console.log(classes)
                     return classes

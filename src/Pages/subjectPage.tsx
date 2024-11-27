@@ -11,28 +11,42 @@ import {ClassBlock} from "../Component/ClassBlock.tsx";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import 'react-datepicker/dist/react-datepicker-cssmodules.css';
+import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 
 export function SubjectPage() {
 
     const params = useParams()
 
     const { classArray } = useAppSelector(state => state.class)
+    const { subjects } = useAppSelector(state => state.subjectById)
 
     const dispatch = useAppDispatch()
     useEffect ( () => {
         dispatch(getClassesThunk({id : `${params.id}`}))
-    } , [] );
+        dispatch(getSubjectByIdThunk({id : `${params.id}`}))
+    } , [dispatch] );
 
     function grouping(array : [], name : string){
 
     }
 
+    console.log(subjects)
+
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
 
-    const groupedClass = _.groupBy(classArray, 'title')
+    let groupedClass
 
-    console.log(groupedClass)
+    const classname = classArray.map(item=>({...item, month : getMonths(getDate(item.createdOn).month)}))
+
+    // console.log(classname)
+
+
+    groupedClass = _.groupBy(classname, 'month')
+
+    // console.log(date)
+
+    console.log(JSON.stringify(groupedClass))
 
     function handleDateChange(date){
         setStartDate(date)
@@ -40,37 +54,42 @@ export function SubjectPage() {
 
     return (
         <>
-            <div style={{backgroundColor:"pink"}} className="w-full h-full flex gap-64 ">
+            <div  className="w-full h-full flex  gap-64 ">
                 {/*<h3>{params.id}</h3>*/}
-                {Object.entries(groupedClass).map(([key,item])=>(
-                    <div>
-                        {/*<div>{groupedClass[key]}</div>*/}
-                        <div>{key}</div>
-                        {item.map((data : Classes)=>(
-                            <ClassBlock classDate={data.createdOn}/>
-                            // <div className="flex flex-col mt-10  ">
-                            //     { getMonths(data.month) }
-                            //     <div className="btn btn-secondary w-fit flex mt-5 flex-col ">
-                            //         <span>{data.date}</span>
-                            //         <span>{getMonths(data.month)}</span>
-                            //     </div>
-                            // </div>
-                        ))}
-                    </div>
-                ))}
-
-                <button className="btn btn-primary">Export</button>
-
-                <div className="flex flex-col gap-10">
-                    <button  className="btn btn-primary flex flex-col">
-                        <span>Starting Date</span>
-                        <DatePicker className="bg-white " popperPlacement="right" onSelect={()=>setStartDate(startDate)} selected={startDate} onChange={(date) => setStartDate(date)} />
-                    </button>
-                    <button  className="btn btn-primary flex flex-col">
-                        <span>End Date</span>
-                        <DatePicker className="bg-white" popperPlacement="left" onSelect={(date)=>handleDateSelect(date)} selected={endDate} onChange={(date) => setEndDate(date)} />
-                    </button>
+                <div className="flex flex-col gap-8">
+                    {Object.keys(groupedClass).map((item)=>(
+                        <>
+                            <h3 className="text-lg font-bold">{item}</h3>
+                            <div className="flex flex-row gap-5">
+                            {groupedClass[item].map((data : Classes)=>(
+                                <ClassBlock classDate={data}/>
+                                // <div className="flex flex-col mt-10  ">
+                                //     { getMonths(data.month) }
+                                //     <div className="btn btn-secondary w-fit flex mt-5 flex-col ">
+                                //         <span>{data.date}</span>
+                                //         <span>{getMonths(data.month)}</span>
+                                //     </div>
+                                // </div>
+                            ))}
+                            </div>
+                        </>
+                    ))}
                 </div>
+
+                <div className="flex flex-col items-center gap-8">
+                    <div className="flex flex-col gap-5">
+                        <button  className="btn btn-secondary flex flex-col">
+                            <span>Starting Date</span>
+                            <DatePicker className="bg-white " popperPlacement="right" onSelect={()=>setStartDate(startDate)} selected={startDate} onChange={(date) => setStartDate(date)} />
+                        </button>
+                        <button  className="btn btn-secondary flex flex-col">
+                            <span>End Date</span>
+                            <DatePicker className="bg-white" popperPlacement="left" onSelect={(date)=>setEndDate(date)} selected={endDate} onChange={(date) => setEndDate(date)} />
+                        </button>
+                    </div>
+                    <button className="btn btn-secondary ">Export</button>
+                </div>
+
 
 
 

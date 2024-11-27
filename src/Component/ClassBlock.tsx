@@ -4,14 +4,13 @@ import {getMonths} from "../Model/Months.ts";
 
 export function ClassBlock({classDate}) {
 
-    const {month , date} = getDate(classDate)
+    const {month , date} = getDate(classDate.createdOn)
 
 
 
     return (
         <>
-            <div className="flex flex-col mt-10  ">
-                { getMonths(month) }
+            <div className="flex flex-col   ">
                  <div className="btn btn-secondary w-fit flex mt-5 flex-col ">
                      <span>{date}</span>
                      <span>{getMonths(month)}</span>

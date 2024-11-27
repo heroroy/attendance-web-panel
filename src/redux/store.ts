@@ -3,12 +3,14 @@ import {profileSlice} from "./profileSlice.ts";
 import {TypedUseSelectorHook , useDispatch , useSelector} from "react-redux";
 import {subjectSlice} from "./subjectSlice.ts";
 import {classesSlice} from "./classesSlice.ts";
+import {subjectByIdSlice} from "./getSubjectById.ts";
 
 export const store = configureStore({
     reducer : {
         auth : profileSlice.reducer,
         subject : subjectSlice.reducer,
         class : classesSlice.reducer,
+        subjectById : subjectByIdSlice.reducer
     },
     devTools: true
 })
