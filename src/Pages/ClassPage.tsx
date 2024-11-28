@@ -5,6 +5,7 @@ import {getClassesByIdThunk} from "../redux/classesSlice.ts";
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdThunk} from "../redux/userSlice.ts";
 import User from "../Model/User.ts";
+import {keys} from "lodash";
 
 export function ClassPage() {
 
@@ -17,6 +18,7 @@ export function ClassPage() {
     const { classArray } = useAppSelector(state => state.class)
     const { subjects } = useAppSelector(state => state.subjectById)
     const { users } = useAppSelector(state => state.userById)
+    let userD = []
 
 
     useEffect ( () => {
@@ -29,23 +31,9 @@ export function ClassPage() {
 
 
     useEffect ( () => {
-        subjects?.studentsEnrolled?.map(item=>(
-            dispatch(getUsersByIdThunk({id : item}))
-        ))
-
+        dispatch(getUsersByIdThunk({id : subjects?.studentsEnrolled}))
     } , [subjects] );
 
-    useEffect ( () => {
-
-        setUserDetail((prevState)=>[...prevState,users])
-    } , [users] );
-
-
-
-    // console.log(classArray)
-    // console.log(subjects)
-    // console.log(users)
-    console.log(userDetail)
 
 
     return (
@@ -65,7 +53,7 @@ export function ClassPage() {
                     <tr >
                         <td className="border border-slate-600 text-center">{ index + 1 }</td>
                         <td className="border border-slate-600 text-center">{ item }</td>
-                        <td className="border border-slate-600 text-center">{ item }</td>
+                        <td className="border border-slate-600 text-center">{ users[index]?.id === item ? users[index]?.name : item }</td>
                         <td className="border border-slate-600 text-center">{ classArray.attendees.includes(item) ? "P" : "A" }</td>
                     </tr>
                 ) ) }

@@ -16,16 +16,17 @@ const initialState: userState = {
 
 export const getUsersByIdThunk = createAsyncThunk<
     Users[],
-    { id :string },
+    { id :string[] },
     {rejectValue : string}
 >(
     "userId/getById",
     async ({id }, {rejectWithValue})=>{
         console.log(id)
-             return await database.collection("users").doc(`${id}`)
+             return await database.collection("users")
+                 .where('id' , 'in' , id)
                 .get()
                 .then(result=> {
-                    return result.data() as Users[]
+                   return result.docs.map(doc=> doc.data())
                 })
                 .then(users=>{
                     console.log(users)
