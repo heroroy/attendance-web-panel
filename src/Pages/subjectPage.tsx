@@ -62,7 +62,7 @@ export function SubjectPage() {
                             <h3 className="text-lg font-bold">{item}</h3>
                             <div className="flex flex-row gap-5">
                             {groupedClass[item].map((data : Classes)=>(
-                                <ClassBlock classDate={data}/>
+                                <ClassBlock classInfo={data}/>
                                 // <div className="flex flex-col mt-10  ">
                                 //     { getMonths(data.month) }
                                 //     <div className="btn btn-secondary w-fit flex mt-5 flex-col ">

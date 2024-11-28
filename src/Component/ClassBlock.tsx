@@ -1,16 +1,22 @@
 import {groupBy} from "lodash";
 import {getDate} from "../Util/Naming_Conv.ts";
 import {getMonths} from "../Model/Months.ts";
+import {useNavigate} from "react-router-dom";
 
-export function ClassBlock({classDate}) {
+export function ClassBlock({classInfo}) {
 
-    const {month , date} = getDate(classDate.createdOn)
+    const {month , date} = getDate(classInfo.createdOn)
+    const navigate = useNavigate()
+
+    function handleClick(){
+        navigate(`../class/${classInfo.id}`)
+    }
 
 
 
     return (
         <>
-            <div className="flex flex-col   ">
+            <div onClick={handleClick} className="flex flex-col   ">
                  <div className="btn btn-secondary w-fit flex mt-5 flex-col ">
                      <span>{date}</span>
                      <span>{getMonths(month)}</span>

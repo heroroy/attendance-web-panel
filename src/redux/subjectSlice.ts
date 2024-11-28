@@ -7,7 +7,7 @@ import {Simulate} from "react-dom/test-utils";
 import error = Simulate.error;
 
 import { collection, query, where, onSnapshot } from "firebase/firestore";
-import {isArray , result} from "lodash";
+import {isArray , orderBy , result} from "lodash";
 
 interface subjectState {
     subjects: Subject[]
@@ -47,25 +47,41 @@ export const getSubjectThunk = createAsyncThunk<
 >(
     "subject/get",
     async ({ userId }, {rejectWithValue}) => {
-        const fetchSubjects = async (): Promise<Subject[]> => {
+        // const fetchSubjects = async (): Promise<Subject[]> => {
             return new Promise((resolve, reject) => {
-
-                database.collection("subjects")
+                    database.collection("subjects")
                     .where('createdBy', '==', `${userId}`)
+                    .orderBy('created', 'desc')
                     .onSnapshot((querySnapshot)=>{
-                        let sub: Subject[] = [];
+                        let sub : Subject[] = [];
                         querySnapshot.forEach((doc) => {
                             sub.push(doc.data() as Subject);
                         });
-                        // console.log("Current subjects:", sub);
-                        resolve(sub);
+                        console.log("Current subjects:", sub);
+                        resolve(sub)
                     },(error) => {
                         console.error("Error fetching subjects:", error);
-                        reject(error);
+                        reject(error)
                     })
-            });
-        };
+            })
+            .then((subjects)=>{
+                console.log("Subjects = " + JSON.stringify(subjects))
+                return subjects
+            })
+            .catch(error=>{
+                rejectWithValue(error)
+            })
+        // };
 
+
+        // return await fetchSubjects()
+        //     .then((subjects)=>{
+        //         console.log("Subjects = " + JSON.stringify(subjects))
+        //         return subjects
+        //     })
+        //     .catch(error=>{
+        //         rejectWithValue(error())
+        //     })
 
         // return await database.collection("subjects")
         //     .where('createdBy', '==', `${ userId }`)
@@ -102,14 +118,6 @@ export const getSubjectThunk = createAsyncThunk<
         //     return sub
         // })
 
-        return await fetchSubjects()
-            .then((subjects)=>{
-                // console.log("Subjects = " + JSON.stringify(subjects))
-                return subjects
-            })
-            .catch(error=>{
-                rejectWithValue(error())
-            })
 
     }
 )

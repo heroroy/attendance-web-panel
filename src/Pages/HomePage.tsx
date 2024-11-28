@@ -15,16 +15,16 @@ export function HomePage() {
 
     const {profile} = useAppSelector(state => state.auth)
     const {subjects} = useAppSelector(state => state.subject)
-    console.log(subjects)
+    // console.log(subjects)
     const groupedSubjects = _.groupBy(subjects, 'department')
 
     useEffect(() => {
         if (profile?.id == null) return
         dispatch(getSubjectThunk({userId: profile.id}))
-    }, [profile])
+    }, [profile, dispatch])
 
 
-    console.log(JSON.stringify(groupedSubjects))
+    // console.log(JSON.stringify(groupedSubjects))
 
     return (
         <div  className="w-full h-full flex flex-col gap-32 relative">

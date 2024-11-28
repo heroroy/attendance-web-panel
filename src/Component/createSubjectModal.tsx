@@ -6,6 +6,7 @@ import {subjectAddThunk} from "../redux/subjectSlice.ts";
 import Section from "../Model/Section.ts";
 import Subject from "../Model/Subject.ts";
 import Department, {getDepartmentLabel} from "../Model/Department.ts";
+import { v4 as uuidv4 } from 'uuid';
 
 interface inputModal {
     name: string,
@@ -95,10 +96,13 @@ export function CreateSubjectModal({ onDismiss }) {
                 section : input.sec,
                 studentsEnrolled : roll.slice(0,roll.length-1),
                 title : input.name,
-                id : input.name + "-" + input.department + "-" + input.sec,
+                // id : input.name + "-" + input.department + "-" + input.sec,
+                id : uuidv4(),
                 createdBy : profile?.email?.split('@')[0],
                 created: new Date().getTime()
             } as Subject ))
+
+            onDismiss()
 
         }catch (error){
             alert(error)

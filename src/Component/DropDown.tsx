@@ -34,7 +34,7 @@ export function DropDown({ items , title, setInput, input} : DropDownProps) {
                     { title }
                     <MdArrowDropDown size={22}/>
                 </summary>
-                <ul onClick={handleClick} className="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                <ul onClick={handleClick} className="menu dropdown-content bg-base-100 cursor-pointer rounded-box z-[1] w-52 p-2 shadow">
                     {items.map(data=>(
                         <li><a>{data}</a></li>
                     ))}

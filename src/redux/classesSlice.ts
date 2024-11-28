@@ -7,7 +7,7 @@ import {Classes} from "../Model/classes.ts";
 import {result} from "lodash";
 
 interface classState {
-    classArray : Classes[]
+    classArray : Classes[] | Classes
     loading? : boolean,
     error? : string | null
 }
@@ -61,6 +61,28 @@ export const getClassesThunk= createAsyncThunk<
     }
 )
 
+export const getClassesByIdThunk = createAsyncThunk<
+    Classes,
+    {id : string},
+    {rejectValue : string}
+>(
+    "class/getById",
+    async ({id }, {rejectWithValue})=>{
+        return await database.collection("classes").doc(`${id}`)
+            .get()
+            .then((result)=>{
+                return result.data() as Classes
+            }).then((classes)=>{
+                console.log(classes)
+                return classes
+            })
+            .catch(error=>{
+                return rejectWithValue(error)
+            })
+    }
+)
+
+
 export const classesSlice = createSlice({
     name : 'class' ,
     initialState,
@@ -81,6 +103,19 @@ export const classesSlice = createSlice({
                 state.classArray = action.payload
             })
             .addCase(getClassesThunk.rejected,(state : classState, action : PayloadAction<String | undefined> ) => {
+                state.loading = false;
+                state.error = action.payload || 'class not found'
+            })
+            .addCase(getClassesByIdThunk.pending,(state : classState ) => {
+                state.loading = true;
+                state.error = null
+            })
+            .addCase(getClassesByIdThunk.fulfilled,(state : classState, action : PayloadAction<Classes> ) => {
+                state.loading = false;
+                state.error = null;
+                state.classArray = action.payload
+            })
+            .addCase(getClassesByIdThunk.rejected,(state : classState, action : PayloadAction<String | undefined> ) => {
                 state.loading = false;
                 state.error = action.payload || 'class not found'
             })

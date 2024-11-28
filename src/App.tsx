@@ -6,6 +6,7 @@ import {HomePage} from "./Pages/HomePage.tsx";
 import {Provider, ReactReduxContext} from "react-redux";
 import {store} from "./redux/store.ts";
 import AppBar from "./Component/AppBar.tsx";
+import {ClassPage} from "./Pages/ClassPage.tsx";
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
                             <Route path="/" element={<Loginpage/>}/>
                             <Route path="/home" element={<HomePage/>}/>
                             <Route path="/subject/:id" element={<SubjectPage/>}/>
+                            <Route path="/class/:id" element={<ClassPage/>}/>
                         </Routes>
                     </div>
                 </BrowserRouter>
