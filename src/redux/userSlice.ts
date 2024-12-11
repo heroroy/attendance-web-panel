@@ -1,9 +1,9 @@
 import {createAsyncThunk , createSlice , PayloadAction} from "@reduxjs/toolkit";
 import {database} from "../firebase.ts";
-import {Users} from "../Model/users.ts";
+import {User} from "../Model/users.ts";
 
 interface userState {
-    users: Users[]
+    users: User[]
     loading?: boolean,
     error?: string | null
 }
@@ -14,8 +14,8 @@ const initialState: userState = {
     error: null
 }
 
-export const getUsersByIdThunk = createAsyncThunk<
-    Users[],
+export const getUsersByIdsThunk = createAsyncThunk<
+    User[],
     { id :string[] },
     {rejectValue : string}
 >(
@@ -48,16 +48,16 @@ export const userByIdSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(getUsersByIdThunk.pending, (state: userState) => {
+            .addCase(getUsersByIdsThunk.pending, (state: userState) => {
                 state.loading = true;
                 state.error = null
             })
-            .addCase(getUsersByIdThunk.fulfilled, (state: userState, action: PayloadAction<Users[]>) => {
+            .addCase(getUsersByIdsThunk.fulfilled, (state: userState, action: PayloadAction<User[]>) => {
                 state.loading = false;
                 state.error = null;
                 state.users = action.payload
             })
-            .addCase(getUsersByIdThunk.rejected, (state: userState, action: PayloadAction<string | undefined>) => {
+            .addCase(getUsersByIdsThunk.rejected, (state: userState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
                 state.error = action.payload || 'subject not created'
             })

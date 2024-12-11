@@ -3,23 +3,23 @@ import {GoogleAuthProvider} from "firebase/auth";
 import {auth , database} from "../firebase.ts";
 import {useState} from "react";
 import Subject from "../Model/Subject.ts";
-import {Classes} from "../Model/classes.ts";
+import {Class} from "../Model/classes.ts";
 import {result} from "lodash";
 
 interface classState {
-    classArray : Classes[] | Classes
+    classes : Class[] | Class
     loading? : boolean,
     error? : string | null
 }
 
 const initialState: classState  = {
-    classArray : [],
+    classes : [],
     loading : false,
     error : null
 }
 
 export const getClassesThunk= createAsyncThunk<
-    Classes[],
+    Class[],
     { id : string },
     {rejectValue : string}
 >(
@@ -30,10 +30,10 @@ export const getClassesThunk= createAsyncThunk<
 
         console.log(id)
             return await database.collection("classes")
-                .where("subjectId" , "==" , `${id}`)
+                .where("subjectId" , "==" , id)
                 .get()
                 .then((result)=>{
-                    return result.docs.map(doc=>doc.data() as Classes)
+                    return result.docs.map(doc=>doc.data() as Class)
                 })
                 .then((classes)=>{
                     console.log(classes)
@@ -61,8 +61,8 @@ export const getClassesThunk= createAsyncThunk<
     }
 )
 
-export const getClassesByIdThunk = createAsyncThunk<
-    Classes,
+export const getClassByIdThunk = createAsyncThunk<
+    Class,
     {id : string},
     {rejectValue : string}
 >(
@@ -71,7 +71,7 @@ export const getClassesByIdThunk = createAsyncThunk<
         return await database.collection("classes").doc(`${id}`)
             .get()
             .then((result)=>{
-                return result.data() as Classes
+                return result.data() as Class
             }).then((classes)=>{
                 console.log(classes)
                 return classes
@@ -97,25 +97,25 @@ export const classesSlice = createSlice({
                 state.loading = true;
                 state.error = null
             })
-            .addCase(getClassesThunk.fulfilled,(state : classState, action : PayloadAction<Classes[]> ) => {
+            .addCase(getClassesThunk.fulfilled,(state : classState, action : PayloadAction<Class[]> ) => {
                 state.loading = false;
                 state.error = null;
-                state.classArray = action.payload
+                state.classes = action.payload
             })
-            .addCase(getClassesThunk.rejected,(state : classState, action : PayloadAction<String | undefined> ) => {
+            .addCase(getClassesThunk.rejected,(state : classState, action : PayloadAction<string | undefined> ) => {
                 state.loading = false;
                 state.error = action.payload || 'class not found'
             })
-            .addCase(getClassesByIdThunk.pending,(state : classState ) => {
+            .addCase(getClassByIdThunk.pending,(state : classState ) => {
                 state.loading = true;
                 state.error = null
             })
-            .addCase(getClassesByIdThunk.fulfilled,(state : classState, action : PayloadAction<Classes> ) => {
+            .addCase(getClassByIdThunk.fulfilled,(state : classState, action : PayloadAction<Class> ) => {
                 state.loading = false;
                 state.error = null;
-                state.classArray = action.payload
+                state.classes = action.payload
             })
-            .addCase(getClassesByIdThunk.rejected,(state : classState, action : PayloadAction<String | undefined> ) => {
+            .addCase(getClassByIdThunk.rejected,(state : classState, action : PayloadAction<string | undefined> ) => {
                 state.loading = false;
                 state.error = action.payload || 'class not found'
             })

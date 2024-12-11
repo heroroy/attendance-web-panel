@@ -1,9 +1,9 @@
 import {useParams} from "react-router-dom";
 import {useAppDispatch , useAppSelector} from "../redux/store.ts";
 import {useEffect , useState} from "react";
-import {getClassesByIdThunk} from "../redux/classesSlice.ts";
+import {getClassByIdThunk } from "../redux/classesSlice.ts";
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
-import {getUsersByIdThunk} from "../redux/userSlice.ts";
+import {getUsersByIdsThunk} from "../redux/userSlice.ts";
 import User from "../Model/User.ts";
 import {keys} from "lodash";
 
@@ -15,25 +15,26 @@ export function ClassPage() {
 
     const dispatch = useAppDispatch()
 
-    const { classArray } = useAppSelector(state => state.class)
-    const { subjects } = useAppSelector(state => state.subjectById)
+    const { classes } = useAppSelector(state => state.class)
+    const { subject } = useAppSelector(state => state.subjectById)
     const { users } = useAppSelector(state => state.userById)
     let userD = []
 
 
     useEffect ( () => {
-        dispatch(getClassesByIdThunk({id : params.id}))
+        dispatch(getClassByIdThunk({id : params.id}))
     } , [dispatch] );
 
     useEffect ( () => {
-        dispatch(getSubjectByIdThunk({id : classArray.subjectId}))
-    } , [classArray] );
+        dispatch(getSubjectByIdThunk({id : classes.subjectId}))
+    } , [classes] );
 
 
     useEffect ( () => {
-        dispatch(getUsersByIdThunk({id : subjects?.studentsEnrolled}))
-    } , [subjects] );
+        dispatch(getUsersByIdsThunk({id : subject?.studentsEnrolled}))
+    } , [subject] );
 
+    console.log(classes)
 
 
     return (
@@ -49,12 +50,12 @@ export function ClassPage() {
                 </tr>
                 </thead>
                 <tbody>
-                { subjects?.studentsEnrolled?.map ( (item , index) => (
+                { subject?.studentsEnrolled?.map ( (item , index) => (
                     <tr >
                         <td className="border border-slate-600 text-center">{ index + 1 }</td>
                         <td className="border border-slate-600 text-center">{ item }</td>
                         <td className="border border-slate-600 text-center">{ users[index]?.id === item ? users[index]?.name : item }</td>
-                        <td className="border border-slate-600 text-center">{ classArray.attendees.includes(item) ? "P" : "A" }</td>
+                        <td className="border border-slate-600 text-center">{ classes?.attendees?.includes(item) ? "P" : "A" }</td>
                     </tr>
                 ) ) }
                 </tbody>

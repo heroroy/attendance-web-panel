@@ -3,13 +3,13 @@ import Subject from "../Model/Subject.ts";
 import {database} from "../firebase.ts";
 
 interface subjectState {
-    subjects: Subject[]
+    subject: Subject[]
     loading?: boolean,
     error?: string | null
 }
 
 const initialState: subjectState = {
-    subjects: [],
+    subject: [],
     loading: false,
     error: null
 }
@@ -21,7 +21,7 @@ export const getSubjectByIdThunk = createAsyncThunk<
 >(
     "subjectId/getById",
     async ({id }, {rejectWithValue})=>{
-        return await database.collection("subjects").doc(`${id}`)
+        return await database.collection("subjects").doc(id)
             .get()
             .then(result=> {
                 return result.data() as Subject[]
@@ -53,7 +53,7 @@ export const subjectByIdSlice = createSlice({
             .addCase(getSubjectByIdThunk.fulfilled, (state: subjectState, action: PayloadAction<Subject[]>) => {
                 state.loading = false;
                 state.error = null;
-                state.subjects = action.payload
+                state.subject = action.payload
             })
             .addCase(getSubjectByIdThunk.rejected, (state: subjectState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;

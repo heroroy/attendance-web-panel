@@ -8,6 +8,7 @@ import error = Simulate.error;
 
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import {isArray , orderBy , result} from "lodash";
+import {useAppSelector} from "./store.ts";
 
 interface subjectState {
     subjects: Subject[]
@@ -24,15 +25,17 @@ const initialState: subjectState = {
 
 export const subjectAddThunk = createAsyncThunk<
     void,
-    Subject,
+    Subject ,
     { rejectValue: string }
 >(
     'subject/add',
-    async (subject: Subject, {rejectWithValue}) => {
+    async (subject: Subject  ,{rejectWithValue}) => {
         await database.collection("subjects")
             .doc(subject.id)
             .set(subject)
-            .then(() => console.log("inserted"))
+            .then(() => {
+                console.log ( "inserted" )
+            })
             .catch(error => {
                 console.error("error", error)
                 rejectWithValue(error)
@@ -41,37 +44,46 @@ export const subjectAddThunk = createAsyncThunk<
 )
 
 export const getSubjectThunk = createAsyncThunk<
-    Subject[],
+    void,
     { userId: string },
     { rejectValue: string }
 >(
     "subject/get",
-    async ({ userId }, {rejectWithValue}) => {
+    async ({ userId }, {rejectWithValue, dispatch}) => {
         // const fetchSubjects = async (): Promise<Subject[]> => {
-            return new Promise((resolve, reject) => {
-                    database.collection("subjects")
+
+        // let subjects   = []
+
+            // return new Promise((resolve, reject) => {
+                    dispatch(setPending())
+                    await database.collection("subjects")
                     .where('createdBy', '==', `${userId}`)
                     .orderBy('created', 'desc')
                     .onSnapshot((querySnapshot)=>{
-                        let sub : Subject[] = [];
-                        querySnapshot.forEach((doc) => {
-                            sub.push(doc.data() as Subject);
-                        });
-                        console.log("Current subjects:", sub);
-                        resolve(sub)
+                        dispatch(setSubjects(querySnapshot.docs.map(doc => doc.data() as Subject)))
+                        // resolve(sub)
                     },(error) => {
                         console.error("Error fetching subjects:", error);
-                        reject(error)
+                        dispatch(setError(error.message))
+                        // reject(rejectWithValue(error))
+                        // return rejectWithValue(error)
                     })
-            })
-            .then((subjects)=>{
-                console.log("Subjects = " + JSON.stringify(subjects))
-                return subjects
-            })
-            .catch(error=>{
-                rejectWithValue(error)
-            })
+            // })
+
+        // return subjects
+
+            // .then((subjects)=>{
+            //     console.log("Subjects = " + JSON.stringify(subjects))
+            //     return subjects
+            // })
+            // .catch(error=>{
+            //     rejectWithValue(error)
+            // })
         // };
+
+        // console.log(subjects)
+        //
+        // return
 
 
         // return await fetchSubjects()
@@ -126,9 +138,19 @@ export const subjectSlice = createSlice({
     name: 'subject',
     initialState,
     reducers: {
-        display(initialState) {
-            initialState
-        }
+        setPending(state : subjectState) {
+            state.loading = true;
+            state.error = null;
+        },
+        setSubjects(state : subjectState, action: PayloadAction<Subject[]>) {
+            state.loading = false;
+            state.error = null;
+            state.subjects = action.payload;
+        },
+        setError(state : subjectState, action: PayloadAction<string | undefined>) {
+            state.loading = false;
+            state.error = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -145,18 +167,20 @@ export const subjectSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload || 'subject not created'
             })
-            .addCase(getSubjectThunk.pending, (state: subjectState) => {
-                state.loading = true;
-                state.error = null
-            })
-            .addCase(getSubjectThunk.fulfilled, (state: subjectState, action: PayloadAction<Subject[]>) => {
-                state.loading = false;
-                state.error = null;
-                state.subjects = action.payload
-            })
-            .addCase(getSubjectThunk.rejected, (state: subjectState, action: PayloadAction<string | undefined>) => {
-                state.loading = false;
-                state.error = action.payload || 'subject not created'
-            })
+            // .addCase(getSubjectThunk.pending, (state: subjectState) => {
+            //     state.loading = true;
+            //     state.error = null
+            // })
+            // .addCase(getSubjectThunk.fulfilled, (state: subjectState, action: PayloadAction<Subject[]>) => {
+            //     state.loading = false;
+            //     state.error = null;
+            //     state.subjects = action.payload
+            // })
+            // .addCase(getSubjectThunk.rejected, (state: subjectState, action: PayloadAction<string | undefined>) => {
+            //     state.loading = false;
+            //     state.error = action.payload || 'subject not created'
+            // })
     }
 })
+
+const {setSubjects, setError, setPending} = subjectSlice.actions

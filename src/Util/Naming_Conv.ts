@@ -1,36 +1,18 @@
-
-interface ProfileNameMode {
-    ProfileName : string
-}
-
 export function ProfileName(name : string ): string  {
-    let nameString = " "
+    // let nameString = " "
 
-     name?.split(' ').map((word)=> {
-         // console.log(word.substring(0,1) + word.substring(1,word.length).toLowerCase())
-         nameString = nameString  + word.substring(0,1) + word.substring ( 1 , word.length ).toLowerCase() + ' '
-     })
+    return name.split(" ").map(word => word.charAt(0) + word.substring(1).toLowerCase()).join(" ")
 
-    return nameString
+    // return nameString
 
- }
-
- export function Initials(name : string) : string {
-
-    let namestring = ""
-
-    name.split(' ').map((word)=>{
-        namestring = namestring + word.substring(0,1)
-    })
-     console.log(namestring)
-
-     return namestring
  }
 
  export function getDate(dateNumber : number){
      const dateObject = new Date(dateNumber);
      const date = dateObject.getDate();
-     const month = dateObject.getMonth() + 1;
+     const month = dateObject.toLocaleString('default', { month: 'short' });
+
+     // console.log(month)
 
      return {month, date}
  }

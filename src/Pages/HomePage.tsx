@@ -15,12 +15,19 @@ export function HomePage() {
 
     const {profile} = useAppSelector(state => state.auth)
     const {subjects} = useAppSelector(state => state.subject)
-    // console.log(subjects)
+    console.log(subjects)
     const groupedSubjects = _.groupBy(subjects, 'department')
 
     useEffect(() => {
-        if (profile?.id == null) return
-        dispatch(getSubjectThunk({userId: profile.id}))
+        (async ()=>{
+            try {
+                if (profile?.id == null) return
+                await dispatch(getSubjectThunk({userId: profile.id}))
+            }catch (error){
+                console.log(error)
+            }
+        })()
+
     }, [profile, dispatch])
 
 
@@ -47,8 +54,6 @@ export function HomePage() {
                         <span className='text-xl font-medium'>{getDepartmentLabel(Department[dept]) || dept}</span>
                         <div className="flex flex-row flex-wrap gap-4">
                             {groupedSubjects[dept].map(subject => <SubjectCard subject={subject}/>)}
-                            {/*{groupedSubjects[dept].map(subject => <SubjectCard subject={subject}/>)}*/}
-                            {/*{groupedSubjects[dept].map(subject => <SubjectCard subject={subject}/>)}*/}
                         </div>
                     </div>
                 ))}
