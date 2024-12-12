@@ -6,6 +6,7 @@ import {subjectAddThunk} from "../redux/subjectSlice.ts";
 import Section from "../Model/Section.ts";
 import Subject from "../Model/Subject.ts";
 import Department, {getDepartmentLabel} from "../Model/Department.ts";
+import { v4 as uuidv4 } from 'uuid';
 
 interface inputModal {
     name: string,
@@ -13,10 +14,6 @@ interface inputModal {
     sec : string ,
     department : string
 }
-// export interface cardProps {
-//     dept_name : "",
-//     card : inputModal
-// }
 
 export function CreateSubjectModal({ onDismiss }) {
 
@@ -99,10 +96,13 @@ export function CreateSubjectModal({ onDismiss }) {
                 section : input.sec,
                 studentsEnrolled : roll.slice(0,roll.length-1),
                 title : input.name,
-                id : input.name + "-" + input.department + "-" + input.sec,
-                createdBy : profile?.name,
+                // id : input.name + "-" + input.department + "-" + input.sec,
+                id : uuidv4(),
+                createdBy : profile?.email?.split('@')[0],
                 created: new Date().getTime()
             } as Subject ))
+
+            onDismiss()
 
         }catch (error){
             alert(error)
@@ -129,7 +129,7 @@ export function CreateSubjectModal({ onDismiss }) {
                                             <h3 className=" text-2xl font-semibold text-gray-900"
                                                 id="modal-title">Create Subject</h3>
                                             <form id="addEditButton" onSubmit={ handleSubmit }
-                                                  className="mt-2 flex flex-col gap-3">
+                                                  className="mt-2 flex flex-col gap-3" data-theme="light">
 
                                                 <TextInput
                                                     name="name"
@@ -146,7 +146,7 @@ export function CreateSubjectModal({ onDismiss }) {
                                                 />
                                                 <DropDown input={input} setInput={setInput} title="Department" items={dept} />
                                                 <DropDown input={input} setInput={setInput} title="Section" items={sect} />
-                                                <div className="flex items-center justify-center w-full">
+                                                <div className="flex items-center justify-center w-full" data-theme="light">
                                                     <label htmlFor="dropzone-file"
                                                            className="flex flex-col items-center justify-center w-full h-20 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-blue-800 dark:bg-blue-700 hover:bg-gray-100 dark:border-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                                                         <div
@@ -190,7 +190,7 @@ export function CreateSubjectModal({ onDismiss }) {
                                         <div>
                                             <h5>Students</h5>
                                              <table
-                                                className="table-fixed border-collapse border border-slate-500 w-80 h-full">
+                                                className="table-fixed border-collapse border border-slate-500 w-80 h-full" data-theme="light">
                                                 <thead>
                                                 <tr>
                                                     <th className="border border-slate-600">Sl No.</th>
@@ -199,7 +199,7 @@ export function CreateSubjectModal({ onDismiss }) {
                                                 </thead>
                                                 <tbody>
                                                 { roll.slice(0,roll.length-1).map ( (item , index) => (
-                                                    <tr>
+                                                    <tr >
                                                         <td className="border border-slate-600">{ index + 1 }</td>
                                                         <td className="border border-slate-600">{ item }</td>
                                                     </tr>
