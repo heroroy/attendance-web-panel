@@ -13,6 +13,7 @@
     "@clerk/clerk-react": "^5.14.0",
     "@reduxjs/toolkit": "^2.3.0",
     "dayjs": "^1.11.13",
+    "exceljs": "^4.4.0",
     "firebase": "^11.0.1",
     "lodash": "^4.17.21",
     "react": "^18.3.1",
