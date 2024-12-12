@@ -6,7 +6,6 @@ import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdsThunk} from "../redux/userSlice.ts";
 import User from "../Model/User.ts";
 import {keys} from "lodash";
-import ExcelJS from "exceljs";
 
 export function ClassPage() {
 
@@ -36,81 +35,6 @@ export function ClassPage() {
     } , [subject] );
 
     console.log(classes)
-
-    const exportFile = () => {
-        const workbook = new ExcelJS.Workbook();
-        const sheet = workbook.addWorksheet("my sheet")
-        sheet.properties.defaultRowHeight = 50
-
-
-        sheet.columns = [
-            {
-                header : "sl No.",
-                key : 'index',
-                width : 10
-            },
-            {
-                header : "Roll No.",
-                key : 'roll',
-                width : 15
-            },
-            {
-                header : "Name",
-                key : 'name',
-                width : 15
-            },
-            {
-                header : "Present",
-                key : 'present',
-                width : 15
-            },
-        ]
-
-        subject?.studentsEnrolled?.map((student, index)=> {
-
-            let rowData = {
-                index : index+1,
-                roll : student,
-                name : users[index]?.id === student ? users[index]?.name : student,
-                present : classes?.attendees?.includes(student) ? "P" : "A"
-            }
-
-            console.log(rowData)
-
-            sheet.addRow(rowData);
-
-            // sheet.addRow (
-            //     studentDates?.attendees?.includes(student) ?
-            //     {
-            //         roll : student ,
-            //         date : "Present"
-            //     }
-            //     : {
-            //         roll : student,
-            //         date : "Absent"
-            //     }
-            // )
-        })
-
-        const writeFile = (fileName, content) => {
-            const link = document.createElement("a");
-            const blob = new Blob([content], {
-                type: "application/vnd.ms-excel;charset=utf-8;"
-            });
-            link.download = fileName;
-            link.href = URL.createObjectURL(blob);
-            link.click();
-        };
-
-        workbook.xlsx.writeBuffer().then(data=>{
-            writeFile("day_to_day_attendance_sheet",data)
-        })
-            .catch((error) => {
-                console.error("Error generating CSV:", error);
-            });
-
-
-    }
 
 
     return (
