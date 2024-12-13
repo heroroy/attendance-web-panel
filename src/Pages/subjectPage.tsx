@@ -12,6 +12,7 @@ import { DatePicker } from 'rsuite';
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {data} from "autoprefixer";
 import ExcelJS from "exceljs"
+import {ExportExcel} from "../Component/exportExcel.ts";
 
 export function SubjectPage() {
 
@@ -46,146 +47,36 @@ export function SubjectPage() {
         //         // const dates = Math.floor(diffTime/(1000 * 60 * 60 * 24))
         //         const diff = formattedDate(endDate) - formattedDate(startDate)
 
-        const diff = Math.ceil((endDate-startDate)/(1000 * 60 * 60 * 24))
-
-        console.log(diff)
-        const dateFormat  = {weekday:'short',month:'short',day:'numeric'}
-        const dates = Array.from(
-            {length: diff},
-            (_,i) => {
-                const date  = startDate
-                date?.setDate(startDate?.getDate()+1)
-                // const [weekdayStr, dateStr] = date.toLocaleDateString('en-US',dateFormat).split(', ')
-                // return new Intl.DateTimeFormat('en-US').format(date);
-                return date?.toDateString()
-            }
-        )
-
-        console.log(dates )
+        // const diff = Math.ceil((endDate-startDate)/(1000 * 60 * 60 * 24))
+        //
+        // console.log(diff)
+        // const dateFormat  = {weekday:'short',month:'short',day:'numeric'}
+        // const dates = Array.from(
+        //     {length: diff},
+        //     (_,i) => {
+        //         const date  = startDate
+        //         date?.setDate(startDate?.getDate()+1)
+        //         // const [weekdayStr, dateStr] = date.toLocaleDateString('en-US',dateFormat).split(', ')
+        //         // return new Intl.DateTimeFormat('en-US').format(date);
+        //         return date?.toDateString()
+        //     }
+        // )
 
 
-        classes.map(classs=>console.log(new Date(classs.createdOn).toDateString()))
-
-
-
-        // const mockData = [
-        //     // subject?.studentsEnrolled
-        //     //     // .filter(student => dates.includes(classes)) // Ensure `dates` includes `classes`
-        //     //     .map(student => (
-        //     //         {
-        //     //             Roll_num: `${student}`, // Convert student to string
-        //     //             dates: `` // Add other necessary logic for `dates` if needed
-        //     //         }
-        //     //     )) || []
-        //         classes.map(one_class=>
-        //             dates.includes( new Date(one_class.createdOn).toDateString()) &&
-        //             {
-        //                 date : "p"
-        //             }
-        //         )
-        //     ]
 
         let studentDates
 
+        console.log(startDate)
+        console.log(startDate*( 60 * 60 * 24))
+
         studentDates = classes.filter(one_class=>
-            dates.includes(new Date(one_class.createdOn).toDateString())
+            (new Date(one_class.createdOn) > startDate && new Date(one_class.createdOn) < endDate)
         )
 
-        const exportFile = () => {
-            const workbook = new ExcelJS.Workbook();
-            const sheet = workbook.addWorksheet("my sheet")
-            sheet.properties.defaultRowHeight = 50
+        console.log(studentDates)
 
 
-            sheet.columns = [
-                {
-                    header : "Roll Number",
-                    key : 'roll',
-                    width : 10
-                },
-            ...studentDates.map((date)=>(
-                    {
-                        header : new Intl.DateTimeFormat('en-US').format(date.createdOn)  ,
-                        key : new Intl.DateTimeFormat('en-US').format(date.createdOn) ,
-                        width : 10
-                    }
-                ))
-            ]
-
-            subject?.studentsEnrolled?.map(student=> {
-
-                const rowData = {roll : student}
-
-                studentDates?.map((date)=>{
-                    const isPresent = date.attendees?.includes(student)
-                    rowData[new Intl.DateTimeFormat('en-US').format(date.createdOn)] = isPresent ? "Present" : "Absent"
-                    console.log(student , rowData[new Intl.DateTimeFormat('en-US').format(date.createdOn)])
-                })
-
-                console.log(rowData)
-
-                sheet.addRow(rowData);
-
-                // sheet.addRow (
-                //     studentDates?.attendees?.includes(student) ?
-                //     {
-                //         roll : student ,
-                //         date : "Present"
-                //     }
-                //     : {
-                //         roll : student,
-                //         date : "Absent"
-                //     }
-                // )
-            })
-
-            const writeFile = (fileName, content) => {
-                const link = document.createElement("a");
-                const blob = new Blob([content], {
-                    type: "application/vnd.ms-excel;charset=utf-8;"
-                });
-                link.download = fileName;
-                link.href = URL.createObjectURL(blob);
-                link.click();
-            };
-
-            workbook.xlsx.writeBuffer().then(data=>{
-                writeFile("attendance_sheet",data)
-            })
-            .catch((error) => {
-                console.error("Error generating CSV:", error);
-            });
-
-
-        }
-
-
-            // console.log(studentDates)
-
-        exportFile()
-
-        // const mockData = (subject?.studentsEnrolled || []).map(student=>{
-        //
-        //
-        //     // studentDates =  classes.map(one_class=>
-        //     //      dates.filter(date => date?.includes(new Date(one_class.createdOn).toDateString()))
-        //     // )
-        //
-        //     studentDates.map(date=> {
-        //         return {
-        //             `roll_num` = student ,
-        //             `${studentDates[0]}` = 0
-        //         }
-        //     })
-        // })
-
-        // const mock = [
-        // dates.includes(classes) &&
-        // [
-        //     `${dates}` , "p"
-        // ]
-        //
-        // ]
+        ExportExcel( { studentDates : studentDates , subject : subject })
 
     }
 

@@ -7,6 +7,10 @@ import {getUsersByIdsThunk} from "../redux/userSlice.ts";
 import User from "../Model/User.ts";
 import {keys} from "lodash";
 import ExcelJS from "exceljs";
+import {getDate} from "../Util/Naming_Conv.ts";
+import _ from "lodash"
+import {ExportExcel} from "../Component/exportExcel.ts";
+import {Class} from "../Model/classes.ts";
 
 export function ClassPage() {
 
@@ -33,88 +37,44 @@ export function ClassPage() {
 
     useEffect ( () => {
         dispatch(getUsersByIdsThunk({id : subject?.studentsEnrolled}))
+        subject?.studentsEnrolled?.map(students=>students as User)
     } , [subject] );
 
-    console.log(classes)
-
-    const exportFile = () => {
-        const workbook = new ExcelJS.Workbook();
-        const sheet = workbook.addWorksheet("my sheet")
-        sheet.properties.defaultRowHeight = 50
+    console.log(subject?.studentsEnrolled)
 
 
-        sheet.columns = [
-            {
-                header : "sl No.",
-                key : 'index',
-                width : 10
-            },
-            {
-                header : "Roll No.",
-                key : 'roll',
-                width : 15
-            },
-            {
-                header : "Name",
-                key : 'name',
-                width : 15
-            },
-            {
-                header : "Present",
-                key : 'present',
-                width : 15
-            },
-        ]
+    const user = _.groupBy(users,'id')
 
-        subject?.studentsEnrolled?.map((student, index)=> {
-
-            let rowData = {
-                index : index+1,
-                roll : student,
-                name : users[index]?.id === student ? users[index]?.name : student,
-                present : classes?.attendees?.includes(student) ? "P" : "A"
-            }
-
-            console.log(rowData)
-
-            sheet.addRow(rowData);
-
-            // sheet.addRow (
-            //     studentDates?.attendees?.includes(student) ?
-            //     {
-            //         roll : student ,
-            //         date : "Present"
-            //     }
-            //     : {
-            //         roll : student,
-            //         date : "Absent"
-            //     }
-            // )
-        })
-
-        const writeFile = (fileName, content) => {
-            const link = document.createElement("a");
-            const blob = new Blob([content], {
-                type: "application/vnd.ms-excel;charset=utf-8;"
-            });
-            link.download = fileName;
-            link.href = URL.createObjectURL(blob);
-            link.click();
-        };
-
-        workbook.xlsx.writeBuffer().then(data=>{
-            writeFile("day_to_day_attendance_sheet",data)
-        })
-            .catch((error) => {
-                console.error("Error generating CSV:", error);
-            });
-
-
+    function exportFunc(){
+        ExportExcel( { studentDates : [classes] , subject : subject })
     }
 
 
+
+
+    // subject?.studentsEnrolled.map(student=>(
+    //     (users.id === student) && (
+    //          Object.create({
+    //             id : student,
+    //             name : users.name
+    //         })
+    //     )
+    // ))
+    // Object.create({
+    //     id : users.id
+    // })
+
     return (
         <>
+            <div className="flex  justify-between px-4 w-full mb-8">
+                <div>
+                    <p>{subject?.title} - { subject?.department?.split(" ").map(word=>word.charAt(0)).join("") } { subject?.section }  </p>
+                    <h4>{getDate(classes?.createdOn).month}, {getDate(classes?.createdOn).date}</h4>
+                </div>
+                <div>
+                    <button className="btn btn-secondary" onClick={exportFunc}>Export</button>
+                </div>
+            </div>
             <table
                 className="table-fixed border-collapse border border-slate-500 w-full h-full" data-theme="light">
                 <thead>
@@ -130,7 +90,7 @@ export function ClassPage() {
                     <tr >
                         <td className="border border-slate-600 text-center">{ index + 1 }</td>
                         <td className="border border-slate-600 text-center">{ item }</td>
-                        <td className="border border-slate-600 text-center">{ users[index]?.id === item ? users[index]?.name : item }</td>
+                        <td className="border border-slate-600 text-center">{ user[item] && user[item][0]?.name || item }</td>
                         <td className="border border-slate-600 text-center">{ classes?.attendees?.includes(item) ? "P" : "A" }</td>
                     </tr>
                 ) ) }
