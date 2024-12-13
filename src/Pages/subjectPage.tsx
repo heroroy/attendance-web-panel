@@ -3,13 +3,16 @@ import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {getClassesThunk} from "../redux/classesSlice.ts";
 import {useParams} from "react-router-dom";
 import {getDate} from "../Util/Naming_Conv.ts";
-import _ from "lodash";
+import _ , {isArray} from "lodash";
 import {Class} from "../Model/classes.ts";
 import {ClassBlock} from "../Component/ClassBlock.tsx";
 import "react-datepicker/dist/react-datepicker.css";
 import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 import { DatePicker } from 'rsuite';
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
+import {data} from "autoprefixer";
+import ExcelJS from "exceljs"
+import {ExportExcel} from "../Component/exportExcel.ts";
 
 export function SubjectPage() {
 
@@ -17,6 +20,8 @@ export function SubjectPage() {
     const [endDate, setEndDate] = useState<Date | null>(new Date());
     const params = useParams()
     const { classes } = useAppSelector(state => state.class)
+    const { subject } = useAppSelector(state => state.subjectById)
+
     let groupedClass
 
     const today = new Date()
@@ -31,16 +36,51 @@ export function SubjectPage() {
     console.log(JSON.stringify(groupedClass))
 
     useEffect ( () => {
-        dispatch(getSubjectByIdThunk({id : classes.subjectId}))
-    } , [classes] );
+        dispatch(getSubjectByIdThunk({id : params.id}))
+    } , [] );
 
 
     function handleExport(){
-        const csvData = [
-            ["Roll Number",[endDate-startDate].map(date=>date)]
-        ]
-        console.log(csvData)
+        // const formattedDate = (date) => new Intl.DateTimeFormat('en-US').format(date);
+        //         const diffTime = Math.abs(endDate-startDate)
+        //         const diffDay = Math.floor(diffTime/(1000 * 60 * 60 * 24))
+        //         // const dates = Math.floor(diffTime/(1000 * 60 * 60 * 24))
+        //         const diff = formattedDate(endDate) - formattedDate(startDate)
+
+        // const diff = Math.ceil((endDate-startDate)/(1000 * 60 * 60 * 24))
+        //
+        // console.log(diff)
+        // const dateFormat  = {weekday:'short',month:'short',day:'numeric'}
+        // const dates = Array.from(
+        //     {length: diff},
+        //     (_,i) => {
+        //         const date  = startDate
+        //         date?.setDate(startDate?.getDate()+1)
+        //         // const [weekdayStr, dateStr] = date.toLocaleDateString('en-US',dateFormat).split(', ')
+        //         // return new Intl.DateTimeFormat('en-US').format(date);
+        //         return date?.toDateString()
+        //     }
+        // )
+
+
+
+        let studentDates
+
+        console.log(startDate)
+        console.log(startDate*( 60 * 60 * 24))
+
+        studentDates = classes.filter(one_class=>
+            (new Date(one_class.createdOn) > startDate && new Date(one_class.createdOn) < endDate)
+        )
+
+        console.log(studentDates)
+
+
+        ExportExcel( { studentDates : studentDates , subject : subject })
+
     }
+
+
 
 
 
