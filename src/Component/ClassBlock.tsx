@@ -15,7 +15,7 @@ export function ClassBlock({classInfo}) {
 
     return (
         <div onClick={handleClick} className="flex flex-col   ">
-             <div className="btn btn-secondary w-fit flex mt-5 flex-col ">
+             <div className="btn bg-slate-600 w-fit flex   flex-col ">
                  <span>{date}</span>
                  <span>{month}</span>
              </div>

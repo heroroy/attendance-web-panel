@@ -11,6 +11,7 @@ import {getDate} from "../Util/Naming_Conv.ts";
 import _ from "lodash"
 import {ExportExcel} from "../Component/exportExcel.ts";
 import {Class} from "../Model/classes.ts";
+import {ScreenComponent} from "../Component/ScreenComponent.tsx";
 
 export function ClassPage() {
 
@@ -65,38 +66,42 @@ export function ClassPage() {
     // })
 
     return (
-        <>
-            <div className="flex  justify-between px-4 w-full mb-8">
-                <div>
-                    <p>{subject?.title} - { subject?.department?.split(" ").map(word=>word.charAt(0)).join("") } { subject?.section }  </p>
-                    <h4>{getDate(classes?.createdOn).month}, {getDate(classes?.createdOn).date}</h4>
+
+        <ScreenComponent>
+            <>
+                <div className="flex  justify-between px-4 w-full mb-8">
+                    <div>
+                        <p>{subject?.title} - { subject?.department?.split(" ").map(word=>word.charAt(0)).join("") } { subject?.section }  </p>
+                        <h4>{getDate(classes?.createdOn).month}, {getDate(classes?.createdOn).date}</h4>
+                    </div>
+                    <div>
+                        <button className="btn bg-slate-600" onClick={exportFunc}>Export</button>
+                    </div>
                 </div>
-                <div>
-                    <button className="btn btn-secondary" onClick={exportFunc}>Export</button>
-                </div>
-            </div>
-            <table
-                className="table-fixed border-collapse border border-slate-500 w-full h-full" data-theme="light">
-                <thead>
-                <tr>
-                    <th className="border border-slate-600">Sl No.</th>
-                    <th className="border border-slate-600">Roll No.</th>
-                    <th className="border border-slate-600">Name</th>
-                    <th className="border border-slate-600">Present</th>
-                </tr>
-                </thead>
-                <tbody>
-                { subject?.studentsEnrolled?.map ( (item , index) => (
-                    <tr >
-                        <td className="border border-slate-600 text-center">{ index + 1 }</td>
-                        <td className="border border-slate-600 text-center">{ item }</td>
-                        <td className="border border-slate-600 text-center">{ user[item] && user[item][0]?.name || item }</td>
-                        <td className="border border-slate-600 text-center">{ classes?.attendees?.includes(item) ? "P" : "A" }</td>
+                <table
+                    className="table-auto border-collapse border gap-3 text-gray-300 bg-gray-700 border-slate-500 w-full h-full" data-theme="light">
+                    <thead>
+                    <tr>
+                        <th className="border border-slate-600">Sl No.</th>
+                        <th className="border border-slate-600">Roll No.</th>
+                        <th className="border border-slate-600">Name</th>
+                        <th className="border border-slate-600">Present</th>
                     </tr>
-                ) ) }
-                </tbody>
-            </table>
-        </>
+                    </thead>
+                    <tbody>
+                    { subject?.studentsEnrolled?.map ( (item , index) => (
+                        <tr >
+                            <td className="border border-slate-600 text-center">{ index + 1 }</td>
+                            <td className="border border-slate-600 text-center">{ item }</td>
+                            <td className="border border-slate-600 text-center">{ user[item] && user[item][0]?.name || item }</td>
+                            <td className="border border-slate-600 text-center">{ classes?.attendees?.includes(item) ? "P" : "A" }</td>
+                        </tr>
+                    ) ) }
+                    </tbody>
+                </table>
+            </>
+        </ScreenComponent>
+
     );
 }
 

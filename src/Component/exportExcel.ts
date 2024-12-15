@@ -39,7 +39,7 @@ export function ExportExcel({ studentDates , subject } : ExportExcelProps) {
             ))
         ]
 
-        subject?.studentsEnrolled?.map ( (student , index ) => {
+        subject?.studentsEnrolled?.forEach ( (student , index ) => {
 
             const rowData = {
                 index : index+1,

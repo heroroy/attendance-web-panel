@@ -32,7 +32,7 @@ export const loginThunk = createAsyncThunk<
                 return user
             })
             .then(user => {
-                if (user.email?.split('@')[1] !== 'rcciit.org.in')
+                if (user.email?.split("@")[1] !== 'rcciit.org.in')
                     throw new Error('Only RCC IIT domains are allowed to sign in')
                 return user
             })
