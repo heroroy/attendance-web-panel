@@ -1,26 +1,22 @@
 import {ReactNode} from "react";
 
-export enum ScreenComponentProps  {
-    error = "Error",
-    success = "success",
-    loading = "loading",
-    empty = "empty"
+export enum ScreenState {
+    ERROR = "ERROR", SUCCESS = "SUCCESS", LOADING = "LOADING"
 }
 
-export function ScreenComponent({  children }: {  children  : ReactNode } ) {
+interface ScreenComponentProps {
+    state: ScreenState,
+    children: ReactNode
+}
 
-    return (
-        <>{children}</>
-    )
-    // switch (state) {
-    //     case ScreenComponentProps.error:
-    //         return "Information Technology"
-    //     case ScreenComponentProps.success:
-    //         return <>{children}</>
-    //     case ScreenComponentProps.loading:
-    //         return "Electronics and Communication"
-    //     case ScreenComponentProps.empty:
-    //         return "Electrical Engineering"
-    // }
+export function ScreenComponent({state, children}: ScreenComponentProps) {
+    switch (state) {
+        case ScreenState.LOADING:
+            return <p>Loading...</p>
+        case ScreenState.SUCCESS:
+            return <>{children}</>
+        case ScreenState.ERROR:
+            return <p>Error State</p>
+    }
 }
 

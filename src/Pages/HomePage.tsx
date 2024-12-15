@@ -6,7 +6,7 @@ import _ from 'lodash'
 import SubjectCard from "../Component/SubjectCard.tsx";
 import Department, {getDepartmentLabel} from "../Model/Department.ts";
 import {capitalizeWords} from "../Util/Naming_Conv.ts";
-import {ScreenComponent} from "../Component/ScreenComponent.tsx";
+import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 
 export function HomePage() {
     const [open, setOpen] = useState<boolean>(false)
@@ -31,12 +31,9 @@ export function HomePage() {
 
     }, [profile, dispatch])
 
-
-    // console.log(JSON.stringify(groupedSubjects))
-
     return (
 
-        <ScreenComponent >
+        <ScreenComponent state={loading ? ScreenState.LOADING : error ? ScreenState.ERROR : ScreenState.SUCCESS}>
 
             <div  className="w-full items-stretch flex flex-col gap-32 relative ">
                 <div className='flex w-full flex-row justify-between items-center'>

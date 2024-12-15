@@ -11,19 +11,19 @@ import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 import {DateRangePicker} from 'rsuite';
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {DateRange} from "rsuite/DateRangePicker";
-import {ScreenComponent} from "../Component/ScreenComponent.tsx";
+import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 import {exportAttendance} from "../Component/exportAttendance.ts";
 
 export function SubjectPage() {
     const params = useParams()
 
     // const [startDate, setStartDate] = useState<Date | null>(null);
-    const [dateRange, setDateRange] = useState<DateRange | null>([new Date() , new Date()]);
+    const [dateRange, setDateRange] = useState<DateRange | null>([new Date(), new Date()]);
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
-    const {classes} = useAppSelector(state => state.class)
-    const {subject} = useAppSelector(state => state.subjectById)
+    const {classes, loading: classLoading, error: classError} = useAppSelector(state => state.class)
+    const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
 
     const groupedClass = _.groupBy(classes.map(item => ({...item, month: getDate(item.createdOn).month})), 'month')
 
@@ -38,11 +38,11 @@ export function SubjectPage() {
     }, [dispatch, params.id]);
 
     async function handleExport() {
-        if(!dateRange) {
+        if (!dateRange) {
             alert("Select both dates")
             return
         }
-        if(!isArray(classes) || !subject) {
+        if (!isArray(classes) || !subject) {
             return
         }
         const startDate = dateRange[0]
@@ -61,30 +61,40 @@ export function SubjectPage() {
             .catch(() => alert("Error Exporting Attendance"))
     }
 
+    let screenState: ScreenState
+
+    if (subjectError || classError) {
+        screenState = ScreenState.ERROR
+    } else if (subjectLoading || classLoading) {
+        screenState = ScreenState.LOADING
+    } else screenState = ScreenState.SUCCESS
+
     return (
-        <ScreenComponent>
-            <div className="h-full w-full flex flex-col    ">
+        <ScreenComponent state={screenState}>
+            <div className="h-full w-full flex flex-col">
                 <div className="mb-20 flex flex-col gap-7">
                     <div>
-                        <p className="text-lg text-gray-400">{subject.department} - {subject.section}</p>
-                        <h4 className="text-6xl">{subject.title}</h4>
+                        <p className="text-lg text-gray-400">{subject?.department} - {subject?.section}</p>
+                        <h4 className="text-6xl">{subject?.title}</h4>
                     </div>
-                    <div >
-                        <p className="flex flex-col w-fit items-center"><span className="text-2xl">{classes.length}</span> <span className="text-xs text-gray-400">Classes</span></p>
+                    <div>
+                        <p className="flex flex-col w-fit items-center"><span
+                            className="text-2xl">{classes.length}</span> <span
+                            className="text-xs text-gray-400">Classes</span></p>
                     </div>
                 </div>
 
-                <div  className="h-full w-full flex justify-between items-start gap-64 ">
+                <div className="h-full w-full flex justify-between items-start gap-64 ">
 
                     {/*<h3>{params.id}</h3>*/}
                     <div className="flex flex-col gap-5">
-                        {Object.keys(groupedClass).map((item)=>(
+                        {Object.keys(groupedClass).map((item) => (
                             <>
                                 <h3 className="text-lg font-bold">{item}</h3>
                                 <div className="flex flex-row gap-5">
-                                {groupedClass[item].map((data : Class)=>(
-                                    <ClassBlock classInfo={data}/>
-                                ))}
+                                    {groupedClass[item].map((data: Class) => (
+                                        <ClassBlock classInfo={data}/>
+                                    ))}
                                 </div>
                             </>
                         ))}
@@ -109,12 +119,11 @@ export function SubjectPage() {
                         {/*        }} format="dd.MM.yyyy" value={endDate} />*/}
                         {/*    </button>*/}
                         {/*</div>*/}
-                        <DateRangePicker className="border-transparent focus:border-transparent focus:ring-0" style={{width: "40px"}} onChange={(date)=>setDateRange(date)} placement="auto" placeholder="Export" />
+                        <DateRangePicker className="border-transparent focus:border-transparent focus:ring-0"
+                                         style={{width: "40px"}} onChange={(date) => setDateRange(date)}
+                                         placement="auto" placeholder="Export"/>
                         <button className="btn bg-slate-600 btn-sm " onClick={handleExport}>Export</button>
                     </div>
-
-
-
 
 
                     {/*{classArray.map(item=> {*/}
