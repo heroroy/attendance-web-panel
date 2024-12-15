@@ -8,12 +8,8 @@ import {Class} from "../Model/classes.ts";
 import {ClassBlock} from "../Component/ClassBlock.tsx";
 import "react-datepicker/dist/react-datepicker.css";
 import 'react-datepicker/dist/react-datepicker-cssmodules.css';
-import {DatePicker , DateRangePicker} from 'rsuite';
-import {DatePicker} from 'rsuite';
+import {DateRangePicker} from 'rsuite';
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
-import {data} from "autoprefixer";
-import ExcelJS from "exceljs"
-import {ExportExcel} from "../Component/exportExcel.ts";
 import {DateRange} from "rsuite/DateRangePicker";
 import {ScreenComponent} from "../Component/ScreenComponent.tsx";
 import {exportAttendance} from "../Component/exportAttendance.ts";
