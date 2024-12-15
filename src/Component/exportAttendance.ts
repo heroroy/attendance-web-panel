@@ -8,26 +8,25 @@ type ExportExcelProps = {
 }
 
 export function exportAttendance({classes, subject}: ExportExcelProps): Promise<void> {
-    const workbook = new ExcelJS.Workbook();
+    return new Promise((resolve, reject) => {
+        try {
+            const workbook = new ExcelJS.Workbook();
+            const sheet = workbook.addWorksheet('Attendance')
+            sheet.properties.defaultRowHeight = 50
+            sheet.columns = getColumns({classes})
 
-    const sheet = workbook.addWorksheet('Attendance')
-    sheet.properties.defaultRowHeight = 50
-
-    sheet.columns = getColumns({classes})
-
-    console.log("Classes = " + JSON.stringify(classes))
-
-    getAttendanceRows({classes, subject})
-        .forEach(row => {
-            console.log("Row = " + JSON.stringify(row))
-            sheet.addRow(row)
-        })
-
-    return workbook.xlsx.writeBuffer()
+            getAttendanceRows({classes, subject})
+                .forEach(row => sheet.addRow(row))
+            resolve(workbook)
+        } catch (e) {
+            reject(e)
+        }
+    })
+        .then(workbook => workbook.xlsx.writeBuffer())
         .then(data => downloadFile(`${subject.title} - ${subject.section}`, data))
 }
 
-async function downloadFile(fileName: string, data: ArrayBuffer) {
+function downloadFile(fileName: string, data: ArrayBuffer) {
     const link = document.createElement("a");
     const blob = new Blob([data], {
         type: "application/vnd.ms-excel;charset=utf-8;"
