@@ -1,89 +1,71 @@
-import {useEffect , useState} from "react";
+import {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {getClassesThunk} from "../redux/classesSlice.ts";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {getDate} from "../Util/Naming_Conv.ts";
-import _ , {isArray} from "lodash";
+import _, {isArray} from "lodash";
 import {Class} from "../Model/classes.ts";
 import {ClassBlock} from "../Component/ClassBlock.tsx";
 import "react-datepicker/dist/react-datepicker.css";
 import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 import {DatePicker , DateRangePicker} from 'rsuite';
+import {DatePicker} from 'rsuite';
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {data} from "autoprefixer";
 import ExcelJS from "exceljs"
 import {ExportExcel} from "../Component/exportExcel.ts";
 import {DateRange} from "rsuite/DateRangePicker";
 import {ScreenComponent} from "../Component/ScreenComponent.tsx";
+import {exportAttendance} from "../Component/exportAttendance.ts";
 
 export function SubjectPage() {
+    const params = useParams()
 
     // const [startDate, setStartDate] = useState<Date | null>(null);
     const [dateRange, setDateRange] = useState<DateRange | null>([new Date() , new Date()]);
-    const params = useParams()
-    const { classes } = useAppSelector(state => state.class)
-    const { subject } = useAppSelector(state => state.subjectById)
-
-    console.log(dateRange)
-
-    let groupedClass
-
-    const today = new Date()
-
     const dispatch = useAppDispatch()
-    useEffect ( () => {
-        dispatch(getClassesThunk({id : `${params.id}`}))
-    } , [dispatch] );
+    const navigate = useNavigate()
 
-    groupedClass = _.groupBy(classes.map(item=>({...item, month : getDate(item.createdOn).month})), 'month')
+    const {classes} = useAppSelector(state => state.class)
+    const {subject} = useAppSelector(state => state.subjectById)
 
-    console.log(JSON.stringify(groupedClass))
+    const groupedClass = _.groupBy(classes.map(item => ({...item, month: getDate(item.createdOn).month})), 'month')
 
-    useEffect ( () => {
-        dispatch(getSubjectByIdThunk({id : params.id}))
-    } , [] );
-
-
-    function handleExport(){
-        // const formattedDate = (date) => new Intl.DateTimeFormat('en-US').format(date);
-        //         const diffTime = Math.abs(endDate-startDate)
-        //         const diffDay = Math.floor(diffTime/(1000 * 60 * 60 * 24))
-        //         // const dates = Math.floor(diffTime/(1000 * 60 * 60 * 24))
-        //         const diff = formattedDate(endDate) - formattedDate(startDate)
-
-        // const diff = Math.ceil((endDate-startDate)/(1000 * 60 * 60 * 24))
-        //
-        // console.log(diff)
-        // const dateFormat  = {weekday:'short',month:'short',day:'numeric'}
-        // const dates = Array.from(
-        //     {length: diff},
-        //     (_,i) => {
-        //         const date  = startDate
-        //         date?.setDate(startDate?.getDate()+1)
-        //         // const [weekdayStr, dateStr] = date.toLocaleDateString('en-US',dateFormat).split(', ')
-        //         // return new Intl.DateTimeFormat('en-US').format(date);
-        //         return date?.toDateString()
-        //     }
-        // )
-
-        let studentDates
-
-        if (dateRange) {
-            studentDates = classes.filter ( one_class =>
-                (new Date ( one_class.createdOn ) > dateRange[0] && new Date ( one_class.createdOn ) < dateRange[1])
-            )
+    useEffect(() => {
+        if (!params.id) {
+            navigate(-1)
+            return
         }
 
-        ExportExcel( { studentDates : studentDates , subject : subject })
+        dispatch(getSubjectByIdThunk({id: params.id}))
+        dispatch(getClassesThunk({id: `${params.id}`}))
+    }, [dispatch, params.id]);
 
+    async function handleExport() {
+        if(!dateRange) {
+            alert("Select both dates")
+            return
+        }
+        if(!isArray(classes) || !subject) {
+            return
+        }
+        const startDate = dateRange[0]
+        const endDate = dateRange[1]
+
+        startDate.setHours(0, 0, 0) //12am of start day
+        endDate.setHours(23, 59, 59) //11:59pm of end day
+
+        const classesInRange = classes.filter(classInfo => {
+            const classDate = new Date(classInfo.createdOn)
+            return classDate >= startDate && classDate <= endDate
+        })
+
+        exportAttendance({classes: classesInRange, subject: subject})
+            .then(() => alert("Attendance Exported"))
+            .catch(() => alert("Error Exporting Attendance"))
     }
 
-
-
-
-
     return (
-
         <ScreenComponent>
             <div className="h-full w-full flex flex-col    ">
                 <div className="mb-20 flex flex-col gap-7">
