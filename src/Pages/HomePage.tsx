@@ -5,7 +5,7 @@ import {getSubjectThunk} from "../redux/subjectSlice.ts";
 import _ from 'lodash'
 import SubjectCard from "../Component/SubjectCard.tsx";
 import Department, {getDepartmentLabel} from "../Model/Department.ts";
-import {ProfileName} from "../Util/Naming_Conv.ts";
+import {capitalizeWords} from "../Util/Naming_Conv.ts";
 
 export function HomePage() {
     const [open, setOpen] = useState<boolean>(false)
@@ -38,7 +38,7 @@ export function HomePage() {
             <div className='flex flex-row justify-between items-center'>
                 <div className="flex flex-col">
                     <span className="text-gray-500 text-2xl">Welcome Back</span>
-                    <span className="text-5xl font-bold">{ProfileName(profile?.name)}</span>
+                    <span className="text-5xl font-bold">{capitalizeWords(profile?.name)}</span>
                 </div>
                 <button
                     onClick={() => setOpen(true)}

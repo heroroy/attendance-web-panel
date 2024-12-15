@@ -1,4 +1,3 @@
-import {groupBy} from "lodash";
 import {getDate} from "../Util/Naming_Conv.ts";
 import {useNavigate} from "react-router-dom";
 

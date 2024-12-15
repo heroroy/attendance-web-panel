@@ -1,15 +1,15 @@
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useAppDispatch , useAppSelector} from "../redux/store.ts";
 import {useEffect , useState} from "react";
 import {getClassByIdThunk } from "../redux/classesSlice.ts";
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdsThunk} from "../redux/userSlice.ts";
 import User from "../Model/User.ts";
-import {keys} from "lodash";
+import {isArray, keys} from "lodash";
 import ExcelJS from "exceljs";
-import {getDate} from "../Util/Naming_Conv.ts";
+import {capitalizeWords, formatDate, getDate} from "../Util/Naming_Conv.ts";
 import _ from "lodash"
-import {ExportExcel} from "../Component/exportExcel.ts";
+import {exportAttendance} from "../Component/exportAttendance.ts";
 import {Class} from "../Model/classes.ts";
 
 export function ClassPage() {
@@ -18,6 +18,7 @@ export function ClassPage() {
 
     const params = useParams()
 
+    const navigate = useNavigate()
     const dispatch = useAppDispatch()
 
     const { classes } = useAppSelector(state => state.class)
@@ -27,49 +28,43 @@ export function ClassPage() {
 
 
     useEffect ( () => {
+        if(!params.id) {
+            navigate(-1)
+            return
+        }
         dispatch(getClassByIdThunk({id : params.id}))
-    } , [dispatch] );
+    } , [navigate, params.id, dispatch] );
 
     useEffect ( () => {
+        if(!classes || isArray(classes)) return
+
         dispatch(getSubjectByIdThunk({id : classes.subjectId}))
-    } , [classes] );
+    } , [dispatch, classes] );
 
 
-    useEffect ( () => {
-        dispatch(getUsersByIdsThunk({id : subject?.studentsEnrolled}))
-        subject?.studentsEnrolled?.map(students=>students as User)
-    } , [subject] );
+    useEffect (() => {
+        if(!subject) return
 
-    console.log(subject?.studentsEnrolled)
-
+        dispatch(getUsersByIdsThunk({id : subject.studentsEnrolled}))
+    } , [dispatch, subject]);
 
     const user = _.groupBy(users,'id')
 
     function exportFunc(){
-        ExportExcel( { studentDates : [classes] , subject : subject })
+        if(isArray(classes) || !subject) return
+
+        exportAttendance({ classes : [classes] , subject : subject })
+            .then(() => alert("Attendance Exported"))
+            .catch(() => alert("Error Exporting Attendance"))
     }
-
-
-
-
-    // subject?.studentsEnrolled.map(student=>(
-    //     (users.id === student) && (
-    //          Object.create({
-    //             id : student,
-    //             name : users.name
-    //         })
-    //     )
-    // ))
-    // Object.create({
-    //     id : users.id
-    // })
-
+    if(!classes || isArray(classes))
+        return <h1>Loading...</h1>
     return (
         <>
             <div className="flex  justify-between px-4 w-full mb-8">
                 <div>
-                    <p>{subject?.title} - { subject?.department?.split(" ").map(word=>word.charAt(0)).join("") } { subject?.section }  </p>
-                    <h4>{getDate(classes?.createdOn).month}, {getDate(classes?.createdOn).date}</h4>
+                    <p>{subject?.title} - {capitalizeWords(subject?.department ?? "")} {subject?.section}</p>
+                    <h4>{formatDate(new Date(classes?.createdOn))}</h4>
                 </div>
                 <div>
                     <button className="btn btn-secondary" onClick={exportFunc}>Export</button>
@@ -91,7 +86,7 @@ export function ClassPage() {
                         <td className="border border-slate-600 text-center">{ index + 1 }</td>
                         <td className="border border-slate-600 text-center">{ item }</td>
                         <td className="border border-slate-600 text-center">{ user[item] && user[item][0]?.name || item }</td>
-                        <td className="border border-slate-600 text-center">{ classes?.attendees?.includes(item) ? "P" : "A" }</td>
+                        <td className="border border-slate-600 text-center">{ classes?.attendees?.includes(item) ? "Present" : "Absent" }</td>
                     </tr>
                 ) ) }
                 </tbody>
