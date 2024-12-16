@@ -18,14 +18,14 @@ export function SubjectPage() {
     const params = useParams()
 
     // const [startDate, setStartDate] = useState<Date | null>(null);
-    const [dateRange, setDateRange] = useState<DateRange | null>([new Date(), new Date()]);
+    const [dateRange, setDateRange] = useState<DateRange | [null, null]>([null, null]);
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
     const {classes, loading: classLoading, error: classError} = useAppSelector(state => state.class)
     const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
 
-    const groupedClass = _.groupBy(classes.map(item => ({...item, month: getDate(item.createdOn).month})), 'month')
+    const groupedClass = _.groupBy(Object.keys(classes).map(item => ({...classes[item], month: getDate(classes[item].createdOn).month})), 'month')
 
     useEffect(() => {
         if (!params.id) {
@@ -38,7 +38,7 @@ export function SubjectPage() {
     }, [dispatch, params.id]);
 
     async function handleExport() {
-        if (!dateRange) {
+        if (dateRange === [null, null]) {
             alert("Select both dates")
             return
         }
@@ -77,10 +77,16 @@ export function SubjectPage() {
                         <p className="text-lg text-gray-400">{subject?.department} - {subject?.section}</p>
                         <h4 className="text-6xl">{subject?.title}</h4>
                     </div>
-                    <div>
+                    <div className="flex flex-row w-full justify-between">
                         <p className="flex flex-col w-fit items-center"><span
                             className="text-2xl">{classes.length}</span> <span
                             className="text-xs text-gray-400">Classes</span></p>
+                        <div className="flex rounded-xl justify-self-start bg-gray-500 px-1 items-center  gap-1">
+                            <DateRangePicker className="border-transparent bg-gray-500 focus:border-transparent focus:ring-0"
+                                             style={{width: "40px"}} onChange={(date) => setDateRange(date)}
+                                             placement="auto" placeholder="Export"/>
+                            <button className="btn bg-slate-600 btn-sm " onClick={handleExport}>Export</button>
+                        </div>
                     </div>
                 </div>
 
@@ -88,15 +94,15 @@ export function SubjectPage() {
 
                     {/*<h3>{params.id}</h3>*/}
                     <div className="flex flex-col gap-5">
-                        {Object.keys(groupedClass).map((item) => (
-                            <>
-                                <h3 className="text-lg font-bold">{item}</h3>
-                                <div className="flex flex-row gap-5">
+                        {Object.keys(groupedClass).map((item, index) => (
+                            <div key={index}>
+                                <p className=" font-light mb-1">{item}</p>
+                                <div key={index} className="flex flex-row gap-2">
                                     {groupedClass[item].map((data: Class) => (
-                                        <ClassBlock classInfo={data}/>
+                                        <div key={data?.id}><ClassBlock classInfo={data}/></div>
                                     ))}
                                 </div>
-                            </>
+                            </div>
                         ))}
                     </div>
 
@@ -119,10 +125,7 @@ export function SubjectPage() {
                         {/*        }} format="dd.MM.yyyy" value={endDate} />*/}
                         {/*    </button>*/}
                         {/*</div>*/}
-                        <DateRangePicker className="border-transparent focus:border-transparent focus:ring-0"
-                                         style={{width: "40px"}} onChange={(date) => setDateRange(date)}
-                                         placement="auto" placeholder="Export"/>
-                        <button className="btn bg-slate-600 btn-sm " onClick={handleExport}>Export</button>
+
                     </div>
 
 

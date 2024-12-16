@@ -5,11 +5,12 @@ export enum ScreenState {
 }
 
 interface ScreenComponentProps {
-    state: ScreenState,
-    children: ReactNode
+    state?: ScreenState,
+    children?: ReactNode
 }
 
 export function ScreenComponent({state, children}: ScreenComponentProps) {
+
     switch (state) {
         case ScreenState.LOADING:
             return <p>Loading...</p>
