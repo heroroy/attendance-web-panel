@@ -18,7 +18,7 @@ export function SubjectPage() {
     const params = useParams()
 
     // const [startDate, setStartDate] = useState<Date | null>(null);
-    const [dateRange, setDateRange] = useState<DateRange | [null, null]>([null, null]);
+    const [dateRange, setDateRange] = useState<DateRange | null>(null);
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
@@ -38,7 +38,7 @@ export function SubjectPage() {
     }, [dispatch, params.id]);
 
     async function handleExport() {
-        if (dateRange === [null, null]) {
+        if (!dateRange || dateRange == [new Date() , new Date ()]) {
             alert("Select both dates")
             return
         }
