@@ -27,7 +27,7 @@ export function CreateSubjectModal({ onDismiss }) {
     const [ roll, setRoll] = useState([])
 
     const dept = Object.values(Department)
-        .map(dept => getDepartmentLabel(dept))
+        .map((dept : Department) => getDepartmentLabel(dept))
     const sect = Object.values(Section)
 
     const fileReader = new FileReader()
@@ -190,7 +190,7 @@ export function CreateSubjectModal({ onDismiss }) {
                                         <div>
                                             <h5>Students</h5>
                                              <table
-                                                className="table-fixed border-collapse border border-slate-500 w-80 h-full" data-theme="light">
+                                                className="table-fixed border-collapse border border-slate-500 w-80 h-56 scroll-auto" data-theme="light">
                                                 <thead>
                                                 <tr>
                                                     <th className="border border-slate-600">Sl No.</th>

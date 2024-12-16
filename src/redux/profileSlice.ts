@@ -32,7 +32,7 @@ export const loginThunk = createAsyncThunk<
                 return user
             })
             .then(user => {
-                if (user.email?.split('@')[1] !== 'rcciit.org.in')
+                if (user.email?.split("@")[1] !== 'rcciit.org.in')
                     throw new Error('Only RCC IIT domains are allowed to sign in')
                 return user
             })
@@ -54,6 +54,20 @@ export const loginThunk = createAsyncThunk<
                 auth.signOut()
                 return rejectWithValue(e.message)
             })
+    }
+)
+
+export const logoutThunk = createAsyncThunk<
+    void,
+    void,
+    {rejectValue : string}
+>(
+    'profile/logout',
+    async (_, {rejectWithValue}) => {
+            return await auth.signOut()
+                    .then(()=>console.log("logged out"))
+                    .catch((e)=>rejectWithValue(e.message))
+
     }
 )
 
@@ -113,6 +127,19 @@ export const profileSlice = createSlice({
                 state.profile = action.payload
             })
             .addCase(getProfileThunk.rejected, (state: ProfileState, action: PayloadAction<string | undefined>) => {
+                state.loading = false;
+                state.error = action.payload || "cannot load profile";
+            })
+            .addCase(logoutThunk.pending, (state: ProfileState) => {
+                state.loading = true;
+                state.error = null
+            })
+            .addCase(logoutThunk.fulfilled, (state: ProfileState) => {
+                state.loading = false;
+                state.error = null;
+                state.profile = null
+            })
+            .addCase(logoutThunk.rejected, (state: ProfileState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
                 state.error = action.payload || "cannot load profile";
             })

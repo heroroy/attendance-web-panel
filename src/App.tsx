@@ -4,20 +4,26 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {SubjectPage} from "./Pages/subjectPage.tsx";
 import {HomePage} from "./Pages/HomePage.tsx";
 import {Provider, ReactReduxContext} from "react-redux";
-import {store} from "./redux/store.ts";
+import {store , useAppSelector} from "./redux/store.ts";
 import AppBar from "./Component/AppBar.tsx";
 import {ClassPage} from "./Pages/ClassPage.tsx";
 
 function App() {
+
+    const {profile} = useAppSelector(state => state.auth)
+
     return (
-        <Provider store={store}>
-            <div className='w-screen h-screen flex flex-col items-center'>
-                <AppBar className='w-full'/>
+
+            <div className='w-screen  flex flex-col items-center'>
                 <BrowserRouter>
-                    <div className='max-w-[1800px] p-16 flex flex-1 flex-col items-center'>
+                <AppBar className='w-full'/>
+                    <div className=' w-full p-20 flex flex-1 flex-col items-center'>
                         <Routes>
                             <Route path="/" element={<Loginpage/>}/>
-                            <Route path="/home" element={<HomePage/>}/>
+                            <Route path="/home" element={
+                                 profile != null ? <HomePage/> : <Loginpage/>
+
+                            }/>
                             <Route path="/subject/:id" element={<SubjectPage/>}/>
                             <Route path="/class/:id" element={<ClassPage/>}/>
                         </Routes>
@@ -25,7 +31,6 @@ function App() {
                 </BrowserRouter>
             </div>
 
-        </Provider>
     )
 }
 
