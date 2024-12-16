@@ -15,13 +15,13 @@ function App() {
     return (
 
             <div className='w-screen  flex flex-col items-center'>
-                <AppBar className='w-full'/>
                 <BrowserRouter>
+                <AppBar className='w-full'/>
                     <div className=' w-full p-20 flex flex-1 flex-col items-center'>
                         <Routes>
                             <Route path="/" element={<Loginpage/>}/>
                             <Route path="/home" element={
-                                 profile ? <HomePage/> : <Loginpage/>
+                                 profile != null ? <HomePage/> : <Loginpage/>
 
                             }/>
                             <Route path="/subject/:id" element={<SubjectPage/>}/>

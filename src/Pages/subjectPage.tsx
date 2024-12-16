@@ -59,6 +59,8 @@ export function SubjectPage() {
         exportAttendance({classes: classesInRange, subject: subject})
             .then(() => alert("Attendance Exported"))
             .catch(() => alert("Error Exporting Attendance"))
+
+        setDateRange(null)
     }
 
     let screenState: ScreenState
@@ -82,7 +84,7 @@ export function SubjectPage() {
                             className="text-2xl">{classes.length}</span> <span
                             className="text-xs text-gray-400">Classes</span></p>
                         <div className="flex rounded-xl justify-self-start bg-gray-500 px-1 items-center  gap-1">
-                            <DateRangePicker className="border-transparent bg-gray-500 focus:border-transparent focus:ring-0"
+                            <DateRangePicker  className="border-transparent bg-gray-500 focus:border-transparent focus:ring-0"
                                              style={{width: "40px"}} onChange={(date) => setDateRange(date)}
                                              placement="auto" placeholder="Export"/>
                             <button className="btn bg-slate-600 btn-sm " onClick={handleExport}>Export</button>

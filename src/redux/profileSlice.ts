@@ -57,6 +57,20 @@ export const loginThunk = createAsyncThunk<
     }
 )
 
+export const logoutThunk = createAsyncThunk<
+    void,
+    void,
+    {rejectValue : string}
+>(
+    'profile/logout',
+    async (_, {rejectWithValue}) => {
+            return await auth.signOut()
+                    .then(()=>console.log("logged out"))
+                    .catch((e)=>rejectWithValue(e.message))
+
+    }
+)
+
 export const getProfileThunk = createAsyncThunk<User, void, { rejectValue: string }>(
     'profile/get',
     async (_, {rejectWithValue}) => {
@@ -113,6 +127,19 @@ export const profileSlice = createSlice({
                 state.profile = action.payload
             })
             .addCase(getProfileThunk.rejected, (state: ProfileState, action: PayloadAction<string | undefined>) => {
+                state.loading = false;
+                state.error = action.payload || "cannot load profile";
+            })
+            .addCase(logoutThunk.pending, (state: ProfileState) => {
+                state.loading = true;
+                state.error = null
+            })
+            .addCase(logoutThunk.fulfilled, (state: ProfileState) => {
+                state.loading = false;
+                state.error = null;
+                state.profile = null
+            })
+            .addCase(logoutThunk.rejected, (state: ProfileState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
                 state.error = action.payload || "cannot load profile";
             })
