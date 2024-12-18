@@ -5,7 +5,7 @@ enum Department {
     EE = "EE",
 }
 
-export const getDepartmentLabel = (department: Department) => {
+export const getDepartmentLabel = (department: Department ) => {
     switch (department) {
         case Department.IT:
             return "Information Technology"

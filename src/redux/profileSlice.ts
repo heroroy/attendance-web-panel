@@ -78,7 +78,7 @@ export const getProfileThunk = createAsyncThunk<User, void, { rejectValue: strin
             const userStr = localStorage.getItem('user')
             if (userStr == null) return rejectWithValue('User not found')
             return JSON.parse(userStr)
-        } catch (e) {
+        } catch (e : any) {
             return rejectWithValue(e.message)
         }
     }
@@ -98,7 +98,7 @@ export const profileSlice = createSlice({
     name: 'profile',
     initialState,
     reducers: {
-        display(initialState) {
+        display() {
             getProfileThunk()
         }
     },

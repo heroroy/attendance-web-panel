@@ -3,16 +3,16 @@ import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {getClassesThunk} from "../redux/classesSlice.ts";
 import {useNavigate, useParams} from "react-router-dom";
 import {getDate} from "../Util/Naming_Conv.ts";
-import _, {isArray} from "lodash";
+import _ , { isArray , size} from "lodash";
 import {Class} from "../Model/classes.ts";
 import {ClassBlock} from "../Component/ClassBlock.tsx";
 import "react-datepicker/dist/react-datepicker.css";
 import 'react-datepicker/dist/react-datepicker-cssmodules.css';
-import {DateRangePicker} from 'rsuite';
+import { DateRangePicker} from 'rsuite';
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
-import {DateRange} from "rsuite/DateRangePicker";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 import {exportAttendance} from "../Component/exportAttendance.ts";
+import {DateRange} from "rsuite/DateRangePicker";
 
 export function SubjectPage() {
     const params = useParams()
@@ -25,7 +25,11 @@ export function SubjectPage() {
     const {classes, loading: classLoading, error: classError} = useAppSelector(state => state.class)
     const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
 
-    const groupedClass = _.groupBy(Object.keys(classes).map(item => ({...classes[item], month: getDate(classes[item].createdOn).month})), 'month')
+    if(!classes || !(classes as Class) )
+        return <h1>Loading...</h1>
+
+
+    const groupedClass = _.groupBy(Object.keys(classes).map((item) => ({...(classes[item as keyof typeof classes] as  Class), month: getDate((classes[item as keyof typeof classes] as Class).createdOn).month})), 'month')
 
     useEffect(() => {
         if (!params.id) {
@@ -38,7 +42,7 @@ export function SubjectPage() {
     }, [dispatch, params.id]);
 
     async function handleExport() {
-        if (!dateRange || dateRange == [new Date() , new Date ()]) {
+        if (!dateRange || !dateRange[0] || !dateRange[1]) {
             alert("Select both dates")
             return
         }
@@ -48,8 +52,8 @@ export function SubjectPage() {
         const startDate = dateRange[0]
         const endDate = dateRange[1]
 
-        startDate.setHours(0, 0, 0) //12am of start day
-        endDate.setHours(23, 59, 59) //11:59pm of end day
+        startDate?.setHours(0, 0, 0) //12am of start day
+        endDate?.setHours(23, 59, 59) //11:59pm of end day
 
         const classesInRange = classes.filter(classInfo => {
             const classDate = new Date(classInfo.createdOn)
@@ -81,11 +85,11 @@ export function SubjectPage() {
                     </div>
                     <div className="flex flex-row w-full justify-between">
                         <p className="flex flex-col w-fit items-center"><span
-                            className="text-2xl">{classes.length}</span> <span
+                            className="text-2xl">{size(classes)}</span> <span
                             className="text-xs text-gray-400">Classes</span></p>
                         <div className="flex rounded-xl justify-self-start bg-gray-500 px-1 items-center  gap-1">
                             <DateRangePicker  className="border-transparent bg-gray-500 focus:border-transparent focus:ring-0"
-                                             style={{width: "40px"}} onChange={(date) => setDateRange(date)}
+                                             style={{width: "40px"}} onChange={setDateRange}
                                              placement="auto" placeholder="Export"/>
                             <button className="btn bg-slate-600 btn-sm " onClick={handleExport}>Export</button>
                         </div>

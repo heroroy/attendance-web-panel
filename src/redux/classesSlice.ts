@@ -1,10 +1,6 @@
 import {createAsyncThunk , createSlice , PayloadAction} from "@reduxjs/toolkit";
-import {GoogleAuthProvider} from "firebase/auth";
-import {auth , database} from "../firebase.ts";
-import {useState} from "react";
-import Subject from "../Model/Subject.ts";
+import { database} from "../firebase.ts";
 import {Class} from "../Model/classes.ts";
-import {result} from "lodash";
 
 interface classState {
     classes : Class[] | Class

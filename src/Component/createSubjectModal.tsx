@@ -1,5 +1,5 @@
 import {TextInput} from "./textInput.tsx";
-import {useEffect, useState} from "react";
+import {FormEvent  , useEffect , useState} from "react";
 import {DropDown} from "./DropDown.tsx";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {subjectAddThunk} from "../redux/subjectSlice.ts";
@@ -8,14 +8,18 @@ import Subject from "../Model/Subject.ts";
 import Department, {getDepartmentLabel} from "../Model/Department.ts";
 import { v4 as uuidv4 } from 'uuid';
 
-interface inputModal {
+export interface inputModal {
     name: string,
-    file : FileList | null,
+    file : FileList | null | Blob,
     sec : string ,
     department : string
 }
 
-export function CreateSubjectModal({ onDismiss }) {
+type OnDismissProps = {
+    onDismiss : () => void
+}
+
+export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
 
     const [input , setInput] = useState<inputModal> ( {
         name : "",
@@ -24,25 +28,25 @@ export function CreateSubjectModal({ onDismiss }) {
         department : ""
     } )
     const profile = useAppSelector(state => state.auth.profile)
-    const [ roll, setRoll] = useState([])
+    const [ roll, setRoll] = useState<string[]>([])
 
-    const dept = Object.values(Department)
+    const dept : string[] = Object.values(Department)
         .map((dept : Department) => getDepartmentLabel(dept))
-    const sect = Object.values(Section)
+    const sect : string[] = Object.values(Section)
 
     const fileReader = new FileReader()
     const csvFileToArray = (text : any) => {
         // console.log(text)
         const csvHeader = text.toString().slice(0, text.indexOf("\n")).split(",")
         const csvRows = text.toString().slice(text.indexOf("\n") + 1).split("\n")
-        const columns = []
+        const columns : { [key: string]: any[] } = {}
         // console.log(csvHeader)
-        csvHeader.map(header=>(
+        csvHeader.map((header: string  )=>(
             columns[header] = []
         ))
-        csvRows.map((i)=>{
+        csvRows.map((i : string )=>{
             const values = i.split(",")
-            csvHeader.map((header, index)=>{
+            csvHeader.map((header : string , index : number )=>{
                 columns[header]?.push(values[index]?.trim().toLowerCase() || "")
             })
         })
@@ -64,7 +68,7 @@ export function CreateSubjectModal({ onDismiss }) {
     useEffect ( () => {
         if(input.file){
             fileReader.onload = (event) => {
-                const text = event.target.result
+                const text = event.target?.result
                 csvFileToArray(text)
             }
 
@@ -74,7 +78,7 @@ export function CreateSubjectModal({ onDismiss }) {
 
     const dispatch = useAppDispatch()
 
-    function handleSubmit(e) {
+    function handleSubmit(e : FormEvent) {
         e.preventDefault ()
         try {
 
@@ -198,7 +202,7 @@ export function CreateSubjectModal({ onDismiss }) {
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                { roll.slice(0,roll.length-1).map ( (item , index) => (
+                                                { roll?.slice(0,roll?.length-1).map ( (item , index) => (
                                                     <tr >
                                                         <td className="border border-slate-600">{ index + 1 }</td>
                                                         <td className="border border-slate-600">{ item }</td>

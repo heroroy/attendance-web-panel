@@ -39,7 +39,7 @@ export function HomePage() {
                 <div className='flex w-full flex-row justify-between items-center'>
                     <div className="flex flex-col">
                         <span className="text-gray-500 text-2xl">Welcome Back</span>
-                        <span className="text-5xl font-bold">{capitalizeWords(profile?.name)}</span>
+                        {profile && <span className="text-5xl font-bold">{ capitalizeWords ( profile.name ) }</span> }
                     </div>
                     <button
                         onClick={() => setOpen(true)}
@@ -50,9 +50,9 @@ export function HomePage() {
                 </div>
 
                 <div className="">
-                    {Object.keys(groupedSubjects).map(dept => (
+                    {Object.keys(groupedSubjects).map((dept) => (
                         <div className="flex flex-col gap-8 mb-16">
-                            <span className='text-xl font-medium'>{getDepartmentLabel(Department[dept]) || dept}</span>
+                            <span className='text-xl font-medium'>{getDepartmentLabel(Department[dept as keyof typeof Department]) || dept}</span>
                             <div className="flex flex-row flex-wrap gap-10 ">
                                 {groupedSubjects[dept].map(subject => <SubjectCard subject={subject}/>)}
                             </div>

@@ -1,18 +1,15 @@
 import {useNavigate , useParams} from "react-router-dom";
 import {useAppDispatch , useAppSelector} from "../redux/store.ts";
-import {useEffect , useState} from "react";
+import {useEffect } from "react";
 import {getClassByIdThunk} from "../redux/classesSlice.ts";
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdsThunk} from "../redux/userSlice.ts";
-import User from "../Model/User.ts";
 import _ , {isArray} from "lodash";
 import {capitalizeWords , formatDate} from "../Util/Naming_Conv.ts";
 import {exportAttendance} from "../Component/exportAttendance.ts";
 import {ScreenComponent , ScreenState} from "../Component/ScreenComponent.tsx";
 
 export function ClassPage() {
-
-    const [userDetail, setUserDetail] = useState<User[]>([])
 
     const params = useParams()
 
@@ -23,7 +20,6 @@ export function ClassPage() {
     const { subject , loading : subjectLoading , error : subjectError } = useAppSelector(state => state.subjectById)
     const { users , loading : usersLoading , error : usersError } = useAppSelector(state => state.userById)
     const { subjects } = useAppSelector(state => state.subject)
-    let userD = []
 
     console.log(subjects)
 
@@ -38,7 +34,7 @@ export function ClassPage() {
     useEffect ( () => {
         if(!classes || isArray(classes)) return
 
-        dispatch(getSubjectByIdThunk({id : classes.subjectId, subject : subjects}))
+        dispatch(getSubjectByIdThunk({id : classes.subjectId}))
     } , [dispatch, classes] );
 
 

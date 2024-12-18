@@ -1,5 +1,5 @@
 import {useAppDispatch , useAppSelector} from "../redux/store.ts";
-import {useEffect , useState} from "react";
+import { useState} from "react";
 import {capitalizeWords} from "../Util/Naming_Conv.ts";
 import {logoutThunk} from "../redux/profileSlice.ts";
 import {useNavigate} from "react-router-dom";
@@ -18,6 +18,7 @@ const AppBar = ({ className } : { className: string}) => {
         try {
             dispatch(logoutThunk())
             localStorage.setItem("user",JSON.stringify(null))
+            setPopUp(false)
             navigate("/")
         }catch (e){
             console.log(e)

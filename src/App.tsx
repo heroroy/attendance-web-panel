@@ -3,8 +3,7 @@ import {Loginpage} from "./Pages/loginpage.tsx";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {SubjectPage} from "./Pages/subjectPage.tsx";
 import {HomePage} from "./Pages/HomePage.tsx";
-import {Provider, ReactReduxContext} from "react-redux";
-import {store , useAppSelector} from "./redux/store.ts";
+import { useAppSelector} from "./redux/store.ts";
 import AppBar from "./Component/AppBar.tsx";
 import {ClassPage} from "./Pages/ClassPage.tsx";
 

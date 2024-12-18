@@ -1,4 +1,5 @@
-export function capitalizeWords(name: string): string {
+export function capitalizeWords(name: string ): string {
+
     return name.split(" ").map(word => word.charAt(0) + word.substring(1).toLowerCase()).join(" ")
 }
 

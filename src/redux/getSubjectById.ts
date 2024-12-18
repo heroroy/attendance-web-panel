@@ -1,7 +1,6 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import Subject from "../Model/Subject.ts";
 import {database} from "../firebase.ts";
-import {useAppSelector} from "./store.ts";
 
 interface SubjectByIdState {
     subject: Subject | null
@@ -17,15 +16,15 @@ const initialState: SubjectByIdState = {
 
 export const getSubjectByIdThunk = createAsyncThunk<
     Subject,
-    { id: string, subject : Subject },
+    { id: string},
     { rejectValue: string }
 >(
     "subjectId/getById",
-    async ({id, subject}, {rejectWithValue}) => {
+    async ({id}, {rejectWithValue}) => {
 
         // const {subject} = useAppSelector(state => state.subject)
 
-        console.log(subject)
+        // console.log(subject)
 
         return await database.collection("subjects").doc(id)
             .get()

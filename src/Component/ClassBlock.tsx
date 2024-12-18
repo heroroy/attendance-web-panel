@@ -1,9 +1,10 @@
 import {getDate} from "../Util/Naming_Conv.ts";
 import {useNavigate} from "react-router-dom";
+import {Class} from "../Model/classes.ts";
 
-export function ClassBlock({classInfo}) {
+export function ClassBlock({classInfo} : {classInfo : Class}) {
 
-    const {month , date, monthShort} = getDate(classInfo.createdOn)
+    const { date, monthShort} = getDate(classInfo.createdOn)
     const navigate = useNavigate()
 
     function handleClick(){
