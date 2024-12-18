@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 
-export default {
+/*eslint-env node*/
+/*global someFunction, a*/
+/*eslint no-undef: "error"*/
+module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
