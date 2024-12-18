@@ -3,7 +3,7 @@
 /*eslint-env node*/
 /*global someFunction, a*/
 /*eslint no-undef: "error"*/
-module.exports = {
+export default  {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
