@@ -1,19 +1,23 @@
 import {MdArrowDropDown} from "react-icons/md";
-import {useRef , useState} from "react";
+import {Dispatch , SetStateAction , useState} from "react";
+import {inputModal} from "./createSubjectModal.tsx";
+
 
 type DropDownProps = {
-    items : String[],
+    items : string[],
     title : string,
     // handleClick : (data : string) => void
-    setInput,
-    input
+    setInput :  Dispatch<SetStateAction<inputModal>>,
+    input : inputModal
 }
 
 export function DropDown({ items , title, setInput, input} : DropDownProps) {
 
     const [value , setValue ] = useState(title)
 
-    function handleClick(e){
+    function handleClick(e : any ){
+
+        console.log(typeof e)
         e.preventDefault()
         // console.log(e.target.textContent)
         if(title === "Section"){

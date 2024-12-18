@@ -1,14 +1,7 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {GoogleAuthProvider} from "firebase/auth";
-import {auth, database} from "../firebase.ts";
-import {useState} from "react";
+import { database} from "../firebase.ts";
 import Subject from "../Model/Subject.ts";
-import {Simulate} from "react-dom/test-utils";
-import error = Simulate.error;
 
-import { collection, query, where, onSnapshot } from "firebase/firestore";
-import {isArray , orderBy , result} from "lodash";
-import {useAppSelector} from "./store.ts";
 
 interface subjectState {
     subjects: Subject[]
@@ -49,7 +42,7 @@ export const getSubjectThunk = createAsyncThunk<
     { rejectValue: string }
 >(
     "subject/get",
-    async ({ userId }, {rejectWithValue, dispatch}) => {
+    async ({ userId }, { dispatch}) => {
         // const fetchSubjects = async (): Promise<Subject[]> => {
 
         // let subjects   = []

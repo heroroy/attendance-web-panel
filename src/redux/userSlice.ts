@@ -26,14 +26,14 @@ export const getUsersByIdsThunk = createAsyncThunk<
                  .where('id' , 'in' , id)
                 .get()
                 .then(result=> {
-                   return result.docs.map(doc=> doc.data())
+                   return result.docs.map(doc=> doc.data() as User)
                 })
-                .then(users=>{
+                .then((users)=>{
                     console.log(users)
                     return users
                 })
-                .catch((error)=>{
-                    rejectWithValue(error)
+                .catch(error=>{
+                    return rejectWithValue(error)
                 })
     }
 
@@ -57,7 +57,7 @@ export const userByIdSlice = createSlice({
                 state.error = null;
                 state.users = action.payload
             })
-            .addCase(getUsersByIdsThunk.rejected, (state: userState, action: PayloadAction<string | undefined>) => {
+            .addCase(getUsersByIdsThunk.rejected, (state: userState, action : PayloadAction<string | undefined >) => {
                 state.loading = false;
                 state.error = action.payload || 'subject not created'
             })

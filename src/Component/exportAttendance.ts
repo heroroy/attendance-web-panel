@@ -22,8 +22,8 @@ export function exportAttendance({classes, subject}: ExportExcelProps): Promise<
             reject(e)
         }
     })
-        .then(workbook => workbook.xlsx.writeBuffer())
-        .then(data => downloadFile(`${subject.title} - ${subject.section}`, data))
+        .then((workbook : any ) => workbook.xlsx.writeBuffer())
+        .then((data : ArrayBuffer) => downloadFile(`${subject.title} - ${subject.section}`, data))
 }
 
 function downloadFile(fileName: string, data: ArrayBuffer) {
@@ -53,7 +53,7 @@ function getColumns({classes}: { classes: Class[] }) {
 
 function getAttendanceRows({classes, subject}: ExportExcelProps) {
     return subject.studentsEnrolled.map((roll, index) => {
-        const row = {index: index + 1, roll: roll}
+        const row : any  = {index: index + 1, roll: roll}
         classes.forEach(classData => {
             const present = classData.attendees.includes(roll)
             row[classData.id] = present ? 'Present' : 'Absent'
