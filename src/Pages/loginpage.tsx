@@ -27,6 +27,10 @@ export function Loginpage() {
     }
 
     useEffect(() => {
+        if(error) alert(error)
+    }, [error]);
+
+    useEffect(() => {
         if (profile == null) return
         navigate("/home", { replace: true })
     }, [navigate, profile]);
