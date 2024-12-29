@@ -1,50 +1,25 @@
-# React + TypeScript + Vite
+# AttendEase - Manage your attendance with ease
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## About
+AttendEase is a Attendance Recording and Tracking app built for the HOD of IT Department Dr.Hironmoy Roy for the IT Department of RCCIIT. </br>
 
-Currently, two official plugins are available:
+#### AttendEase consists of - 
+- Web Panel for Teachers
+- [Android App for Teachers](https://github.com/Vaibhav2002/AttendEase)
+- [Android App for Students](https://github.com/Vaibhav2002/AttendEase)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## AttendEase Web Panel
+AttendEase Web Panel is built for Teachers to easily view and analyze the attendance of thier subjects and classes.
+Teachers can easily view the attandance %age, attendees/absentees of their classes.
+On top of all this Teachers can also export the Attendance of a class or all classes in a date range in an Excel Sheet for easy integration in College's official Attendance.
 
-## Expanding the ESLint configuration
+### Features
+- Attendance Tracking and Analysis
+- Exporting Attendance of a class or a range of classes
+- Managing subjects and classes with their attendance
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Screenshots
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+|                                  |                                        |                                              |
+|----------------------------------|----------------------------------------|----------------------------------------------|
+|  |  |  |
