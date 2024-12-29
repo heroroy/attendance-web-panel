@@ -5,7 +5,7 @@ import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {subjectAddThunk} from "../redux/subjectSlice.ts";
 import Section from "../Model/Section.ts";
 import Subject from "../Model/Subject.ts";
-import Department, {getDepartmentLabel} from "../Model/Department.ts";
+import Department, {getDepartmentFromLabel, getDepartmentLabel} from "../Model/Department.ts";
 import { v4 as uuidv4 } from 'uuid';
 
 export interface inputModal {
@@ -96,7 +96,7 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
 
             dispatch(subjectAddThunk({
                 creatorName : profile?.name,
-                department : input.department,
+                department : getDepartmentFromLabel(input.department),
                 section : input.sec,
                 studentsEnrolled : roll.slice(0,roll.length-1),
                 title : input.name,

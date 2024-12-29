@@ -18,4 +18,17 @@ export const getDepartmentLabel = (department: Department ) => {
     }
 }
 
+export const getDepartmentFromLabel = (label: string) => {
+    switch (label) {
+        case "Information Technology":
+            return Department.IT
+        case "Computer Science":
+            return Department.CSE
+        case "Electronics and Communication":
+            return Department.ECE
+        case "Electrical Engineering":
+            return Department.EE
+    }
+}
+
 export default Department
