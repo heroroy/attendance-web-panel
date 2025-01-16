@@ -14,7 +14,7 @@ type DropDownProps = {
 export function DropDown({ items , title, setInput, input} : DropDownProps) {
 
     const [value , setValue ] = useState(title)
-    const detailsRef = useRef<HTMLDetailsElement | null>(null);
+    const detailsRef = useRef(null);
 
     function handleClick(data : string, e : any ){
 
