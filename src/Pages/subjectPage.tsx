@@ -16,11 +16,10 @@ import {DateRange} from "rsuite/DateRangePicker";
 
 export function SubjectPage() {
     const params = useParams()
-
-    // const [startDate, setStartDate] = useState<Date | null>(null);
-    const [dateRange, setDateRange] = useState<DateRange | null>(null);
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
+
+    const [dateRange, setDateRange] = useState<DateRange | null>(null);
 
     const {classes, loading: classLoading, error: classError} = useAppSelector(state => state.class)
     const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
@@ -86,13 +85,15 @@ export function SubjectPage() {
                     <div className="flex flex-row w-full justify-between">
                         <p className="flex flex-col w-fit items-center"><span
                             className="text-2xl">{size(classes)}</span> <span
-                            className="text-xs text-gray-400">Classes</span></p>
-                        <div className="flex rounded-xl justify-self-start bg-gray-500 px-1 items-center  gap-1">
-                            <DateRangePicker  className="border-transparent bg-gray-500 focus:border-transparent focus:ring-0"
-                                             style={{width: "40px"}} onChange={setDateRange}
-                                             placement="auto" placeholder="Export"/>
-                            <button className="btn bg-slate-600 btn-sm " onClick={handleExport}>Export</button>
-                        </div>
+                            className="text-xs text-gray-400">Classes</span>
+                        </p>
+                        {size(classes) >0 && <div className="flex rounded-xl justify-self-start bg-gray-500 px-1 items-center  gap-1">
+                            <DateRangePicker
+                                className="border-transparent bg-gray-500 focus:border-transparent focus:ring-0"
+                                style={ { width : "40px" } } onChange={ setDateRange }
+                                placement="auto" placeholder="Export"/>
+                            <button className="btn bg-slate-600 btn-sm " onClick={ handleExport }>Export</button>
+                        </div> }
                     </div>
                 </div>
 
