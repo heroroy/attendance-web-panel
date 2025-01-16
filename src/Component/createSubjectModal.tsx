@@ -1,11 +1,11 @@
 import {TextInput} from "./textInput.tsx";
-import {FormEvent  , useEffect , useState} from "react";
+import {FormEvent  , useEffect  , useState} from "react";
 import {DropDown} from "./DropDown.tsx";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {subjectAddThunk} from "../redux/subjectSlice.ts";
 import Section from "../Model/Section.ts";
 import Subject from "../Model/Subject.ts";
-import Department, {getDepartmentFromLabel, getDepartmentLabel} from "../Model/Department.ts";
+import Department, {getDepartmentLabel} from "../Model/Department.ts";
 import { v4 as uuidv4 } from 'uuid';
 
 export interface inputModal {
@@ -59,6 +59,11 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
         });
     }
     const handleFileUpload=(file : any)=>{
+        if(file.type !== "text/csv"){
+            alert("File must be Csv")
+            return
+        }
+
         setInput((prevState)=>({
             ...prevState,
             file : file
@@ -89,22 +94,17 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
             // console.log(input.file)
             setInput ((prevState)=>( { ...prevState , name : input.name, file : input.file, sec : input.sec, department : input.department }) )
 
-            // setSubjectCard((prevState)=>[
-            //     ...prevState,
-            //     { dept_name : input.name , card : input }
-            // ])
-
             dispatch(subjectAddThunk({
-                creatorName : profile?.name,
-                department : getDepartmentFromLabel(input.department),
-                section : input.sec,
-                studentsEnrolled : roll.slice(0,roll.length-1),
-                title : input.name,
-                // id : input.name + "-" + input.department + "-" + input.sec,
-                id : uuidv4(),
-                createdBy : profile?.email?.split('@')[0],
-                created: new Date().getTime()
-            } as Subject ))
+                    creatorName : profile?.name,
+                    department : input.department,
+                    section : input.sec,
+                    studentsEnrolled : roll.slice(0,roll.length-1),
+                    title : input.name,
+                    // id : input.name + "-" + input.department + "-" + input.sec,
+                    id : uuidv4(),
+                    createdBy : profile?.email?.split('@')[0],
+                    created: new Date().getTime()
+                } as Subject ))
 
             onDismiss()
 
@@ -113,16 +113,15 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
         }
     }
 
-    // console.log(input)
-    // console.log(roll)
 
     return (
-        <div>
-            <div className="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                <div className="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+        <div  className="fixed inset-0 z-10 flex items-center justify-center"
+              aria-labelledby="modal-title"
+              role="dialog"
+              aria-modal="true">
 
-                <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                    <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            {/*backdrop*/}
+                <div className="fixed inset-0 bg-gray-500/75 transition-opacity opacity-5" onClick={onDismiss} aria-hidden="true"></div>
 
                         <div
                             className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all lg:w-auto sm:my-8 ">
@@ -141,10 +140,12 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
                                                     id="name"
                                                     value={ input.name }
                                                     placeholder="Name"
-                                                    onChange={ (e) => setInput ( {
-                                                        ...input ,
-                                                        name : e.target.value
-                                                    } ) }
+                                                    onChange={ (e) => {
+                                                        setInput({
+                                                            ...input ,
+                                                            name : e.target.value
+                                                        } )
+                                                         }}
                                                     className={ `block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-700 focus:ring-2 focus:ring-inset focus:text-neutral-400 sm:text-sm/6 ` }
                                                     required={true}
                                                 />
@@ -167,8 +168,7 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
                                                                 <span
                                                                     className="font-semibold">Click to upload</span> or
                                                                 drag and drop</p>
-                                                            <p className="text-xs text-gray-500 dark:text-gray-400">SVG,
-                                                                PNG, JPG or GIF (MAX. 800x400px)</p>
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400">CSV file Only</p>
                                                         </div>
 
                                                         <TextInput
@@ -181,10 +181,6 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
                                                             className="hidden"
                                                             required={true}
                                                         />
-
-                                                        {/*<input required={true}  id="dropzone-file" type="file" onChange={(e) => {*/}
-                                                        {/*    if (e.target.files) handleFileUpload(e.target.files[0]);*/}
-                                                        {/*}} className="hidden"/>*/}
 
                                                     </label>
                                                 </div>
@@ -223,10 +219,9 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
         </div>
+
     );
 }
+
 
