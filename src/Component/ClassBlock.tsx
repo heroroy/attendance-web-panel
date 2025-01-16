@@ -7,6 +7,13 @@ export function ClassBlock({classInfo} : {classInfo : Class}) {
     const { date, monthShort} = getDate(classInfo.createdOn)
     const navigate = useNavigate()
 
+
+
+    if (!classInfo.id) {
+        navigate(-1)
+        return
+    }
+
     function handleClick(){
         navigate(`../class/${classInfo.id}`)
     }

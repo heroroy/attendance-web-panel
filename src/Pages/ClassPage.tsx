@@ -64,7 +64,7 @@ export function ClassPage() {
 
     return (
         <ScreenComponent state={screenState} >
-            <>
+
                 <div className="flex  justify-between px-4 w-full mb-8">
                     <div>
                         <p>{subject?.title} - {capitalizeWords(subject?.department ?? "")} {subject?.section}</p>
@@ -81,21 +81,25 @@ export function ClassPage() {
                         <th className="border border-slate-600">Sl No.</th>
                         <th className="border border-slate-600">Roll No.</th>
                         <th className="border border-slate-600">Name</th>
-                        <th className="border border-slate-600">Present</th>
+                        <th className="border border-slate-600">Attendance</th>
                     </tr>
                     </thead>
                     <tbody>
                     { subject?.studentsEnrolled?.map ( (item , index) => (
-                        <tr key={index} className="h-6">
+                        <tr key={index} className={`h-6 ${
+                            index % 2 === 0
+                                ? "bg-gray-800 text-gray-300" // Custom colors for even rows
+                                : "bg-gray-600 text-gray-200" // Custom colors for odd rows
+                        }`}>
                             <td className="border border-slate-600 text-center">{ index + 1 }</td>
                             <td className="border border-slate-600 text-center">{ item }</td>
                             <td className="border border-slate-600 text-center">{ user[item] && user[item][0]?.name || item }</td>
-                            <td className="border border-slate-600 text-center">{ classes?.attendees?.includes(item) ? "P" : "A" }</td>
+                            <td className="border border-slate-600 text-center">{ classes?.attendees?.includes(item) ? "Present" : "Absent" }</td>
                         </tr>
                     ) ) }
                     </tbody>
                 </table>
-            </>
+
         </ScreenComponent>
 
     );

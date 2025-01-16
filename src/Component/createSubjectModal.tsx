@@ -115,7 +115,7 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
 
 
     return (
-        <div  className="fixed inset-0 z-10 flex items-center justify-center"
+        <div  className="fixed inset-0 z-10 flex items-center justify-center "
               aria-labelledby="modal-title"
               role="dialog"
               aria-modal="true">
@@ -125,8 +125,8 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
 
                         <div
                             className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all lg:w-auto sm:my-8 ">
-                            <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                                <div className="sm:flex sm:items-start">
+                            <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 ">
+                                <div className="sm:flex sm:items-start ">
                                     <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left flex gap-7">
                                         <div>
                                             <h3 className=" text-2xl font-semibold text-gray-900"
@@ -146,7 +146,7 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
                                                             name : e.target.value
                                                         } )
                                                          }}
-                                                    className={ `block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-700 focus:ring-2 focus:ring-inset focus:text-neutral-400 sm:text-sm/6 ` }
+                                                    className={ `block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:text-neutral-600 sm:text-lg/6 ` }
                                                     required={true}
                                                 />
                                                 <DropDown input={input} setInput={setInput} title="Department" items={dept} />
@@ -187,10 +187,11 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
 
                                             </form>
                                         </div>
-                                        <div>
-                                            <h5>Students</h5>
-                                             <table
-                                                className="table-fixed border-collapse border border-slate-500 w-80 h-56 scroll-auto" data-theme="light">
+                                        <div className="overflow-y-auto">
+                                            <h5 className="text-neutral-600 mb-3">Students</h5>
+                                            <div className="overflow-y-auto h-80 scroll-smooth">
+                                                 <table
+                                                    className="table-zebra border-collapse border border-slate-500 w-80 h-56 scroll-auto" data-theme="light">
                                                 <thead>
                                                 <tr>
                                                     <th className="border border-slate-600">Sl No.</th>
@@ -206,6 +207,7 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
                                                 ) ) }
                                                 </tbody>
                                             </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
