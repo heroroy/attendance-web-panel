@@ -1,5 +1,5 @@
 import {TextInput} from "./textInput.tsx";
-import {FormEvent , useCallback , useEffect , useRef , useState} from "react";
+import {FormEvent  , useEffect , useRef , useState} from "react";
 import {DropDown} from "./DropDown.tsx";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {subjectAddThunk} from "../redux/subjectSlice.ts";
@@ -20,8 +20,6 @@ type OnDismissProps = {
 }
 
 export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
-
-    const modalRef = useRef(null)
 
     const [input , setInput] = useState<inputModal> ( {
         name : "",
@@ -115,22 +113,6 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
         }
     }
 
-    // console.log(input)
-    // console.log(roll)
-    // function handleClickOutside(e){
-    //     if(modalRef.current && !modalRef.current.contains(e.target)) onDismiss()
-    // }
-
-    useEffect(()=>{
-        if (modalRef.current) {
-            modalRef.current.showModal();
-        }
-        return () => {
-            if (modalRef.current) {
-                modalRef.current.close();
-            }
-        };
-    },[])
 
     return (
         <div  className="fixed inset-0 z-10 flex items-center justify-center"
