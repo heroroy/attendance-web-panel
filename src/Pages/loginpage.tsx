@@ -38,12 +38,12 @@ export function Loginpage() {
     return (
 
         <ScreenComponent state={loading ? ScreenState.LOADING : error ? ScreenState.ERROR : ScreenState.SUCCESS }>
-            <div className="h-screen overflow-hidden ">
+            <div className="h-auto  ">
                 <div className="flex flex-col items-center gap-1">
                     <h4 className="text-7xl ">Attend<span className="text-blue-500">Ease</span></h4>
                     <p className="text-2xl">Manage Attendance with Ease</p>
                 </div>
-                <div className='w-full h-full flex flex-row justify-center items-center'>
+                <div className='w-full h-full mt-5 flex flex-row justify-center items-center'>
                     <button className="btn bg-blue-700 rounded-full " onClick={handleLogin}>Login with Registered Google Account</button>
                 </div>
             </div>
