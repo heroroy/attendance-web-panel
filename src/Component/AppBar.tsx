@@ -35,13 +35,19 @@ const AppBar = ({ className } : { className: string}) => {
                 {profile?.profilePic && <img onClick={handleClick} alt="profile" className="h-10 w-10 rounded-full justify-self-end mx-2" src={ profile.profilePic }/> }
             </div>
             {popUp && profile &&
-                <div className="card z-30 px-5 pt-5 bg-gray-600  absolute right-5">
-                    <div className="card-title flex flex-col">
-                        <h6>{capitalizeWords(profile?.name)}</h6>
-                        <p className="text-sm font-light">{profile?.email}</p>
-                    </div>
-                    <div className="card-body">
-                        <button onClick={handleLogout} className="btn bg-slate-700">Logout</button>
+                <div className="fixed inset-0 z-30 flex items-center justify-center"
+                     aria-labelledby="modal-title"
+                     role="dialog"
+                     aria-modal="true">
+                    <div className="fixed inset-0 bg-gray-500/75 transition-opacity opacity-0" onClick={()=>setPopUp(false) } aria-hidden="true"></div>
+                    <div  className="card z-30 px-5 pt-5 bg-gray-600 top-14 absolute right-5">
+                        <div className="card-title flex flex-col">
+                            <h6>{capitalizeWords(profile?.name)}</h6>
+                            <p className="text-sm font-light">{profile?.email}</p>
+                        </div>
+                        <div className="card-body">
+                            <button onClick={handleLogout} className="btn bg-slate-700">Logout</button>
+                        </div>
                     </div>
                 </div>
             }

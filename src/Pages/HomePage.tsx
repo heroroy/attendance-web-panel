@@ -31,6 +31,8 @@ export function HomePage() {
 
     }, [profile, dispatch])
 
+
+
     return (
 
         <ScreenComponent state={loading ? ScreenState.LOADING : error ? ScreenState.ERROR : ScreenState.SUCCESS}>
@@ -42,7 +44,7 @@ export function HomePage() {
                         {profile && <span className="text-5xl font-bold">{ capitalizeWords ( profile.name ) }</span> }
                     </div>
                     <button
-                        onClick={() => setOpen(true)}
+                        onClick={() => setOpen(!open)}
                         className="px-8 py-4 z-10  rounded-full text-lg text-white bg-blue-600"
                     >
                         + Subject
