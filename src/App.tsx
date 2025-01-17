@@ -13,7 +13,7 @@ function App() {
 
     return (
 
-            <div className='w-screen h-screen flex flex-col items-center'>
+            <div className='w-screen h-full flex flex-col items-center'>
                 <BrowserRouter>
                 <AppBar className='w-full '/>
                     <div className=' w-full p-20 flex flex-1 flex-col items-center'>

@@ -76,7 +76,7 @@ export function SubjectPage() {
 
     return (
         <ScreenComponent state={screenState}>
-            <div className="h-full w-full flex flex-col">
+            <div className="h-screen w-full flex flex-col">
                 <div className="mb-20 flex flex-col gap-7">
                     <div>
                         <p className="text-lg text-gray-400">{subject?.department} - {subject?.section}</p>
