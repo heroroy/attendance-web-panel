@@ -179,6 +179,7 @@ export function CreateSubjectModal({ onDismiss } : OnDismissProps) {
                                                                 if (e.target.files) handleFileUpload(e.target?.files[0]);
                                                             }}
                                                             className="hidden"
+                                                            accept="text/csv"
                                                             required={true}
                                                         />
 
