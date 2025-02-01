@@ -15,11 +15,10 @@ const SubjectCard = ({subject}: SubjectCardProps) => {
     }
 
     return (
-        <div onClick={handleClick}
-             className="card mb-5 cursor-pointer rounded-lg shadow-gray-600 shadow-lg bg-slate-600 p-3 text-neutral-content w-60">
+        <div onClick={handleClick} className="card cursor-pointer rounded-lg bg-base-300 p-3 text-neutral-content w-60">
             <div className="card-body items-stretch flex flex-col gap-5">
                 <h2 className="card-title">{subject.title}</h2>
-                <p className=" bottom-10 ">{StringFormat(subject.department)}-{subject.section}</p>
+                <p className="text-base">{StringFormat(subject.department)}-{subject.section}</p>
             </div>
         </div>
     );
