@@ -41,6 +41,7 @@ export const loginThunk = createAsyncThunk<
                 email: user.email,
                 name: user.displayName,
                 profilePic: user.photoURL,
+                role: "TEACHER"
             } as User))
             .then(user => (
                 database.collection('users').doc(user.id).set(user)

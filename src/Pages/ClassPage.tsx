@@ -6,7 +6,7 @@ import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdsThunk} from "../redux/userSlice.ts";
 import _ , {isArray} from "lodash";
 import {capitalizeWords , formatDate} from "../Util/Naming_Conv.ts";
-import {exportAttendance} from "../Component/exportAttendance.ts";
+import {exportAttendance} from "../Util/exportAttendance.ts";
 import {ScreenComponent , ScreenState} from "../Component/ScreenComponent.tsx";
 
 export function ClassPage() {

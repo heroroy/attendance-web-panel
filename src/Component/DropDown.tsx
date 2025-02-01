@@ -42,9 +42,6 @@ export function DropDown({ items , title, setInput, input} : DropDownProps) {
             detailsRef.current.open = false;
         }
     }
-
-    console.log(value)
-
     return (
         <>
             <details ref={detailsRef} className="dropdown details-modal">

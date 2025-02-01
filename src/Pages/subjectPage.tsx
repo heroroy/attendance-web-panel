@@ -11,7 +11,7 @@ import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 import { DateRangePicker} from 'rsuite';
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
-import {exportAttendance} from "../Component/exportAttendance.ts";
+import {exportAttendance} from "../Util/exportAttendance.ts";
 import {DateRange} from "rsuite/DateRangePicker";
 
 export function SubjectPage() {

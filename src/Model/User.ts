@@ -3,5 +3,5 @@ export default interface User {
     email: string
     name: string
     profilePic: string
-    role: 'TEACHER'
+    role: 'TEACHER' | 'STUDENT'
 }
