@@ -31,11 +31,11 @@ export const loginThunk = createAsyncThunk<
                 if (!user) throw new Error("User is null")
                 return user
             })
-            // .then(user => {
-            //     if (user.email?.split("@")[1] !== 'rcciit.org.in')
-            //         throw new Error('Only RCC IIT domains are allowed to sign in')
-            //     return user
-            // })
+            .then(user => {
+                if (user.email?.split("@")[1] !== 'rcciit.org.in')
+                    throw new Error('Only RCC IIT domains are allowed to sign in')
+                return user
+            })
             .then(user => ({
                 id: user.email?.split('@')[0],
                 email: user.email,
