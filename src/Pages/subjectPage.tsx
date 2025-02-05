@@ -33,7 +33,7 @@ export function SubjectPage() {
 
         dispatch(getSubjectByIdThunk({id: params.id}))
         dispatch(getClassesThunk({id: `${params.id}`}))
-    }, [dispatch, params.id]);
+    }, [dispatch, navigate, params.id]);
 
     const [avgAttendance, setAvgAttendance] = useState(0)
 
