@@ -4,9 +4,9 @@ export default function readCsv(file: File):Promise<string[]> {
     return new Promise((resolve, reject) => {
         Papa.parse(file, {
             complete: (result) => {
-                console.log("result >>", result.data)
                 // Extract roll numbers from the CSV data
-                const data = result.data.map((row: any) => row as string);
+                const data = result.data.map((row: any) => row[0] as string);
+                console.log("result >>", data)
                 resolve(data)
             },
             header: false, // Treat the first row as the header
