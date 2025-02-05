@@ -7,7 +7,7 @@ import { useAppSelector} from "./redux/store.ts";
 import AppBar from "./Component/AppBar.tsx";
 import {ClassPage} from "./Pages/ClassPage.tsx";
 
-function App() {
+function Attendance() {
 
     const {profile} = useAppSelector(state => state.auth)
 
@@ -33,4 +33,4 @@ function App() {
     )
 }
 
-export default App
+export default Attendance
