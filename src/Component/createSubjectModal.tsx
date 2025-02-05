@@ -41,6 +41,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
         }
 
         readCsv(file)
+            .then(rolls => rolls.map(roll => roll.toLowerCase().replace("/", "")))
             .then(rolls => {
                 setInput((prevState) => ({
                     ...prevState, students: rolls
