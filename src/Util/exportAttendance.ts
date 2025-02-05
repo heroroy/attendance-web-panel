@@ -42,7 +42,7 @@ function getColumns({classes}: { classes: Class[] }) {
         {header: "Roll Number", key: 'roll', width: 20},
         ...classes.map((classData) => (
             {
-                header: new Intl.DateTimeFormat('en-US').format(classData.createdOn),
+                header: new Date(classData.createdOn).toLocaleDateString('en-GB'),
                 key: classData.id,
                 width: 10
             }

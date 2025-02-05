@@ -10,7 +10,7 @@ const AppBar = ({ className } : { className: string}) => {
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
-    function handleClick(){
+    function handleProfileClick(){
         setPopUp(!popUp)
     }
 
@@ -25,14 +25,18 @@ const AppBar = ({ className } : { className: string}) => {
         }
     }
 
+    function handleTitleClick(){
+        navigate("/home")
+    }
+
     return (
         <div className={className}>
             <div className=" border-b-2 border-b-gray-600 p-4 flex flex-nowrap ">
-                <h3 className="text-xl font-bold mx-auto ">
+                <h3 className="text-xl font-bold mx-auto cursor-pointer" onClick={handleTitleClick}>
                     Attend
                     <span className="text-2xl text-blue-500 font-extrabold">Ease</span>
                 </h3>
-                {profile?.profilePic && <img onClick={handleClick} alt="profile" className="h-10 w-10 rounded-full justify-self-end mx-2" src={ profile.profilePic }/> }
+                {profile?.profilePic && <img onClick={handleProfileClick} alt="profile" className="h-10 w-10 rounded-full justify-self-end mx-2" src={ profile.profilePic }/> }
             </div>
             {popUp && profile &&
                 <div className="fixed inset-0 z-30 flex items-center justify-center"

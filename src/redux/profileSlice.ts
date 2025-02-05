@@ -2,6 +2,7 @@ import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {GoogleAuthProvider} from "firebase/auth";
 import {auth, database} from "../firebase.ts";
 import User from "../Model/User.ts";
+import teachers from "../Util/TeacherEmails.ts";
 
 interface ProfileState {
     profile: User | null
@@ -31,16 +32,26 @@ export const loginThunk = createAsyncThunk<
                 if (!user) throw new Error("User is null")
                 return user
             })
-            // .then(user => {
-            //     if (user.email?.split("@")[1] !== 'rcciit.org.in')
-            //         throw new Error('Only RCC IIT domains are allowed to sign in')
-            //     return user
-            // })
+            .then(user => {
+                if(!user.email) throw new Error("Email not found")
+                return user
+            })
+            .then(user => {
+                if (user.email?.split("@")[1] !== 'rcciit.org.in')
+                    throw new Error('Only RCC IIT domains are allowed to sign in')
+                return user
+            })
+            .then(user => {
+                if(!teachers.includes(user.email ?? ""))
+                    throw new Error('Only Registered teachers are allowed to sign in')
+                return user
+            })
             .then(user => ({
                 id: user.email?.split('@')[0],
                 email: user.email,
                 name: user.displayName,
                 profilePic: user.photoURL,
+                role: "TEACHER"
             } as User))
             .then(user => (
                 database.collection('users').doc(user.id).set(user)
