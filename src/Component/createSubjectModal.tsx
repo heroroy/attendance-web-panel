@@ -59,7 +59,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                 alert("All fields are required");
                 return
             }
-            // console.log(input.file)
+            console.log("Studente", input.students)
 
             dispatch(subjectAddThunk({
                 creatorName: profile?.name,
