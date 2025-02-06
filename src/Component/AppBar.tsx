@@ -34,7 +34,7 @@ const AppBar = ({ className } : { className: string}) => {
             <div className=" border-b-2 border-b-gray-600 p-4 flex flex-nowrap ">
 
                 <h3 className="text-xl font-bold mx-auto cursor-pointer flex items-center " onClick={handleTitleClick}>
-                    <img height={25} width={25} className="me-4" src="src/assets/rcc_logo.png"/>
+                    <img height={25} width={25} className="me-4" src="../../src/assets/rcc_logo.png"/>
                     RCCIIT Attend
                     <span className="text-2xl text-blue-500 font-extrabold">Ease</span>
                 </h3>
