@@ -15,7 +15,7 @@ function Attendance() {
 
         <div className='w-screen h-full flex flex-col items-center '>
             <BrowserRouter>
-                {profile != null && <AppBar className='w-full sticky top-0 z-50'/> }
+                {profile != null && <AppBar className='w-full '/> }
                 <div className=' w-full p-20 flex flex-1 flex-col items-center'>
                     <Routes>
                         <Route path="/" element={<Loginpage/>}/>
