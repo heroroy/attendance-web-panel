@@ -10,6 +10,7 @@ Department of RCCIIT. </br>
 - Web Panel for Teachers
 - [Android App for Teachers](https://github.com/Vaibhav2002/AttendEase)
 - [Android App for Students](https://github.com/Vaibhav2002/AttendEase)
+- [Web Panel for Teachers](https://vaan-attendease.vercel.app/)
 
 ## AttendEase Web Panel
 
