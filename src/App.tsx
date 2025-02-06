@@ -13,9 +13,9 @@ function Attendance() {
 
     return (
 
-        <div className='w-screen h-full flex flex-col items-center'>
+        <div className='w-screen h-full flex flex-col items-center '>
             <BrowserRouter>
-                <AppBar className='w-full '/>
+                {profile != null && <AppBar className='w-full sticky top-0 z-50'/> }
                 <div className=' w-full p-20 flex flex-1 flex-col items-center'>
                     <Routes>
                         <Route path="/" element={<Loginpage/>}/>
@@ -25,6 +25,7 @@ function Attendance() {
                         }/>
                         <Route path="/subject/:id" element={<SubjectPage/>}/>
                         <Route path="/class/:id" element={<ClassPage/>}/>
+                        <Route path="/*" element={<HomePage/>}/>
                     </Routes>
                 </div>
             </BrowserRouter>

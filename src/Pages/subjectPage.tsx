@@ -39,11 +39,15 @@ export function SubjectPage() {
 
     useEffect(() => {
         if (!subject || !isArray(classes) || classes.length === 0) return
+
         const enrolledStudentCount = subject.studentsEnrolled.length
 
-        let averageAttendance = _.sum(classes.map(classData => classData.attendees.length / enrolledStudentCount * 100)) / classes.length
+        let avgAttendancePerClass = classes.map(classData=> (classData.attendees?.length || 0) / enrolledStudentCount * 100)
+
+        let averageAttendance = _.sum( avgAttendancePerClass) / classes.length
         console.log(averageAttendance)
-        averageAttendance = Math.round((averageAttendance + Number.EPSILON) * 100) / 100
+        // averageAttendance = Math.round((averageAttendance + Number.EPSILON) * 100) / 100
+        averageAttendance = (Math.round(averageAttendance + Number.EPSILON ) / 100) * 100
         console.log(averageAttendance)
 
         setAvgAttendance(averageAttendance)
@@ -106,7 +110,7 @@ export function SubjectPage() {
                         <div className='flex flex-row gap-16 items-center'>
                             <p className="flex flex-col items-center"><span
                                 className="text-4xl">{size(classes)}</span> <span
-                                className="text-xl text-gray-400">Classes</span>
+                                className="text-xl text-gray-400">{ `${ size ( classes ) === 1 ? "Class" : "Classes" }` }</span>
                             </p>
                             <p className="flex flex-col items-center mt-0"><span
                                 className="text-4xl">{avgAttendance}%</span> <span
@@ -117,7 +121,7 @@ export function SubjectPage() {
                             <div className="flex rounded-xl justify-self-start bg-gray-500 px-1 items-center  gap-1">
                                 <DateRangePicker
                                     className="border-transparent bg-gray-500 focus:border-transparent focus:ring-0"
-                                    style={{width: "40px"}} onChange={setDateRange}
+                                     onChange={setDateRange}
                                     placement="auto" placeholder="Export"/>
                                 <button className="btn bg-slate-600 btn-sm " onClick={handleExport}>Export</button>
                             </div>}

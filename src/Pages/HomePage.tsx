@@ -7,6 +7,7 @@ import SubjectCard from "../Component/SubjectCard.tsx";
 import Department, {getDepartmentLabel} from "../Model/Department.ts";
 import {capitalizeWords} from "../Util/Naming_Conv.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
+import AppBar from "../Component/AppBar.tsx";
 
 export function HomePage() {
     const [open, setOpen] = useState<boolean>(false)
