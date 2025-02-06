@@ -13,11 +13,11 @@ export function ScreenComponent({state, children}: ScreenComponentProps) {
 
     switch (state) {
         case ScreenState.LOADING:
-            return <p>Loading...</p>
+            return <p className="h-screen">Loading...</p>
         case ScreenState.SUCCESS:
             return <>{children}</>
         case ScreenState.ERROR:
-            return <p>Error State</p>
+            return <p className="h-screen">Error State</p>
     }
 }
 
