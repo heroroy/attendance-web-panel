@@ -7,15 +7,15 @@ import {useAppSelector} from "./redux/store.ts";
 import AppBar from "./Component/AppBar.tsx";
 import {ClassPage} from "./Pages/ClassPage.tsx";
 
-function App() {
+function Attendance() {
 
     const {profile} = useAppSelector(state => state.auth)
 
     return (
 
-        <div className='w-screen h-full flex flex-col items-center'>
+        <div className='w-screen h-full flex flex-col items-center '>
             <BrowserRouter>
-                <AppBar className='w-full '/>
+                {profile != null && <AppBar className='w-full sticky top-0 z-50'/> }
                 <div className=' w-full p-20 flex flex-1 flex-col items-center'>
                     <Routes>
                         <Route path="/" element={<Loginpage/>}/>
@@ -25,6 +25,7 @@ function App() {
                         }/>
                         <Route path="/subject/:id" element={<SubjectPage/>}/>
                         <Route path="/class/:id" element={<ClassPage/>}/>
+                        <Route path="/*" element={<HomePage/>}/>
                     </Routes>
                 </div>
             </BrowserRouter>
@@ -33,4 +34,4 @@ function App() {
     )
 }
 
-export default App
+export default Attendance
