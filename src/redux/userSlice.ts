@@ -1,6 +1,7 @@
-import {createAsyncThunk , createSlice , PayloadAction} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {database} from "../firebase.ts";
 import {User} from "../Model/users.ts";
+import _ from "lodash";
 
 interface userState {
     users: User[]
@@ -16,28 +17,27 @@ const initialState: userState = {
 
 export const getUsersByIdsThunk = createAsyncThunk<
     User[],
-    { id :string[] },
-    {rejectValue : string}
+    { id: string[] },
+    { rejectValue: string }
 >(
     "userId/getById",
-    async ({id }, {rejectWithValue})=>{
-        console.log(id)
-             return await database.collection("users")
-                 .where('id' , 'in' , id)
-                .get()
-                .then(result=> {
-                   return result.docs.map(doc=> doc.data() as User)
-                })
-                .then((users)=>{
-                    console.log(users)
-                    return users
-                })
-                .catch(error=>{
-                    return rejectWithValue(error)
-                })
+    async ({id}, { rejectWithValue }) => {
+        const operations = _.chunk(id, 25).map(ids => getUsersByIds(ids))
+        return await Promise.all(operations)
+            .then(result => _.flatten(result))
+            .catch(rejectWithValue)
     }
-
 )
+
+async function getUsersByIds(ids: string[]) {
+    return database.collection("users")
+        .where('id', 'in', ids)
+        .get()
+        .then(result => result.docs)
+        .then(docs => docs.map(doc => doc.data() as User))
+}
+
+
 export const userByIdSlice = createSlice({
     name: 'userId',
     initialState,
@@ -57,7 +57,7 @@ export const userByIdSlice = createSlice({
                 state.error = null;
                 state.users = action.payload
             })
-            .addCase(getUsersByIdsThunk.rejected, (state: userState, action : PayloadAction<string | undefined >) => {
+            .addCase(getUsersByIdsThunk.rejected, (state: userState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
                 state.error = action.payload || 'subject not created'
             })
