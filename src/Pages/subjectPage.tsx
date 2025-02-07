@@ -24,6 +24,10 @@ export function SubjectPage() {
     const {classes, loading: classLoading, error: classError} = useAppSelector(state => state.class)
     const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
 
+    useEffect ( () => {
+        window.scrollTo(0,0)
+    } , [] );
+
 
     useEffect(() => {
         if (!params.id) {
@@ -110,7 +114,7 @@ export function SubjectPage() {
                         <div className='flex flex-row gap-16 items-center'>
                             <p className="flex flex-col items-center"><span
                                 className="text-4xl">{size(classes)}</span> <span
-                                className="text-xl text-gray-400">{ `${ size ( classes ) === 1 ? "Class" : "Classes" }` }</span>
+                                className="text-xl text-gray-400">{ `${ size ( classes ) <= 1 ? "Class" : "Classes" }` }</span>
                             </p>
                             <p className="flex flex-col items-center mt-0"><span
                                 className="text-4xl">{avgAttendance}%</span> <span
