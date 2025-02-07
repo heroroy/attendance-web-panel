@@ -95,7 +95,7 @@ export function ClassPage() {
                         }`}>
                             <td className="border border-slate-600 text-center p-4">{index + 1}</td>
                             <td className="border border-slate-600 text-center p-4">{item}</td>
-                            <td className="border border-slate-600 text-center p-4">{user[item] && user[item][0]?.name || item}</td>
+                            <td className="border border-slate-600 text-center p-4">{user[item] && user[item][0]?.name || "-"}</td>
                             <td className="border border-slate-600 text-center p-4">{classes?.attendees?.includes(item) ? "Present" : "Absent"}</td>
                         </tr>
                     ))}
