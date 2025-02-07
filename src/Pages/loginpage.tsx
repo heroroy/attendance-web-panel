@@ -38,8 +38,10 @@ export function Loginpage() {
     return (
 
         <ScreenComponent state={loading ? ScreenState.LOADING : error ? ScreenState.ERROR : ScreenState.SUCCESS }>
-            <div className="h-auto  ">
-                <div className="flex flex-col items-center gap-1">
+            <div className="min-h-screen flex flex-col overflow-hidden">
+                <div className="flex flex-col items-center gap-2">
+                    <img height={130} width={130} className="mb-3" src="https://github.com/heroroy/attendance-web-panel/blob/main/src/assets/rcc_logo.png?raw=true"/>
+                    <h4 className="text-7xl ">RCCIIT</h4>
                     <h4 className="text-7xl ">Attend<span className="text-blue-500">Ease</span></h4>
                     <p className="text-2xl">Manage Attendance with Ease</p>
                 </div>
