@@ -46,7 +46,7 @@ export function SubjectPage() {
 
         const enrolledStudentCount = subject.studentsEnrolled.length
 
-        let avgAttendancePerClass = classes.map(classData=> (classData.attendees?.length || 0) / enrolledStudentCount * 100)
+        const avgAttendancePerClass = classes.map(classData=> (classData.attendees?.length || 0) / enrolledStudentCount * 100)
 
         let averageAttendance = _.sum( avgAttendancePerClass) / classes.length
         console.log(averageAttendance)
@@ -106,7 +106,7 @@ export function SubjectPage() {
             <div className="h-screen w-full flex flex-col">
                 <div className="mb-20 flex flex-col gap-8 lg:gap-16">
                     <div className='flex flex-col gap-4'>
-                        <p className="text-xl lg:text-2xl text-gray-400">{subject?.department} - {subject?.section}</p>
+                        <p className="text-xl lg:text-2xl text-neutral-500">{subject?.department} - {subject?.section}</p>
                         <h4 className="text-3xl lg:text-5xl">{subject?.title}</h4>
                     </div>
 
@@ -114,20 +114,20 @@ export function SubjectPage() {
                         <div className='flex flex-row gap-16 items-center'>
                             <p className="flex flex-col items-center"><span
                                 className="text-4xl">{size(classes)}</span> <span
-                                className="text-xl text-gray-400">{ `${ size ( classes ) <= 1 ? "Class" : "Classes" }` }</span>
+                                className="text-xl text-neutral-500">Classes</span>
                             </p>
-                            <p className="flex flex-col items-center mt-0"><span
+                            <p className="flex flex-col items-center"><span
                                 className="text-4xl">{avgAttendance}%</span> <span
-                                className="text-xl text-gray-400">Avg Attendance</span>
+                                className="text-xl text-gray-500">Avg Attendance</span>
                             </p>
                         </div>
                         {size(classes) > 0 &&
-                            <div className="flex rounded-xl justify-self-start bg-gray-500 px-1 items-center  gap-1">
+                            <div className="flex rounded-xl justify-self-start px-1 items-center gap-1">
                                 <DateRangePicker
-                                    className="border-transparent bg-gray-500 focus:border-transparent focus:ring-0"
+                                    className="border-transparent focus:border-transparent focus:ring-0"
                                      onChange={setDateRange}
                                     placement="auto" placeholder="Export"/>
-                                <button className="btn bg-slate-600 btn-sm " onClick={handleExport}>Export</button>
+                                <button className="btn btn-primary btn-sm" onClick={handleExport}>Export</button>
                             </div>}
                     </div>
                 </div>
