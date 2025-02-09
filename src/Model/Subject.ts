@@ -9,5 +9,7 @@ export default interface Subject {
     department: Department,
     section: Section,
     title: string
-    studentsEnrolled: string[]
+    studentsEnrolled: string[],
+    paper_code : string,
+    semester : string
 }

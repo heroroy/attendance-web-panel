@@ -13,7 +13,9 @@ export interface inputModal {
     name: string,
     students: string[]
     sec: string,
-    department: string
+    department: string,
+    paper_code : string,
+    sem : string
 }
 
 type OnDismissProps = {
@@ -26,7 +28,9 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
         name: "",
         students: [],
         sec: "",
-        department: ""
+        department: "",
+        paper_code : "",
+        sem : ""
     })
     const profile = useAppSelector(state => state.auth.profile)
 
@@ -56,7 +60,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
         e.preventDefault()
         try {
 
-            if (!input.name || input.students.length === 0 || !input.sec || !input.department) {
+            if (!input.name || input.students.length === 0 || !input.sec || !input.department || !input.paper_code || !input.sem) {
                 alert("All fields are required");
                 return
             }
@@ -68,6 +72,8 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                 section: input.sec,
                 studentsEnrolled: input.students,
                 title: input.name,
+                paper_code : input.paper_code,
+                semester : input.sem,
                 // id : input.name + "-" + input.department + "-" + input.sec,
                 id: uuidv4(),
                 createdBy: profile?.email?.split('@')[0],
@@ -114,8 +120,42 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                                         className={`block w-full bg-base-100 rounded-md border-0 py-1.5 pl-7 pr-20 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:text-neutral-600 sm:text-lg/6 `}
                                         required={true}
                                     />
+
+                                    <TextInput
+                                        name="section"
+                                        type="text"
+                                        id="section"
+                                        value={input.sec}
+                                        placeholder="Section"
+                                        onChange={(e) => {
+                                            setInput({
+                                                ...input,
+                                                sec: e.target.value
+                                            })
+                                        }}
+                                        className={`block w-full bg-base-100 rounded-md border-0 py-1.5 pl-7 pr-20 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:text-neutral-600 sm:text-lg/6 `}
+                                        required={true}
+                                    />
+
+
+                                    <DropDown input={input} setInput={setInput} title="Semester" items={sect}/>
                                     <DropDown input={input} setInput={setInput} title="Department" items={dept}/>
-                                    <DropDown input={input} setInput={setInput} title="Section" items={sect}/>
+
+                                    <TextInput
+                                        name="paper_code"
+                                        type="text"
+                                        id="paper_code"
+                                        value={input.paper_code}
+                                        placeholder="Paper Code"
+                                        onChange={(e) => {
+                                            setInput({
+                                                ...input,
+                                                paper_code: e.target.value
+                                            })
+                                        }}
+                                        className={`block w-full bg-base-100 rounded-md border-0 py-1.5 pl-7 pr-20 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:text-neutral-600 sm:text-lg/6 `}
+                                        required={true}
+                                    />
                                     <div className="flex items-center justify-center w-full">
                                         <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer hover:bg-blue-800 bg-blue-700">
                                             <div className="flex flex-col items-center justify-center p-2">
@@ -153,7 +193,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                             </div>
                             <div className="overflow-y-auto">
                                 <h5 className="mb-3">Students</h5>
-                                <div className="overflow-y-auto h-80 scroll-smooth">
+                                <div className="overflow-y-auto h-96 scroll-smooth">
                                     <table className="table-zebra border-collapse border border-slate-500 w-80 h-56 scroll-auto">
                                         <thead>
                                         <tr>

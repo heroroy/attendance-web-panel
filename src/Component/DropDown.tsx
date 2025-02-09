@@ -26,11 +26,11 @@ export function DropDown({items, title, setInput, input}: DropDownProps) {
 
         e.preventDefault()
         // console.log(e.target.textContent)
-        if (title === "Section") {
+        if (title === "Semester") {
             setInput({
                 ...input,
                 // sec : e.target.textContent
-                sec: data
+                sem: data
             })
             // setValue(e.target.textContent)
             setValue(data)
@@ -57,7 +57,7 @@ export function DropDown({items, title, setInput, input}: DropDownProps) {
                     {value}
                     <MdArrowDropDown size={22}/>
                 </summary>
-                <ul className="menu dropdown-content bg-base-200 cursor-pointer rounded-box z-[1] w-52 p-2 shadow ">
+                <ul className="menu dropdown-content bg-base-200 cursor-pointer rounded-box z-[1] w-60 p-2 shadow ">
                     {items.map(data => (
                         <li onClick={(event) => handleClick(data, event)}><a style={{textDecoration: "none"}}>{data}</a>
                         </li>
