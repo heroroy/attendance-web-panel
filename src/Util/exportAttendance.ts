@@ -53,10 +53,11 @@ function getColumns({classes}: { classes: Class[] }) {
 
 function getAttendanceRows({classes, subject}: ExportExcelProps) {
     return subject.studentsEnrolled.map((roll, index) => {
-        const row : any  = {index: index + 1, roll: roll}
+        const row : any  = {index: index + 1, roll: roll.toUpperCase()}
         classes.forEach(classData => {
             const present = classData.attendees.includes(roll)
-            row[classData.id] = present ? 'Present' : 'Absent'
+            row[classData.id] = present ? 'P' : 'A'
+            // row[classData.id].color = present ? "green" : "red"
         })
         return row
     })

@@ -3,6 +3,7 @@ import {loginThunk} from "../redux/profileSlice.ts"
 import {useNavigate} from "react-router-dom";
 import {useEffect} from "react";
 import {ScreenComponent , ScreenState} from "../Component/ScreenComponent.tsx";
+import logo from "../assets/rcc_logo.png"
 
 export function Loginpage() {
 
@@ -40,7 +41,7 @@ export function Loginpage() {
         <ScreenComponent state={loading ? ScreenState.LOADING : error ? ScreenState.ERROR : ScreenState.SUCCESS }>
             <div className="min-h-screen flex flex-col overflow-hidden">
                 <div className="flex flex-col items-center gap-2">
-                    <img height={130} width={130} className="mb-3" src="https://github.com/heroroy/attendance-web-panel/blob/main/src/assets/rcc_logo.png?raw=true"/>
+                    <img height={130} width={130} className="mb-3" src={logo}/>
                     <h4 className="text-7xl ">RCCIIT</h4>
                     <h4 className="text-7xl ">Attend<span className="text-blue-500">Ease</span></h4>
                     <p className="text-2xl">Manage Attendance with Ease</p>

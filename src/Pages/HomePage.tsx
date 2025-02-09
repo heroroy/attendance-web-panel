@@ -10,7 +10,6 @@ import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 
 export function HomePage() {
     const [open, setOpen] = useState<boolean>(false)
-    // const [subjectCard , setSubjectCard] = useState<cardProps[]>([])
 
     const dispatch = useAppDispatch()
 
@@ -18,6 +17,10 @@ export function HomePage() {
     const {subjects} = useAppSelector(state => state.subject)
     console.log(subjects)
     const groupedSubjects = _.groupBy(subjects, 'department')
+
+    useEffect ( () => {
+        window.scrollTo(0,0)
+    } , [] );
 
     useEffect(() => {
         (async ()=>{
