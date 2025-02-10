@@ -4,7 +4,7 @@ import {getClassesThunk} from "../redux/classesSlice.ts";
 import {useNavigate, useParams} from "react-router-dom";
 import {getDate} from "../Util/Naming_Conv.ts";
 import _, {isArray, size} from "lodash";
-import {Class} from "../Model/classes.ts";
+import {Class} from "../Model/Class.ts";
 import {ClassBlock} from "../Component/ClassBlock.tsx";
 import "react-datepicker/dist/react-datepicker.css";
 import 'react-datepicker/dist/react-datepicker-cssmodules.css';

@@ -23,9 +23,6 @@ export const subjectAddThunk = createAsyncThunk<
 >(
     'subject/add',
     async (subject: Subject, {rejectWithValue}) => {
-
-        console.log(subject)
-
         await database.collection("subjects")
             .doc(subject.id)
             .set(subject)

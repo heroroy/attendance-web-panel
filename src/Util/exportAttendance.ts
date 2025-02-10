@@ -1,5 +1,5 @@
 import ExcelJS from "exceljs";
-import {Class} from "../Model/classes.ts";
+import {Class} from "../Model/Class.ts";
 import Subject from "../Model/Subject.ts";
 
 type ExportExcelProps = {
@@ -44,29 +44,30 @@ function getColumns({classes}: { classes: Class[] }) {
             {
                 header: new Date(classData.createdOn).toLocaleDateString('en-GB'),
                 key: classData.id,
-                width: 10
+                width: 5,
             }
         )),
-        {header: "Average class", key: 'avg_class', width: 20},
-        {header: "Average percentage", key: 'avg_prcnt', width: 20}
-
+        {header: "Attendance", key: 'attendance', width: 5},
+        {header: "Attendance %", key: 'attendancePercentage', width: 5}
     ]
 }
 
 function getAttendanceRows({classes, subject}: ExportExcelProps) {
     return subject.studentsEnrolled.map((roll, index) => {
         const row : any  = {index: index + 1, roll: roll.toUpperCase()}
+        let attendance = 0
+
         classes.forEach(classData => {
             const present = classData.attendees.includes(roll)
             row[classData.id] = present ? 'P' : 'A'
             // row[classData.id].color = present ? "green" : "red"
+
+            if(present) attendance++
+
         })
-        let count = 0
-        classes.forEach(data => {
-            if(row[data.id] === 'P') count++
-        })
-        row['avg_class'] = `${count}/${classes.length}`
-        row['avg_prcnt'] = Math.round((count/classes.length)*100)
+
+        row['attendance'] = `${attendance}/${classes.length}`
+        row['attendancePercentage'] = Math.round((attendance/classes.length)*100) + "%"
         return row
     })
 }
