@@ -58,7 +58,7 @@ export function DropDown({items, title, setInput, input, className = ''}: DropDo
                     {value}
                     <MdArrowDropDown size={22}/>
                 </summary>
-                <ul className="menu dropdown-content bg-base-300 cursor-pointer rounded-box z-[1] w-52 p-2 shadow-lg w-full">
+                <ul className="menu dropdown-content bg-base-300 cursor-pointer rounded-box z-[1] w-60 p-2 shadow-lg w-full">
                     {items.map(data => (
                         <li onClick={(event) => handleClick(data, event)}><a style={{textDecoration: "none"}}>{data}</a>
                         </li>

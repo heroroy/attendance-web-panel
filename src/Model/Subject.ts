@@ -1,5 +1,4 @@
 import Department from "./Department.ts";
-// import Section from "./Section.ts";
 
 export default interface Subject {
     id: string,
@@ -11,5 +10,5 @@ export default interface Subject {
     title: string
     studentsEnrolled: string[],
     paper_code : string,
-    semester : number
+    semester : string
 }

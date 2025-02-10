@@ -3,9 +3,9 @@ import {FormEvent, useState} from "react";
 import {DropDown} from "./DropDown.tsx";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {subjectAddThunk} from "../redux/subjectSlice.ts";
-import Section from "../Model/Section.ts";
+import Semester from "../Model/Semester.ts";
 import Subject from "../Model/Subject.ts";
-import Department, {getDepartmentLabel} from "../Model/Department.ts";
+import Department, {getDepartmentFromLabel} from "../Model/Department.ts";
 import {v4 as uuidv4} from 'uuid';
 import readCsv from "../Util/CsvReader.ts";
 
@@ -35,8 +35,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
     const profile = useAppSelector(state => state.auth.profile)
 
     const dept: string[] = Object.values(Department)
-        .map((dept: Department) => getDepartmentLabel(dept))
-    const sect: number[] = Object.values(Section)
+    const sem: number[] = Object.values(Semester)
 
     const handleFileUpload = (file: File) => {
         if (file.type !== "text/csv") {
@@ -64,17 +63,15 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                 alert("All fields are required");
                 return
             }
-            console.log("Studente", input.students)
 
             dispatch(subjectAddThunk({
                 creatorName: profile?.name,
-                department: input.department,
+                department: getDepartmentFromLabel(input.department),
                 section: input.sec,
                 studentsEnrolled: input.students,
                 title: input.name,
                 paper_code : input.paper_code,
-                semester : input.sem,
-                // id : input.name + "-" + input.department + "-" + input.sec,
+                semester : input.sem.toString(),
                 id: uuidv4(),
                 createdBy: profile?.email?.split('@')[0],
                 created: new Date().getTime()
@@ -102,76 +99,75 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                 <div className="text-center lg:text-start flex flex-col lg:flex-row gap-8">
                     <div className='flex flex-col gap-4 w-72'>
                         <h3 className="text-2xl font-semibold" id="modal-title">Create Subject</h3>
-                        <form id="addEditButton" onSubmit={handleSubmit} className="flex flex-col gap-6 w-full">
+                        <form id="addEditButton" onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
 
-                                    <TextInput
-                                        name="name"
-                                        type="text"
-                                        id="name"
-                                        value={input.name}
-                                        placeholder="Name"
-                                        onChange={(e) => {
-                                            setInput({
-                                                ...input,
-                                                name: e.target.value
-                                            })
-                                        }}
-                                        className={`block w-full bg-base-100 rounded-md border-0 py-1.5 pl-7 pr-20 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:text-neutral-600 sm:text-lg/6 `}
-                                        required={true}
-                                    />
+                            <TextInput
+                                name="name"
+                                type="text"
+                                id="name"
+                                value={input.name}
+                                placeholder="Name"
+                                onChange={(e) => {
+                                    setInput({
+                                        ...input,
+                                        name: e.target.value
+                                    })
+                                }}
+                                required={true}
+                            />
 
-                                    <TextInput
-                                        name="section"
-                                        type="text"
-                                        id="section"
-                                        value={input.sec}
-                                        placeholder="Section"
-                                        onChange={(e) => {
-                                            setInput({
-                                                ...input,
-                                                sec: e.target.value
-                                            })
-                                        }}
-                                        className={`block w-full bg-base-100 rounded-md border-0 py-1.5 pl-7 pr-20 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:text-neutral-600 sm:text-lg/6 `}
-                                        required={true}
-                                    />
+                            <TextInput
+                                name="paper_code"
+                                type="text"
+                                id="paper_code"
+                                value={input.paper_code}
+                                placeholder="Paper Code"
+                                onChange={(e) => {
+                                    setInput({
+                                        ...input,
+                                        paper_code: e.target.value
+                                    })
+                                }}
+                                required={true}
+                            />
+
+                            <TextInput
+                                name="section"
+                                type="text"
+                                id="section"
+                                value={input.sec}
+                                placeholder="Section"
+                                onChange={(e) => {
+                                    setInput({
+                                        ...input,
+                                        sec: e.target.value
+                                    })
+                                }}
+                                required={true}
+                            />
+
+                            <DropDown input={input} setInput={setInput} title="Department" items={dept} className='w-full'/>
+                            <DropDown input={input} setInput={setInput} title="Semester" items={sem} className='w-full'/>
 
 
-                                    <DropDown input={input} setInput={setInput} title="Semester" items={sect}/>
-                                    <DropDown input={input} setInput={setInput} title="Department" items={dept}/>
-
-                                    <TextInput
-                                        name="paper_code"
-                                        type="text"
-                                        id="paper_code"
-                                        value={input.paper_code}
-                                        placeholder="Paper Code"
-                                        onChange={(e) => {
-                                            setInput({
-                                                ...input,
-                                                paper_code: e.target.value
-                                            })
-                                        }}
-                                        className={`block w-full bg-base-100 rounded-md border-0 py-1.5 pl-7 pr-20 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:text-neutral-600 sm:text-lg/6 `}
-                                        required={true}
-                                    />
-                                    <div className="flex items-center justify-center w-full">
-                                        <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer hover:bg-blue-800 bg-blue-700">
-                                            <div className="flex flex-col items-center justify-center p-2">
-                                                <svg
-                                                    className="w-8 h-8 mb-0.5 text-white"
-                                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none" viewBox="0 0 20 16">
-                                                    <path stroke="currentColor" stroke-linecap="round"
-                                                          stroke-linejoin="round" stroke-width="2"
-                                                          d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                                                </svg>
-                                                <p className="text-sm text-white">
-                                                    <span className="font-semibold">Click to upload</span> or drag and
-                                                    drop</p>
-                                                <p className="text-xs text-white">CSV file
-                                                    Only</p>
-                                            </div>
+                            <div className="flex items-center justify-center w-full">
+                                <label htmlFor="dropzone-file"
+                                       className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer hover:bg-secondary bg-primary">
+                                    <div className="flex flex-col items-center justify-center p-2">
+                                        <svg
+                                            className="w-8 h-8 mb-0.5 text-white"
+                                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 20 16">
+                                            <path stroke="currentColor" stroke-linecap="round"
+                                                  stroke-linejoin="round" stroke-width="2"
+                                                  d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                        </svg>
+                                        <p className="text-sm text-white">
+                                            <span className="font-semibold">Click to upload</span> or drag and
+                                            drop</p>
+                                        <p className="text-xs text-white">CSV file
+                                            Only</p>
+                                    </div>
 
                                     <TextInput
                                         name="file"

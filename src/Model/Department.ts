@@ -1,35 +1,33 @@
 enum Department {
-    IT = "IT",
-    CSE = "CSE",
-    ECE = "ECE",
-    EE = "EE",
-}
-
-export function getDepartmentLabel(department: Department) : string {
-    switch (department) {
-        case Department.IT:
-            return "Information Technology"
-        case Department.CSE:
-            return "Computer Science"
-        case Department.ECE:
-            return "Electronics and Communication"
-        case Department.EE:
-            return "Electrical Engineering"
-        default:
-            return ""
-    }
+    IT = "Information Technology",
+    CSE = "Computer Science",
+    ECE = "Electronics and Communications",
+    EE = "Electrical",
 }
 
 export const getDepartmentFromLabel = (label: string) => {
     switch (label) {
-        case "Information Technology":
+        case Department.IT:
             return Department.IT
-        case "Computer Science":
+        case Department.CSE:
             return Department.CSE
-        case "Electronics and Communication":
+        case Department.ECE:
             return Department.ECE
-        case "Electrical Engineering":
+        case Department.EE:
             return Department.EE
+    }
+}
+
+export const getDepartmentShort = (dept: Department) => {
+    switch (dept) {
+        case Department.IT:
+            return "IT"
+        case Department.CSE:
+            return "CSE"
+        case Department.ECE:
+            return "ECE"
+        case Department.EE:
+            return "EE"
     }
 }
 

@@ -4,7 +4,7 @@ import {getClassesThunk} from "../redux/classesSlice.ts";
 import {useNavigate, useParams} from "react-router-dom";
 import {getDate} from "../Util/Naming_Conv.ts";
 import _, {isArray, size} from "lodash";
-import {Class} from "../Model/classes.ts";
+import {Class} from "../Model/Class.ts";
 import {ClassBlock} from "../Component/ClassBlock.tsx";
 import "react-datepicker/dist/react-datepicker.css";
 import 'react-datepicker/dist/react-datepicker-cssmodules.css';
@@ -105,13 +105,14 @@ export function SubjectPage() {
         <ScreenComponent state={screenState}>
             <div className="h-screen w-full flex flex-col">
                 <div className="mb-20 flex flex-col gap-8 lg:gap-16">
-                    <div className='flex flex-col gap-4'>
-                        <p className="text-xl lg:text-2xl text-neutral-500">{subject?.department} - {subject?.section}</p>
-                        <h4 className="text-3xl lg:text-5xl">{subject?.title}</h4>
+                    <div className='flex flex-col'>
+                        <p className="text-xl lg:text-2xl text-neutral-500">{subject?.department}</p>
+                        <p className="text-xl lg:text-xl text-neutral-400">Sem {subject?.semester} - {subject?.section}</p>
+                        <h4 className="text-3xl lg:text-5xl mt-8">{subject?.title}</h4>
                     </div>
 
                     <div className="flex flex-row w-full justify-between">
-                        <div className='flex flex-row gap-16 items-center'>
+                    <div className='flex flex-row gap-16 items-center'>
                             <p className="flex flex-col items-center"><span
                                 className="text-4xl">{size(classes)}</span> <span
                                 className="text-xl text-neutral-500">Classes</span>
