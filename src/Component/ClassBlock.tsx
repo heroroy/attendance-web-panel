@@ -1,6 +1,6 @@
 import {getDate} from "../Util/Naming_Conv.ts";
 import {useNavigate} from "react-router-dom";
-import {Class} from "../Model/classes.ts";
+import {Class} from "../Model/Class.ts";
 
 export function ClassBlock({classInfo}: { classInfo: Class }) {
 

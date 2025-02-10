@@ -3,9 +3,9 @@ import {FormEvent, useState} from "react";
 import {DropDown} from "./DropDown.tsx";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {subjectAddThunk} from "../redux/subjectSlice.ts";
-import Section from "../Model/Section.ts";
+import Semester from "../Model/Semester.ts";
 import Subject from "../Model/Subject.ts";
-import Department, {getDepartmentLabel} from "../Model/Department.ts";
+import Department, {getDepartmentFromLabel} from "../Model/Department.ts";
 import {v4 as uuidv4} from 'uuid';
 import readCsv from "../Util/CsvReader.ts";
 
@@ -13,7 +13,9 @@ export interface inputModal {
     name: string,
     students: string[]
     sec: string,
-    department: string
+    department: string,
+    paper_code : string,
+    sem : number
 }
 
 type OnDismissProps = {
@@ -26,13 +28,14 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
         name: "",
         students: [],
         sec: "",
-        department: ""
+        department: "",
+        paper_code : "",
+        sem : 0
     })
     const profile = useAppSelector(state => state.auth.profile)
 
     const dept: string[] = Object.values(Department)
-        .map((dept: Department) => getDepartmentLabel(dept))
-    const sect: string[] = Object.values(Section)
+    const sem: number[] = Object.values(Semester)
 
     const handleFileUpload = (file: File) => {
         if (file.type !== "text/csv") {
@@ -56,18 +59,19 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
         e.preventDefault()
         try {
 
-            if (!input.name || input.students.length === 0 || !input.sec || !input.department) {
+            if (!input.name || input.students.length === 0 || !input.sec || !input.department || !input.paper_code || !input.sem) {
                 alert("All fields are required");
                 return
             }
-            console.log("Studente", input.students)
 
             dispatch(subjectAddThunk({
                 creatorName: profile?.name,
-                department: input.department,
+                department: getDepartmentFromLabel(input.department),
                 section: input.sec,
                 studentsEnrolled: input.students,
                 title: input.name,
+                paper_code : input.paper_code,
+                semester : input.sem.toString(),
                 id: uuidv4(),
                 createdBy: profile?.email?.split('@')[0],
                 created: new Date().getTime()
@@ -95,7 +99,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                 <div className="text-center lg:text-start flex flex-col lg:flex-row gap-8">
                     <div className='flex flex-col gap-4 w-72'>
                         <h3 className="text-2xl font-semibold" id="modal-title">Create Subject</h3>
-                        <form id="addEditButton" onSubmit={handleSubmit} className="flex flex-col gap-6 w-full">
+                        <form id="addEditButton" onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
 
                             <TextInput
                                 name="name"
@@ -111,8 +115,40 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                                 }}
                                 required={true}
                             />
+
+                            <TextInput
+                                name="paper_code"
+                                type="text"
+                                id="paper_code"
+                                value={input.paper_code}
+                                placeholder="Paper Code"
+                                onChange={(e) => {
+                                    setInput({
+                                        ...input,
+                                        paper_code: e.target.value
+                                    })
+                                }}
+                                required={true}
+                            />
+
+                            <TextInput
+                                name="section"
+                                type="text"
+                                id="section"
+                                value={input.sec}
+                                placeholder="Section"
+                                onChange={(e) => {
+                                    setInput({
+                                        ...input,
+                                        sec: e.target.value
+                                    })
+                                }}
+                                required={true}
+                            />
+
                             <DropDown input={input} setInput={setInput} title="Department" items={dept} className='w-full'/>
-                            <DropDown input={input} setInput={setInput} title="Section" items={sect} className='w-full'/>
+                            <DropDown input={input} setInput={setInput} title="Semester" items={sem} className='w-full'/>
+
 
                             <div className="flex items-center justify-center w-full">
                                 <label htmlFor="dropzone-file"
@@ -153,7 +189,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                     <div className="flex flex-col gap-4">
                         <h5 className='text-2xl'>Students</h5>
                         <div className="overflow-y-auto h-80 scroll-smooth w-full">
-                            <table className="table-zebra border-collapse border border-slate-500 w-96 h-56 scroll-auto">
+                            <table className="table-zebra border-collapse border border-slate-500 w-96 h-64 scroll-auto">
                                 <thead>
                                 <tr>
                                     <th className="border border-slate-600">Sl No.</th>

@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {getSubjectThunk} from "../redux/subjectSlice.ts";
 import _ from 'lodash'
 import SubjectCard from "../Component/SubjectCard.tsx";
-import Department, {getDepartmentLabel} from "../Model/Department.ts";
+import Department from "../Model/Department.ts";
 import {capitalizeWords} from "../Util/Naming_Conv.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 
@@ -40,7 +40,7 @@ export function HomePage() {
 
         <ScreenComponent state={loading ? ScreenState.LOADING : error ? ScreenState.ERROR : ScreenState.SUCCESS}>
 
-            <div  className="w-full h-screen items-stretch flex flex-col gap-32 relative ">
+            <div  className="w-full h-full items-stretch flex flex-col gap-32 relative ">
                 <div className='flex w-full flex-row justify-between items-center'>
                     <div className="flex flex-col gap-4">
                         <span className="text-gray-500 text-2xl font-semibold">Welcome Back</span>
@@ -54,7 +54,7 @@ export function HomePage() {
                 <div className="">
                     {Object.keys(groupedSubjects).map((dept) => (
                         <div className="flex flex-col gap-8 mb-16">
-                            <span className='text-2xl font-medium'>{getDepartmentLabel(Department[dept as keyof typeof Department]) || dept}</span>
+                            <span className='text-2xl font-medium'>{Department[dept as keyof typeof Department] || dept}</span>
                             <div className="flex flex-row flex-wrap gap-10 ">
                                 {groupedSubjects[dept].map(subject => <SubjectCard subject={subject}/>)}
                             </div>

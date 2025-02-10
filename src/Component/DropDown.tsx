@@ -5,7 +5,7 @@ import useClickOutside from "../hooks/useClickOutside.ts";
 
 
 type DropDownProps = {
-    items: string[],
+    items: number[] | string[],
     title: string,
     // handleClick : (data : string) => void
     setInput: Dispatch<SetStateAction<inputModal>>,
@@ -23,15 +23,15 @@ export function DropDown({items, title, setInput, input, className = ''}: DropDo
         }
     })
 
-    function handleClick(data: string, e: any) {
+    function handleClick(data: any, e: any) {
 
         e.preventDefault()
         // console.log(e.target.textContent)
-        if (title === "Section") {
+        if (title === "Semester") {
             setInput({
                 ...input,
                 // sec : e.target.textContent
-                sec: data
+                sem: data
             })
             // setValue(e.target.textContent)
             setValue(data)
@@ -58,7 +58,7 @@ export function DropDown({items, title, setInput, input, className = ''}: DropDo
                     {value}
                     <MdArrowDropDown size={22}/>
                 </summary>
-                <ul className="menu dropdown-content bg-base-300 cursor-pointer rounded-box z-[1] w-52 p-2 shadow-lg w-full">
+                <ul className="menu overflow-y-auto h-48 dropdown-content bg-base-300 cursor-pointer rounded-box z-[1]  p-2 shadow-lg w-full flex flex-nowrap">
                     {items.map(data => (
                         <li onClick={(event) => handleClick(data, event)}><a style={{textDecoration: "none"}}>{data}</a>
                         </li>

@@ -1,6 +1,6 @@
 import {createAsyncThunk , createSlice , PayloadAction} from "@reduxjs/toolkit";
 import { database} from "../firebase.ts";
-import {Class} from "../Model/classes.ts";
+import {Class} from "../Model/Class.ts";
 
 interface classState {
     classes : Class[] | Class

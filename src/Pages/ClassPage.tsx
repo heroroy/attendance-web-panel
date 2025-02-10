@@ -5,10 +5,11 @@ import {getClassByIdThunk} from "../redux/classesSlice.ts";
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdsThunk} from "../redux/userSlice.ts";
 import _, {isArray} from "lodash";
-import {capitalizeWords, formatDate} from "../Util/Naming_Conv.ts";
+import {formatDate} from "../Util/Naming_Conv.ts";
 import {exportAttendance} from "../Util/exportAttendance.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 import User from "../Model/User.ts";
+import {getDepartmentShort} from "../Model/Department.ts";
 
 export function ClassPage() {
 
@@ -64,23 +65,29 @@ export function ClassPage() {
     else if (subjectLoading || classLoading || usersLoading) screenState = ScreenState.LOADING
     else screenState = ScreenState.SUCCESS
 
-    const department = subject ? capitalizeWords(subject.department) : 'null'
+    const department = subject ? getDepartmentShort(subject.department) : 'null'
 
     return (
         <ScreenComponent state={screenState}>
             <div className='flex flex-col gap-16 w-full'>
 
-                <div className="flex items-center justify-between w-full">
-                    <div className='flex flex-col gap-4'>
-                        <p className='text-xl lg:text-2xl text-neutral-500'>{subject?.title} - {department} - {subject?.section}</p>
+
+                <div className='flex flex-col'>
+                    <p className='text-xl lg:text-3xl text-neutral-500'>{subject?.title} - {department}</p>
+                    <p className='text-xl lg:text-2xl text-neutral-400'>Sem {subject?.semester} - {subject?.section}</p>
+
+                    <div className="flex items-center justify-between w-full mt-8">
                         <h4 className="text-3xl lg:text-5xl">{formatDate(new Date(classes?.createdOn))}</h4>
-                    </div>
-                    <div>
-                        <button className="btn btn-primary hover:bg-secondary px-8 btn-md" onClick={exportFunc}>Export
+                        <button
+                            className="btn btn-primary hover:bg-secondary px-8 btn-md"
+                            onClick={exportFunc}
+                        >
+                            Export
                         </button>
                     </div>
                 </div>
-                <table className="table-auto border-collapse border gap-3 bg-primary text-primary-content border-slate-500 w-full h-full">
+                <table
+                    className="table-auto border-collapse border gap-3 bg-primary text-primary-content border-slate-500 w-full h-full">
                     <thead>
                     <tr className="h-12 text-base">
                         <th className="border border-slate-600">Sl No.</th>
@@ -91,7 +98,8 @@ export function ClassPage() {
                     </thead>
                     <tbody>
                     {subject?.studentsEnrolled?.map((item, index) => (
-                        <AttendeeRow index={index} roll={item} user={user[item] && user[item][0]} isPresent={classes.attendees.includes(item)}/>
+                        <AttendeeRow index={index} roll={item} user={user[item] && user[item][0]}
+                                     isPresent={classes.attendees.includes(item)}/>
                     ))}
                     </tbody>
                 </table>
