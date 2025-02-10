@@ -7,6 +7,9 @@ type ExportExcelProps = {
     subject: Subject
 }
 
+
+export type align = "fill" | "center" | "left" | "right" | "justify" | "centerContinuous" | "distributed"
+
 const styles = {
     present: {
         font: {
@@ -14,7 +17,7 @@ const styles = {
             bold: true
         },
         alignment : {
-            horizontal: 'center'
+            horizontal: 'center' as align
         }
     },
     absent: {
@@ -23,12 +26,12 @@ const styles = {
             bold: true
         },
         alignment : {
-            horizontal: 'center'
+            horizontal: 'center' as align
         }
     },
     textAlign : {
         alignment : {
-            horizontal: 'center'
+            horizontal: 'center' as align
         }
     }
 };
@@ -42,7 +45,6 @@ export function exportAttendance({classes, subject}: ExportExcelProps): Promise<
             const workbook = new ExcelJS.Workbook();
             const sheet = workbook.addWorksheet('Attendance')
             sheet.properties.defaultRowHeight = 50
-            sheet.properties.textAlign = "center"
             sheet.columns = getColumns({classes})
 
             getAttendanceRows({classes, subject})
