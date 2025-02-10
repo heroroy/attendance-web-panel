@@ -5,7 +5,7 @@ import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {subjectAddThunk} from "../redux/subjectSlice.ts";
 import Semester from "../Model/Semester.ts";
 import Subject from "../Model/Subject.ts";
-import Department, {getDepartmentLabel} from "../Model/Department.ts";
+import Department, {getDepartmentFromLabel} from "../Model/Department.ts";
 import {v4 as uuidv4} from 'uuid';
 import readCsv from "../Util/CsvReader.ts";
 
@@ -35,7 +35,6 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
     const profile = useAppSelector(state => state.auth.profile)
 
     const dept: string[] = Object.values(Department)
-        .map((dept: Department) => getDepartmentLabel(dept))
     const sem: number[] = Object.values(Semester)
 
     const handleFileUpload = (file: File) => {
@@ -64,11 +63,10 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                 alert("All fields are required");
                 return
             }
-            console.log("Studente", input.students)
 
             dispatch(subjectAddThunk({
                 creatorName: profile?.name,
-                department: input.department,
+                department: getDepartmentFromLabel(input.department),
                 section: input.sec,
                 studentsEnrolled: input.students,
                 title: input.name,
