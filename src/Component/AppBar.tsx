@@ -32,29 +32,27 @@ const AppBar = ({ className } : { className: string}) => {
 
     return (
         <div className={className}>
-            <div className=" border-b-2 border-b-gray-600 p-4 flex flex-nowrap ">
+            <div className="border-b-2 border-b-primary border-opacity-15 p-4 flex flex-nowrap ">
 
                 <h3 className="text-xl font-bold mx-auto cursor-pointer flex items-center " onClick={handleTitleClick}>
                     <img height={25} width={25} className="me-4" src={logo}/>
                     RCCIIT Attend
-                    <span className="text-2xl text-blue-500 font-extrabold">Ease</span>
+                    <span className="text-2xl text-primary font-extrabold">Ease</span>
                 </h3>
-                {profile?.profilePic && <img onClick={handleProfileClick} alt="profile" className="h-10 w-10 rounded-full justify-self-end mx-2" src={ profile.profilePic }/> }
+                {profile?.profilePic && <img onClick={handleProfileClick} alt="profile" className="h-10 w-10 rounded-full justify-self-end mx-2 cursor-pointer" src={ profile.profilePic }/> }
             </div>
             {popUp && profile &&
                 <div className="fixed inset-0 z-30 flex items-center justify-center"
                      aria-labelledby="modal-title"
                      role="dialog"
                      aria-modal="true">
-                    <div className="fixed inset-0 bg-gray-500/75 transition-opacity opacity-0" onClick={()=>setPopUp(false) } aria-hidden="true"></div>
-                    <div  className="card z-30 px-5 pt-5 bg-gray-600 top-14 absolute right-5">
+                    <div className="fixed inset-0 bg-base-300 transition-opacity opacity-0" onClick={()=>setPopUp(false) } aria-hidden="true"></div>
+                    <div  className="z-30 p-6 rounded-lg shadow-lg bg-base-300 top-16 absolute right-8 flex flex-col gap-8">
                         <div className="card-title flex flex-col">
-                            <h6>{capitalizeWords(profile?.name)}</h6>
-                            <p className="text-sm font-light">{profile?.email}</p>
+                            <p className='text-base'>{capitalizeWords(profile?.name)}</p>
+                            <p className="text-sm font-light mt-0">{profile?.email}</p>
                         </div>
-                        <div className="card-body">
-                            <button onClick={handleLogout} className="btn bg-slate-700">Logout</button>
-                        </div>
+                        <button onClick={handleLogout} className="btn btn-primary btn-md">Logout</button>
                     </div>
                 </div>
             }

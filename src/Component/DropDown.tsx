@@ -9,10 +9,11 @@ type DropDownProps = {
     title: string,
     // handleClick : (data : string) => void
     setInput: Dispatch<SetStateAction<inputModal>>,
-    input: inputModal
+    input: inputModal,
+    className?: string
 }
 
-export function DropDown({items, title, setInput, input}: DropDownProps) {
+export function DropDown({items, title, setInput, input, className = ''}: DropDownProps) {
 
     const [value, setValue] = useState(title)
     const detailsRef = useRef<HTMLDetailsElement | null>(null);
@@ -50,21 +51,21 @@ export function DropDown({items, title, setInput, input}: DropDownProps) {
     }
 
     return (
-        <>
-            <details ref={detailsRef} className="dropdown details-modal bg-transparent">
+        <div className={className}>
+            <details ref={detailsRef} className="w-full dropdown details-modal bg-transparent">
                 <summary
-                    className="btn m-1 text-white inline-flex w-full justify-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 cursor-pointer collapse">
+                    className="btn inline-flex w-full justify-center rounded-md font-semibold ring-1 ring-inset ring-primary cursor-pointer collapse">
                     {value}
                     <MdArrowDropDown size={22}/>
                 </summary>
-                <ul className="menu dropdown-content bg-base-200 cursor-pointer rounded-box z-[1] w-60 p-2 shadow ">
+                <ul className="menu dropdown-content bg-base-300 cursor-pointer rounded-box z-[1] w-60 p-2 shadow-lg w-full">
                     {items.map(data => (
                         <li onClick={(event) => handleClick(data, event)}><a style={{textDecoration: "none"}}>{data}</a>
                         </li>
                     ))}
                 </ul>
             </details>
-        </>
+        </div>
     );
 }
 

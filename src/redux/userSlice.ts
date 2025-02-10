@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {database} from "../firebase.ts";
-import {User} from "../Model/users.ts";
 import _ from "lodash";
+import User from "../Model/User.ts";
 
 interface userState {
     users: User[]

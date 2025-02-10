@@ -8,6 +8,7 @@ import _, {isArray} from "lodash";
 import {capitalizeWords, formatDate} from "../Util/Naming_Conv.ts";
 import {exportAttendance} from "../Util/exportAttendance.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
+import User from "../Model/User.ts";
 
 export function ClassPage() {
 
@@ -63,23 +64,25 @@ export function ClassPage() {
     else if (subjectLoading || classLoading || usersLoading) screenState = ScreenState.LOADING
     else screenState = ScreenState.SUCCESS
 
+    const department = subject ? capitalizeWords(subject.department) : 'null'
+
     return (
         <ScreenComponent state={screenState}>
-
             <div className='flex flex-col gap-16 w-full'>
 
                 <div className="flex items-center justify-between w-full">
                     <div className='flex flex-col gap-4'>
-                        <p className='text-xl lg:text-2xl text-gray-400'>{subject?.title} - {capitalizeWords(subject?.department ?? "")} {subject?.section}</p>
+                        <p className='text-xl lg:text-2xl text-neutral-500'>{subject?.title} - {department} - {subject?.section}</p>
                         <h4 className="text-3xl lg:text-5xl">{formatDate(new Date(classes?.createdOn))}</h4>
                     </div>
                     <div>
-                        <button className="btn bg-blue-600 hover:bg-blue-800 px-8" onClick={exportFunc}>Export</button>
+                        <button className="btn btn-primary hover:bg-secondary px-8 btn-md" onClick={exportFunc}>Export
+                        </button>
                     </div>
                 </div>
-                <table className="table-auto border-collapse border gap-3 text-gray-300 bg-gray-700 border-slate-500 w-full h-full">
+                <table className="table-auto border-collapse border gap-3 bg-primary text-primary-content border-slate-500 w-full h-full">
                     <thead>
-                    <tr className="h-12">
+                    <tr className="h-12 text-base">
                         <th className="border border-slate-600">Sl No.</th>
                         <th className="border border-slate-600">Roll No.</th>
                         <th className="border border-slate-600">Name</th>
@@ -88,16 +91,7 @@ export function ClassPage() {
                     </thead>
                     <tbody>
                     {subject?.studentsEnrolled?.map((item, index) => (
-                        <tr key={index} className={`text-base h-6 ${
-                            index % 2 === 0
-                                ? "bg-gray-800 text-gray-300" // Custom colors for even rows
-                                : "bg-gray-600 text-gray-200" // Custom colors for odd rows
-                        }`}>
-                            <td className="border border-slate-600 text-center p-4">{index + 1}</td>
-                            <td className="border border-slate-600 text-center p-4">{item}</td>
-                            <td className="border border-slate-600 text-center p-4">{user[item] && user[item][0]?.name || "-"}</td>
-                            <td className="border border-slate-600 text-center p-4">{classes?.attendees?.includes(item) ? "Present" : "Absent"}</td>
-                        </tr>
+                        <AttendeeRow index={index} roll={item} user={user[item] && user[item][0]} isPresent={classes.attendees.includes(item)}/>
                     ))}
                     </tbody>
                 </table>
@@ -108,3 +102,22 @@ export function ClassPage() {
     );
 }
 
+interface AttendeeRowProps {
+    index: number,
+    roll: string,
+    user?: User,
+    isPresent: boolean
+}
+
+const AttendeeRow = ({index, roll, user, isPresent}: AttendeeRowProps) => {
+    const bgColor = index % 2 === 0 ? "bg-base-100" : "bg-base-200"
+
+    return (
+        <tr key={index} className={`text-base h-6 text-base-content ${bgColor}`}>
+            <td className="border border-slate-600 text-center p-4">{index + 1}</td>
+            <td className="border border-slate-600 text-center p-4">{roll}</td>
+            <td className="border border-slate-600 text-center p-4">{user?.name || "-"}</td>
+            <td className={`border border-slate-600 text-center p-4 font-semibold ${isPresent ? 'text-green-600' : 'text-red-600'}`}>{isPresent ? "Present" : "Absent"}</td>
+        </tr>
+    )
+}
