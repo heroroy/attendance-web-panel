@@ -15,7 +15,7 @@ export function ScreenComponent({state, children}: ScreenComponentProps) {
         case ScreenState.LOADING:
             return <p className="h-screen">Loading...</p>
         case ScreenState.SUCCESS:
-            return <>{children}</>
+            return <div className='w-full h-full'>{children}</div>
         case ScreenState.ERROR:
             return <p className="h-screen">Error State</p>
     }

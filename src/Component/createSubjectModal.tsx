@@ -95,15 +95,14 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
              aria-modal="true">
 
             {/*backdrop*/}
-            <div className="fixed inset-0 bg-black transition-opacity opacity-40" onClick={onDismiss} aria-hidden="true"></div>
+            <div className="fixed inset-0 bg-black transition-opacity opacity-40" onClick={onDismiss}
+                 aria-hidden="true"></div>
 
-            <div className="relative transform overflow-hidden rounded-lg bg-base-100 text-left transition-all lg:w-auto sm:my-8">
-                <div className="px-4 pb-4 pt-5 sm:p-6 sm:pb-4 ">
-                    <div className="sm:flex sm:items-start ">
-                        <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left flex gap-7">
-                            <div>
-                                <h3 className=" text-2xl font-semibold" id="modal-title">Create Subject</h3>
-                                <form id="addEditButton" onSubmit={handleSubmit} className="mt-2 flex flex-col gap-3">
+            <div className="relative transform overflow-hidden rounded-lg bg-base-100 transition-all flex flex-col gap-8 p-8 m-8 lg:m-0">
+                <div className="text-center lg:text-start flex flex-col lg:flex-row gap-8">
+                    <div className='flex flex-col gap-4 w-72'>
+                        <h3 className="text-2xl font-semibold" id="modal-title">Create Subject</h3>
+                        <form id="addEditButton" onSubmit={handleSubmit} className="flex flex-col gap-6 w-full">
 
                                     <TextInput
                                         name="name"
@@ -174,49 +173,48 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                                                     Only</p>
                                             </div>
 
-                                            <TextInput
-                                                name="file"
-                                                type="file"
-                                                id="dropzone-file"
-                                                onChange={(e) => {
-                                                    if (e.target.files) handleFileUpload(e.target?.files[0]);
-                                                }}
-                                                className="hidden"
-                                                accept="text/csv"
-                                                required={true}
-                                            />
+                                    <TextInput
+                                        name="file"
+                                        type="file"
+                                        id="dropzone-file"
+                                        onChange={(e) => {
+                                            if (e.target.files) handleFileUpload(e.target?.files[0]);
+                                        }}
+                                        className="hidden"
+                                        accept="text/csv"
+                                        required={true}
+                                    />
 
-                                        </label>
-                                    </div>
+                                </label>
+                            </div>
 
-                                </form>
-                            </div>
-                            <div className="overflow-y-auto">
-                                <h5 className="mb-3">Students</h5>
-                                <div className="overflow-y-auto h-96 scroll-smooth">
-                                    <table className="table-zebra border-collapse border border-slate-500 w-80 h-56 scroll-auto">
-                                        <thead>
-                                        <tr>
-                                            <th className="border border-slate-600">Sl No.</th>
-                                            <th className="border border-slate-600">Roll No.</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {input.students.map((item, index) => (
-                                            <tr>
-                                                <td className="border border-slate-600 text-center">{index + 1}</td>
-                                                <td className="border border-slate-600 text-center">{item}</td>
-                                            </tr>
-                                        ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                        </form>
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        <h5 className='text-2xl'>Students</h5>
+                        <div className="overflow-y-auto h-80 scroll-smooth w-full">
+                            <table className="table-zebra border-collapse border border-slate-500 w-96 h-56 scroll-auto">
+                                <thead>
+                                <tr>
+                                    <th className="border border-slate-600">Sl No.</th>
+                                    <th className="border border-slate-600">Roll No.</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {input.students.map((item, index) => (
+                                    <tr>
+                                        <td className="border border-slate-600 text-center">{index + 1}</td>
+                                        <td className="border border-slate-600 text-center">{item}</td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                <div className="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button type="submit" form="addEditButton" className="inline-flex w-full justify-center bg-green-600 rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto">Save
+                <div className="sm:flex sm:flex-row-reverse">
+                    <button type="submit" form="addEditButton"
+                            className="inline-flex w-full justify-center bg-green-600 rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto">Save
                     </button>
                     <button onClick={onDismiss} type="button"
                             className="mt-3 inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel

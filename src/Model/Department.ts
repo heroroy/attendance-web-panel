@@ -5,7 +5,7 @@ enum Department {
     EE = "EE",
 }
 
-export const getDepartmentLabel = (department: Department ) => {
+export function getDepartmentLabel(department: Department) : string {
     switch (department) {
         case Department.IT:
             return "Information Technology"
@@ -15,6 +15,8 @@ export const getDepartmentLabel = (department: Department ) => {
             return "Electronics and Communication"
         case Department.EE:
             return "Electrical Engineering"
+        default:
+            return ""
     }
 }
 
