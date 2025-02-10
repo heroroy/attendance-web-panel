@@ -1,4 +1,4 @@
-const Section = {
+const Semester = {
     "1" : 1,
     "2" : 2,
     "3" : 3,
@@ -9,4 +9,4 @@ const Section = {
     "8" : 8,
 }
 
-export default Section
+export default Semester

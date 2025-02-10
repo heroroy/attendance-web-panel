@@ -3,7 +3,7 @@ import {FormEvent, useState} from "react";
 import {DropDown} from "./DropDown.tsx";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {subjectAddThunk} from "../redux/subjectSlice.ts";
-import Section from "../Model/Section.ts";
+import Semester from "../Model/Semester.ts";
 import Subject from "../Model/Subject.ts";
 import Department, {getDepartmentLabel} from "../Model/Department.ts";
 import {v4 as uuidv4} from 'uuid';
@@ -36,7 +36,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
 
     const dept: string[] = Object.values(Department)
         .map((dept: Department) => getDepartmentLabel(dept))
-    const sect: number[] = Object.values(Section)
+    const sem: number[] = Object.values(Semester)
 
     const handleFileUpload = (file: File) => {
         if (file.type !== "text/csv") {
@@ -101,7 +101,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                 <div className="text-center lg:text-start flex flex-col lg:flex-row gap-8">
                     <div className='flex flex-col gap-4 w-72'>
                         <h3 className="text-2xl font-semibold" id="modal-title">Create Subject</h3>
-                        <form id="addEditButton" onSubmit={handleSubmit} className="flex flex-col gap-6 w-full">
+                        <form id="addEditButton" onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
 
                             <TextInput
                                 name="name"
@@ -113,6 +113,21 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                                     setInput({
                                         ...input,
                                         name: e.target.value
+                                    })
+                                }}
+                                required={true}
+                            />
+
+                            <TextInput
+                                name="paper_code"
+                                type="text"
+                                id="paper_code"
+                                value={input.paper_code}
+                                placeholder="Paper Code"
+                                onChange={(e) => {
+                                    setInput({
+                                        ...input,
+                                        paper_code: e.target.value
                                     })
                                 }}
                                 required={true}
@@ -133,24 +148,9 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                                 required={true}
                             />
 
-                            <DropDown input={input} setInput={setInput} title="Semester" items={dept} className='w-full'/>
-                            <DropDown input={input} setInput={setInput} title="Department" items={sect} className='w-full'/>
+                            <DropDown input={input} setInput={setInput} title="Department" items={dept} className='w-full'/>
+                            <DropDown input={input} setInput={setInput} title="Semester" items={sem} className='w-full'/>
 
-                            <TextInput
-                                name="paper_code"
-                                type="text"
-                                id="paper_code"
-                                value={input.paper_code}
-                                placeholder="Paper Code"
-                                onChange={(e) => {
-                                    setInput({
-                                        ...input,
-                                        paper_code: e.target.value
-                                    })
-                                }}
-                                className={`block w-full bg-base-100 rounded-md border-0 py-1.5 pl-7 pr-20 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:text-neutral-600 sm:text-lg/6 `}
-                                required={true}
-                            />
 
                             <div className="flex items-center justify-center w-full">
                                 <label htmlFor="dropzone-file"
