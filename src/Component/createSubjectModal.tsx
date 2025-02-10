@@ -189,7 +189,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                     <div className="flex flex-col gap-4">
                         <h5 className='text-2xl'>Students</h5>
                         <div className="overflow-y-auto h-80 scroll-smooth w-full">
-                            <table className="table-zebra border-collapse border border-slate-500 w-96 h-56 scroll-auto">
+                            <table className="table-zebra border-collapse border border-slate-500 w-96 h-64 scroll-auto">
                                 <thead>
                                 <tr>
                                     <th className="border border-slate-600">Sl No.</th>

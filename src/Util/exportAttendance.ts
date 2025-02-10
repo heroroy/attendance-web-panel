@@ -7,16 +7,58 @@ type ExportExcelProps = {
     subject: Subject
 }
 
+const styles = {
+    present: {
+        font: {
+            color: { argb: 'FF008000' }, // Green
+            bold: true
+        },
+        alignment : {
+            horizontal: 'center'
+        }
+    },
+    absent: {
+        font: {
+            color: { argb: 'FFFF0000' }, // Red
+            bold: true
+        },
+        alignment : {
+            horizontal: 'center'
+        }
+    },
+    textAlign : {
+        alignment : {
+            horizontal: 'center'
+        }
+    }
+};
+
+
+
+
 export function exportAttendance({classes, subject}: ExportExcelProps): Promise<void> {
     return new Promise((resolve, reject) => {
         try {
             const workbook = new ExcelJS.Workbook();
             const sheet = workbook.addWorksheet('Attendance')
             sheet.properties.defaultRowHeight = 50
+            sheet.properties.textAlign = "center"
             sheet.columns = getColumns({classes})
 
             getAttendanceRows({classes, subject})
                 .forEach(row => sheet.addRow(row))
+
+            sheet.eachRow(row=>{
+                row.eachCell(cell=>{
+                    cell.style = styles.textAlign
+                    if(cell.text === 'P') {
+                        cell.style = styles.present
+                    }
+                    else if(cell.text === 'A'){
+                        cell.style = styles.absent
+                    }
+                })
+            })
             resolve(workbook)
         } catch (e) {
             reject(e)
@@ -44,11 +86,11 @@ function getColumns({classes}: { classes: Class[] }) {
             {
                 header: new Date(classData.createdOn).toLocaleDateString('en-GB'),
                 key: classData.id,
-                width: 5,
+                width: 10,
             }
         )),
-        {header: "Attendance", key: 'attendance', width: 5},
-        {header: "Attendance %", key: 'attendancePercentage', width: 5}
+        {header: "Attendance", key: 'attendance', width: 15},
+        {header: "Attendance %", key: 'attendancePercentage', width: 15}
     ]
 }
 
@@ -60,8 +102,6 @@ function getAttendanceRows({classes, subject}: ExportExcelProps) {
         classes.forEach(classData => {
             const present = classData.attendees.includes(roll)
             row[classData.id] = present ? 'P' : 'A'
-            // row[classData.id].color = present ? "green" : "red"
-
             if(present) attendance++
 
         })
