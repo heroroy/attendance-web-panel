@@ -10,5 +10,5 @@ export default interface Subject {
     title: string
     studentsEnrolled: string[],
     paper_code : string,
-    semester : number
+    semester : string
 }

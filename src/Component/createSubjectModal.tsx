@@ -71,7 +71,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                 studentsEnrolled: input.students,
                 title: input.name,
                 paper_code : input.paper_code,
-                semester : input.sem,
+                semester : input.sem.toString(),
                 id: uuidv4(),
                 createdBy: profile?.email?.split('@')[0],
                 created: new Date().getTime()
