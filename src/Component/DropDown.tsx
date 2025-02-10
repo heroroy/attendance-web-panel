@@ -5,7 +5,7 @@ import useClickOutside from "../hooks/useClickOutside.ts";
 
 
 type DropDownProps = {
-    items: string[],
+    items: number[] | string[],
     title: string,
     // handleClick : (data : string) => void
     setInput: Dispatch<SetStateAction<inputModal>>,
@@ -22,7 +22,7 @@ export function DropDown({items, title, setInput, input}: DropDownProps) {
         }
     })
 
-    function handleClick(data: string, e: any) {
+    function handleClick(data: any, e: any) {
 
         e.preventDefault()
         // console.log(e.target.textContent)

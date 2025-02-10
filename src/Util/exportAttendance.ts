@@ -46,7 +46,9 @@ function getColumns({classes}: { classes: Class[] }) {
                 key: classData.id,
                 width: 10
             }
-        ))
+        )),
+        {header: "Average class", key: 'avg_class', width: 20},
+        {header: "Average percentage", key: 'avg_prcnt', width: 20}
 
     ]
 }
@@ -59,6 +61,12 @@ function getAttendanceRows({classes, subject}: ExportExcelProps) {
             row[classData.id] = present ? 'P' : 'A'
             // row[classData.id].color = present ? "green" : "red"
         })
+        let count = 0
+        classes.forEach(data => {
+            if(row[data.id] === 'P') count++
+        })
+        row['avg_class'] = `${count}/${classes.length}`
+        row['avg_prcnt'] = Math.round((count/classes.length)*100)
         return row
     })
 }

@@ -15,7 +15,7 @@ export interface inputModal {
     sec: string,
     department: string,
     paper_code : string,
-    sem : string
+    sem : number
 }
 
 type OnDismissProps = {
@@ -30,13 +30,13 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
         sec: "",
         department: "",
         paper_code : "",
-        sem : ""
+        sem : 0
     })
     const profile = useAppSelector(state => state.auth.profile)
 
     const dept: string[] = Object.values(Department)
         .map((dept: Department) => getDepartmentLabel(dept))
-    const sect: string[] = Object.values(Section)
+    const sect: number[] = Object.values(Section)
 
     const handleFileUpload = (file: File) => {
         if (file.type !== "text/csv") {

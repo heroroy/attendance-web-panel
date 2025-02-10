@@ -40,7 +40,7 @@ export function HomePage() {
 
         <ScreenComponent state={loading ? ScreenState.LOADING : error ? ScreenState.ERROR : ScreenState.SUCCESS}>
 
-            <div  className="w-full h-screen items-stretch flex flex-col gap-32 relative ">
+            <div  className="w-full h-full items-stretch flex flex-col gap-32 relative ">
                 <div className='flex w-full flex-row justify-between items-center'>
                     <div className="flex flex-col gap-4">
                         <span className="text-gray-500 text-2xl font-semibold">Welcome Back</span>
