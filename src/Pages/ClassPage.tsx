@@ -1,7 +1,7 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
-import {useEffect} from "react";
-import {getClassByIdThunk} from "../redux/classesSlice.ts";
+import {useEffect , useRef , useState} from "react";
+import {deleteClassThunk , getClassByIdThunk , manualAttendanceThunk} from "../redux/classesSlice.ts";
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdsThunk} from "../redux/userSlice.ts";
 import _, {isArray} from "lodash";
@@ -10,6 +10,9 @@ import {exportAttendance} from "../Util/exportAttendance.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 import User from "../Model/User.ts";
 import {getDepartmentShort} from "../Model/Department.ts";
+import {MdArrowCircleLeft , MdArrowDropDown} from "react-icons/md";
+
+
 
 export function ClassPage() {
 
@@ -56,6 +59,12 @@ export function ClassPage() {
             .catch(() => alert("Error Exporting Attendance"))
     }
 
+
+    function deleteClass(id : string, subjectid : string){
+        dispatch(deleteClassThunk( { id : id }))
+        navigate(`../subject/${subjectid}`)
+    }
+
     if (!classes || isArray(classes))
         return <h1>Loading...</h1>
 
@@ -69,21 +78,28 @@ export function ClassPage() {
 
     return (
         <ScreenComponent state={screenState}>
+            <button onClick={()=>navigate(-1)} title="Back" className=" btn-soft btn-secondary fixed left-10 top-24"><MdArrowCircleLeft size={40}/></button>
             <div className='flex flex-col gap-16 w-full'>
-
-
                 <div className='flex flex-col'>
                     <p className='text-xl lg:text-3xl text-neutral-500'>{subject?.title} - {department}</p>
                     <p className='text-xl lg:text-2xl text-neutral-400'>Sem {subject?.semester} - {subject?.section}</p>
 
                     <div className="flex items-center justify-between w-full mt-8">
                         <h4 className="text-3xl lg:text-5xl">{formatDate(new Date(classes?.createdOn))}</h4>
-                        <button
-                            className="btn btn-primary hover:bg-secondary px-8 btn-md"
-                            onClick={exportFunc}
-                        >
-                            Export
-                        </button>
+                        <div className="flex gap-4">
+                            <button
+                                className="btn btn-primary hover:bg-secondary px-8 btn-md"
+                                onClick={exportFunc}
+                            >
+                                Export
+                            </button>
+                            <button
+                                className="btn btn-error hover:bg-secondary px-8 btn-md"
+                                onClick={()=>deleteClass(params.id as string, classes.subjectId)}
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <table
@@ -98,8 +114,8 @@ export function ClassPage() {
                     </thead>
                     <tbody>
                     {subject?.studentsEnrolled?.map((item, index) => (
-                        <AttendeeRow index={index} roll={item} user={user[item] && user[item][0]}
-                                     isPresent={classes.attendees.includes(item)}/>
+                        <AttendeeRow id={params.id} index={index} roll={item} user={user[item] && user[item][0]}
+                                     isPresent={classes?.attendees?.includes(item)}/>
                     ))}
                     </tbody>
                 </table>
@@ -114,18 +130,58 @@ interface AttendeeRowProps {
     index: number,
     roll: string,
     user?: User,
-    isPresent: boolean
+    isPresent: boolean,
+    id? : string
 }
 
-const AttendeeRow = ({index, roll, user, isPresent}: AttendeeRowProps) => {
+const AttendeeRow = ({index, roll, user, isPresent, id}: AttendeeRowProps) => {
     const bgColor = index % 2 === 0 ? "bg-base-100" : "bg-base-200"
 
+    const [dropDown, setDropDown] = useState(false)
+
+    const dispatch = useAppDispatch()
+    const dropDownRef = useRef<HTMLTableDataCellElement | null>(null)
+    // useClickOutside(dropDownRef,()=>{
+    //     if(dropDownRef?.current) {
+    //         dropDownRef.current.open = false
+    //     }
+    // })
+    //
+    // useEffect ( () => {
+    //     (()=>{
+    //         console.log(dropDownRef)
+    //     })()
+    // } , [dropDown] );
+
+    function changeAttendance(id : string, roll : string, field : any){
+        dispatch(manualAttendanceThunk( { id : id ,attendanceField : field.innerText,roll : roll } ))
+    }
+
+
+
     return (
-        <tr key={index} className={`text-base h-6 text-base-content ${bgColor}`}>
+        <tr  key={index} className={`text-base h-6 text-base-content ${bgColor}`}>
             <td className="border border-slate-600 text-center p-4">{index + 1}</td>
             <td className="border border-slate-600 text-center p-4">{roll}</td>
-            <td className="border border-slate-600 text-center p-4">{user?.name || "-"}</td>
-            <td className={`border border-slate-600 text-center p-4 font-semibold ${isPresent ? 'text-green-600' : 'text-red-600'}`}>{isPresent ? "Present" : "Absent"}</td>
+            <td className="border border-slate-600 text-center p-4">{user?.name || "--"}</td>
+            <td
+                className={`border border-slate-600 relative  text-center p-4 font-semibold ${isPresent ? 'text-green-600' : 'text-red-600'}`}
+                ref={dropDownRef}
+            >
+                {isPresent ? "Present" : "Absent"}
+                <button   onClick={()=>setDropDown(!dropDown)}>
+                    <MdArrowDropDown size={23}/>
+                </button>
+                {dropDown &&
+                    <button
+
+                        onClick={(event)=>changeAttendance(id as string,roll,event.target)}
+                        className="absolute bg-primary p-1 px-4 rounded-lg right-10 top-5 "
+                    >
+                        {isPresent ? "Absent" : "Present"}
+                    </button>
+                }
+            </td>
         </tr>
     )
 }

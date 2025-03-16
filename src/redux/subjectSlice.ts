@@ -55,6 +55,24 @@ export const getSubjectThunk = createAsyncThunk<
     }
 )
 
+export const deleteSubjectThunk = createAsyncThunk<
+    void,
+    { id: string },
+    {rejectValue : string}
+>(
+    "subject/delete",
+    async ({ id }, { rejectWithValue }) => {
+
+        return await database.collection("subjects").doc(`${id}`)
+            .delete()
+            .then(()=>console.log("subject deleted successfully"))
+            .catch((error)=> {
+                return rejectWithValue ( error )
+            })
+    }
+)
+
+
 export const subjectSlice = createSlice({
     name: 'subject',
     initialState,
@@ -87,6 +105,19 @@ export const subjectSlice = createSlice({
             .addCase(subjectAddThunk.rejected, (state: subjectState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
                 state.error = action.payload || 'subject not created'
+            })
+            .addCase(deleteSubjectThunk.pending, (state: subjectState) => {
+                state.loading = true;
+                state.error = null
+            })
+            .addCase(deleteSubjectThunk.fulfilled, (state: subjectState) => {
+                state.loading = false;
+                state.error = null;
+
+            })
+            .addCase(deleteSubjectThunk.rejected, (state: subjectState, action: PayloadAction<string | undefined>) => {
+                state.loading = false;
+                state.error = action.payload || 'subject not deleted'
             })
     }
 })
