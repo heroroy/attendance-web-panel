@@ -1,8 +1,7 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {database} from "../firebase.ts";
 import Subject from "../Model/Subject.ts";
-import {deleteDoc , query, where, collection, getDocs} from "firebase/firestore";
-import {toast} from "react-toastify";
+import Toast from "../Util/Toast.ts";
 
 
 interface subjectState {
@@ -28,9 +27,9 @@ export const subjectAddThunk = createAsyncThunk<
         await database.collection("subjects")
             .doc(subject.id)
             .set(subject)
-            .catch(error => {
-                console.error("error", error)
-                rejectWithValue(error)
+            .catch(e => {
+                Toast.showError("Failed to create subject")
+                rejectWithValue(e)
             })
     }
 )
@@ -46,64 +45,28 @@ export const getSubjectThunk = createAsyncThunk<
         database.collection("subjects")
             .where('createdBy', '==', `${userId}`)
             .orderBy('created', 'desc')
-            .onSnapshot((querySnapshot) => {
-                console.log("Snapshot =", querySnapshot.docs)
-                dispatch(setSubjects(querySnapshot.docs.map(doc => doc.data() as Subject)))
-                // resolve(sub)
-            }, (error) => {
-                console.error("Error fetching subjects:", error);
-                dispatch(setError(error.message))
-            })
+            .onSnapshot(
+                (querySnapshot) => {
+                    dispatch(setSubjects(querySnapshot.docs.map(doc => doc.data() as Subject)))
+                    // resolve(sub)
+                },
+                error => dispatch(setError(error.message))
+            )
     }
 )
 
 export const deleteSubjectThunk = createAsyncThunk<
     void,
     { id: string },
-    {rejectValue : string}
+    { rejectValue: string }
 >(
     "subject/delete",
-    async ({ id }, { rejectWithValue }) => {
-
-        return await database.collection("subjects").doc(`${id}`)
+    async ({id}, {rejectWithValue}) => {
+        return await database.collection("subjects").doc(id)
             .delete()
-            .then( async ()=> {
-                console.log ( "subject deleted successfully" )
-                setTimeout(()=>{
-                    toast("subject deleted successfully",{
-                        type : "success",
-                        theme : "colored",
-                        position : "top-center",
-                        draggable: true,
-                        autoClose : 2000,
-
-                    })
-                },200)
-
-                const unstub = await getDocs ( query ( collection ( database , "classes" ) , where ( "subjectId" , '==' , `${ id }` ) ) )
-
-                unstub.forEach((doc)=>{
-                    deleteDoc(doc.ref)
-                        .then(()=> {
-                            console.log ( "classes deleted successfully" )
-                            setTimeout(()=>{
-                                toast("classes deleted successfully",{
-                                    type : "success",
-                                    theme : "colored",
-                                    position : "top-center",
-                                    draggable: true,
-                                    autoClose : 2000,
-                                })
-                            },400)
-                        })
-                        .catch(error=>{return rejectWithValue(error)})
-                })
-
-
-
-            })
-            .catch((error)=> {
-                 return rejectWithValue ( error.message )
+            .catch(e => {
+                Toast.showError("Failed to delete subject")
+                rejectWithValue(e)
             })
     }
 )

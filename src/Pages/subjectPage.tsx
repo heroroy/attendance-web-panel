@@ -15,7 +15,6 @@ import {exportAttendance} from "../Util/exportAttendance.ts";
 import {DateRange} from "rsuite/DateRangePicker";
 import {deleteSubjectThunk} from "../redux/subjectSlice.ts";
 import {MdArrowCircleLeft} from "react-icons/md";
-import {ToastContainer} from "react-toastify";
 
 export function SubjectPage() {
     const params = useParams()
@@ -28,9 +27,9 @@ export function SubjectPage() {
     const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
     const {error} = useAppSelector(state => state.subject)
 
-    useEffect ( () => {
-        window.scrollTo(0,0)
-    } , [] );
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, []);
 
 
     useEffect(() => {
@@ -50,12 +49,12 @@ export function SubjectPage() {
 
         const enrolledStudentCount = subject.studentsEnrolled.length
 
-        const avgAttendancePerClass = classes.map(classData=> (classData.attendees?.length || 0) / enrolledStudentCount * 100)
+        const avgAttendancePerClass = classes.map(classData => (classData.attendees?.length || 0) / enrolledStudentCount * 100)
 
-        let averageAttendance = _.sum( avgAttendancePerClass) / classes.length
+        let averageAttendance = _.sum(avgAttendancePerClass) / classes.length
         console.log(averageAttendance)
         // averageAttendance = Math.round((averageAttendance + Number.EPSILON) * 100) / 100
-        averageAttendance = (Math.round(averageAttendance + Number.EPSILON ) / 100) * 100
+        averageAttendance = (Math.round(averageAttendance + Number.EPSILON) / 100) * 100
         console.log(averageAttendance)
 
         setAvgAttendance(averageAttendance)
@@ -70,11 +69,10 @@ export function SubjectPage() {
         month: getDate((classes[item as keyof typeof classes] as Class).createdOn).month
     })), 'month')
 
-    function deleteSubject(){
-        dispatch(deleteSubjectThunk( { id : subject?.id as string }))
-        setTimeout(()=>{
-            navigate(-1)
-        },3000)
+    function deleteSubject() {
+        if (!subject) return;
+        const subjectId = subject.id
+        dispatch(deleteSubjectThunk({id: subjectId}))
     }
 
 
@@ -105,7 +103,7 @@ export function SubjectPage() {
     }
 
     let screenState: ScreenState
-    let errorState : string | null | undefined
+    let errorState: string | null | undefined
 
     if (subjectError || classError || error) {
         screenState = ScreenState.ERROR
@@ -116,7 +114,8 @@ export function SubjectPage() {
 
     return (
         <ScreenComponent error={errorState} state={screenState}>
-            <button onClick={()=>navigate(-1)} title="Back" className=" btn-soft btn-secondary fixed left-10 top-24"><MdArrowCircleLeft size={40}/></button>
+            <button onClick={() => navigate(-1)} title="Back" className=" btn-soft btn-secondary fixed left-10 top-24">
+                <MdArrowCircleLeft size={40}/></button>
             <div className="h-screen w-full flex flex-col">
                 <div className="mb-20 flex flex-col gap-8 lg:gap-16">
                     <div className='flex flex-row w-full justify-between'>
@@ -125,17 +124,13 @@ export function SubjectPage() {
                             <p className="text-xl lg:text-xl text-neutral-400">Sem {subject?.semester} - {subject?.section}</p>
                             <h4 className="text-3xl lg:text-5xl mt-8">{subject?.title}</h4>
                         </div>
-                        <button
-                            className="btn btn-error  btn-md"
-                            onClick={()=>deleteSubject()}
-                        >
+                        <button className="btn btn-error btn-sm" onClick={deleteSubject}>
                             Delete
                         </button>
                     </div>
-                    <ToastContainer position="top-center" autoClose={2000}/>
 
                     <div className="flex flex-row w-full justify-between">
-                    <div className='flex flex-row gap-16 items-center'>
+                        <div className='flex flex-row gap-16 items-center'>
                             <p className="flex flex-col items-center"><span
                                 className="text-4xl">{size(classes)}</span> <span
                                 className="text-xl text-neutral-500">Classes</span>
@@ -149,7 +144,7 @@ export function SubjectPage() {
                             <div className="flex rounded-xl justify-self-start px-1 items-center gap-1">
                                 <DateRangePicker
                                     className="border-transparent focus:border-transparent focus:ring-0"
-                                     onChange={setDateRange}
+                                    onChange={setDateRange}
                                     placement="auto" placeholder="Export"/>
                                 <button className="btn btn-primary btn-sm" onClick={handleExport}>Export</button>
                             </div>}
