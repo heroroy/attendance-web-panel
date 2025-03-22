@@ -15,6 +15,7 @@ import {exportAttendance} from "../Util/exportAttendance.ts";
 import {DateRange} from "rsuite/DateRangePicker";
 import {deleteSubjectThunk} from "../redux/subjectSlice.ts";
 import {MdArrowCircleLeft} from "react-icons/md";
+import {ToastContainer} from "react-toastify";
 
 export function SubjectPage() {
     const params = useParams()
@@ -25,6 +26,7 @@ export function SubjectPage() {
 
     const {classes, loading: classLoading, error: classError} = useAppSelector(state => state.class)
     const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
+    const {error} = useAppSelector(state => state.subject)
 
     useEffect ( () => {
         window.scrollTo(0,0)
@@ -68,9 +70,11 @@ export function SubjectPage() {
         month: getDate((classes[item as keyof typeof classes] as Class).createdOn).month
     })), 'month')
 
-    function deleteSubject(id : string){
-        dispatch(deleteSubjectThunk( { id : id }))
-        navigate("../home")
+    function deleteSubject(){
+        dispatch(deleteSubjectThunk( { id : subject?.id as string }))
+        setTimeout(()=>{
+            navigate(-1)
+        },3000)
     }
 
 
@@ -101,15 +105,17 @@ export function SubjectPage() {
     }
 
     let screenState: ScreenState
+    let errorState : string | null | undefined
 
-    if (subjectError || classError) {
+    if (subjectError || classError || error) {
         screenState = ScreenState.ERROR
+        errorState = subjectError || classError
     } else if (subjectLoading || classLoading) {
         screenState = ScreenState.LOADING
     } else screenState = ScreenState.SUCCESS
 
     return (
-        <ScreenComponent state={screenState}>
+        <ScreenComponent error={errorState} state={screenState}>
             <button onClick={()=>navigate(-1)} title="Back" className=" btn-soft btn-secondary fixed left-10 top-24"><MdArrowCircleLeft size={40}/></button>
             <div className="h-screen w-full flex flex-col">
                 <div className="mb-20 flex flex-col gap-8 lg:gap-16">
@@ -121,11 +127,12 @@ export function SubjectPage() {
                         </div>
                         <button
                             className="btn btn-error  btn-md"
-                            onClick={()=>deleteSubject(subject?.id as string)}
+                            onClick={()=>deleteSubject()}
                         >
                             Delete
                         </button>
                     </div>
+                    <ToastContainer position="top-center" autoClose={2000}/>
 
                     <div className="flex flex-row w-full justify-between">
                     <div className='flex flex-row gap-16 items-center'>

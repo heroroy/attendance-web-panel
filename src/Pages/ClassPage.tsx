@@ -1,6 +1,6 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
-import {useEffect , useRef , useState} from "react";
+import {useEffect , useRef } from "react";
 import {deleteClassThunk , getClassByIdThunk , manualAttendanceThunk} from "../redux/classesSlice.ts";
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdsThunk} from "../redux/userSlice.ts";
@@ -10,7 +10,9 @@ import {exportAttendance} from "../Util/exportAttendance.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 import User from "../Model/User.ts";
 import {getDepartmentShort} from "../Model/Department.ts";
-import {MdArrowCircleLeft , MdArrowDropDown} from "react-icons/md";
+import {MdArrowCircleLeft } from "react-icons/md";
+import {Class} from "../Model/Class.ts";
+import {   ToastContainer } from "react-toastify"
 
 
 
@@ -60,24 +62,30 @@ export function ClassPage() {
     }
 
 
-    function deleteClass(id : string, subjectid : string){
-        dispatch(deleteClassThunk( { id : id }))
-        navigate(`../subject/${subjectid}`)
+    function deleteClass(){
+        dispatch(deleteClassThunk( { id : params.id as string }))
+        setTimeout(()=>{
+            navigate(-1)
+        },3000)
     }
 
     if (!classes || isArray(classes))
         return <h1>Loading...</h1>
 
     let screenState: ScreenState
+    let errorState : string | null | undefined
 
-    if (subjectError || classError || usersError) screenState = ScreenState.ERROR
+    if (subjectError  || classError || usersError) {
+        screenState = ScreenState.ERROR
+        errorState = subjectError || classError || usersError
+    }
     else if (subjectLoading || classLoading || usersLoading) screenState = ScreenState.LOADING
     else screenState = ScreenState.SUCCESS
 
     const department = subject ? getDepartmentShort(subject.department) : 'null'
 
     return (
-        <ScreenComponent state={screenState}>
+        <ScreenComponent error={errorState} state={screenState}>
             <button onClick={()=>navigate(-1)} title="Back" className=" btn-soft btn-secondary fixed left-10 top-24"><MdArrowCircleLeft size={40}/></button>
             <div className='flex flex-col gap-16 w-full'>
                 <div className='flex flex-col'>
@@ -95,7 +103,7 @@ export function ClassPage() {
                             </button>
                             <button
                                 className="btn btn-error hover:bg-secondary px-8 btn-md"
-                                onClick={()=>deleteClass(params.id as string, classes.subjectId)}
+                                onClick={()=>deleteClass()}
                             >
                                 Delete
                             </button>
@@ -114,8 +122,8 @@ export function ClassPage() {
                     </thead>
                     <tbody>
                     {subject?.studentsEnrolled?.map((item, index) => (
-                        <AttendeeRow id={params.id} index={index} roll={item} user={user[item] && user[item][0]}
-                                     isPresent={classes?.attendees?.includes(item)}/>
+                        <AttendeeRow index={index} roll={item} user={user[item] && user[item][0]}
+                                     isPresent={classes?.attendees?.includes(item)} classes={classes}/>
                     ))}
                     </tbody>
                 </table>
@@ -131,30 +139,18 @@ interface AttendeeRowProps {
     roll: string,
     user?: User,
     isPresent: boolean,
-    id? : string
+    classes : Class
 }
 
-const AttendeeRow = ({index, roll, user, isPresent, id}: AttendeeRowProps) => {
+const AttendeeRow  = ({index, roll, user, isPresent, classes}: AttendeeRowProps)  => {
     const bgColor = index % 2 === 0 ? "bg-base-100" : "bg-base-200"
 
-    const [dropDown, setDropDown] = useState(false)
+    const { loading : attendanceLoading} = useAppSelector(state => state.class)
 
     const dispatch = useAppDispatch()
     const dropDownRef = useRef<HTMLTableDataCellElement | null>(null)
-    // useClickOutside(dropDownRef,()=>{
-    //     if(dropDownRef?.current) {
-    //         dropDownRef.current.open = false
-    //     }
-    // })
-    //
-    // useEffect ( () => {
-    //     (()=>{
-    //         console.log(dropDownRef)
-    //     })()
-    // } , [dropDown] );
-
-    function changeAttendance(id : string, roll : string, field : any){
-        dispatch(manualAttendanceThunk( { id : id ,attendanceField : field.innerText,roll : roll } ))
+     function toggleAttendance( classes : Class, roll : string){
+        dispatch(manualAttendanceThunk( { classes : classes ,roll : roll } ))
     }
 
 
@@ -165,22 +161,12 @@ const AttendeeRow = ({index, roll, user, isPresent, id}: AttendeeRowProps) => {
             <td className="border border-slate-600 text-center p-4">{roll}</td>
             <td className="border border-slate-600 text-center p-4">{user?.name || "--"}</td>
             <td
-                className={`border border-slate-600 relative  text-center p-4 font-semibold ${isPresent ? 'text-green-600' : 'text-red-600'}`}
+                className={`border border-slate-600 relative text-center p-4 font-semibold ${isPresent ? 'text-green-600' : 'text-red-600'}`}
                 ref={dropDownRef}
             >
                 {isPresent ? "Present" : "Absent"}
-                <button   onClick={()=>setDropDown(!dropDown)}>
-                    <MdArrowDropDown size={23}/>
-                </button>
-                {dropDown &&
-                    <button
-
-                        onClick={(event)=>changeAttendance(id as string,roll,event.target)}
-                        className="absolute bg-primary p-1 px-4 rounded-lg right-10 top-5 "
-                    >
-                        {isPresent ? "Absent" : "Present"}
-                    </button>
-                }
+                <input disabled={attendanceLoading} checked={isPresent} onClick={()=>toggleAttendance(classes,roll)} color="inherit" className="ms-8 checkbox checkbox-success checkbox-sm" type="checkbox"/>
+                <ToastContainer position="top-center" autoClose={2000}/>
             </td>
         </tr>
     )

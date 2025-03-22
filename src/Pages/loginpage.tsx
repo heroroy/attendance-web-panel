@@ -7,10 +7,7 @@ import logo from "../assets/rcc_logo.png"
 
 export function Loginpage() {
 
-    // const [profile, setProfile] = useState({
-    //     name : "",
-    //     pfp : ""
-    // })
+
 
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
@@ -38,7 +35,7 @@ export function Loginpage() {
 
     return (
 
-        <ScreenComponent state={loading ? ScreenState.LOADING : error ? ScreenState.ERROR : ScreenState.SUCCESS}>
+        <ScreenComponent error={error} state={loading ? ScreenState.LOADING : error ? ScreenState.ERROR : ScreenState.SUCCESS}>
             <div className="flex h-full flex-col overflow-hidden justify-center items-center gap-12">
 
                 <div className="flex flex-col items-center gap-2">

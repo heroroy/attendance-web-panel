@@ -1,6 +1,8 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {database} from "../firebase.ts";
 import Subject from "../Model/Subject.ts";
+import {deleteDoc , query, where, collection, getDocs} from "firebase/firestore";
+import {toast} from "react-toastify";
 
 
 interface subjectState {
@@ -65,9 +67,43 @@ export const deleteSubjectThunk = createAsyncThunk<
 
         return await database.collection("subjects").doc(`${id}`)
             .delete()
-            .then(()=>console.log("subject deleted successfully"))
+            .then( async ()=> {
+                console.log ( "subject deleted successfully" )
+                setTimeout(()=>{
+                    toast("subject deleted successfully",{
+                        type : "success",
+                        theme : "colored",
+                        position : "top-center",
+                        draggable: true,
+                        autoClose : 2000,
+
+                    })
+                },200)
+
+                const unstub = await getDocs ( query ( collection ( database , "classes" ) , where ( "subjectId" , '==' , `${ id }` ) ) )
+
+                unstub.forEach((doc)=>{
+                    deleteDoc(doc.ref)
+                        .then(()=> {
+                            console.log ( "classes deleted successfully" )
+                            setTimeout(()=>{
+                                toast("classes deleted successfully",{
+                                    type : "success",
+                                    theme : "colored",
+                                    position : "top-center",
+                                    draggable: true,
+                                    autoClose : 2000,
+                                })
+                            },400)
+                        })
+                        .catch(error=>{return rejectWithValue(error)})
+                })
+
+
+
+            })
             .catch((error)=> {
-                return rejectWithValue ( error )
+                 return rejectWithValue ( error.message )
             })
     }
 )
@@ -88,7 +124,7 @@ export const subjectSlice = createSlice({
         },
         setError(state: subjectState, action: PayloadAction<string | undefined>) {
             state.loading = false;
-            state.error = action.payload;
+            state.error = action.payload || "Subject not found";
         },
     },
     extraReducers: (builder) => {

@@ -1,17 +1,21 @@
 import {createAsyncThunk , createSlice , PayloadAction} from "@reduxjs/toolkit";
 import { database} from "../firebase.ts";
 import {Class} from "../Model/Class.ts";
+import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import {toast} from "react-toastify";
 
 interface classState {
     classes : Class[] | Class
     loading? : boolean,
-    error? : string | null
+    error? : string | null,
+
 }
 
 const initialState: classState  = {
     classes : [],
     loading : false,
-    error : null
+    error : null,
+
 }
 
 export const getClassesThunk= createAsyncThunk<
@@ -38,22 +42,6 @@ export const getClassesThunk= createAsyncThunk<
                 .catch(e=>{
                     return rejectWithValue(e)
                 })
-            // querySnapshot.forEach((doc)=>{
-            //     querySnapshot_class.forEach((doc_class)=>{
-            //         Object.entries(doc_class.data()).map(([key, value])=>{
-            //             if(key==="subjectId"){
-            //                 if(value===id){
-            //                     classArray.push(doc_class.data())
-            //                 }
-            //             }
-            //         })
-            //     })
-            // })
-            // console.log(classArray)
-            // return { classArray : classArray }
-        // }catch (error){
-        //     return rejectWithValue(error)
-        // }
     }
 )
 
@@ -71,76 +59,38 @@ export const getClassByIdThunk = createAsyncThunk<
             },(error)=>{
                 dispatch(setError(error.message))
             })
-            // .get()
-            // .then((result)=>{
-            //     return result.data() as Class
-            // }).then((classes)=>{
-            //     console.log(classes)
-            //     return classes
-            // })
-            // .catch(error=>{
-            //     return rejectWithValue(error)
-            // })
     }
 )
 
 export const manualAttendanceThunk = createAsyncThunk<
     void,
-    {id : string, attendanceField : string, roll : string},
+    {classes : Class, roll : string},
     {rejectValue : string}
 >(
     "class/manualAttendance",
-    async ({id, attendanceField,roll}, {rejectWithValue})=>{
-
-        console.log(id)
-
-        const classDoc = await database.collection("classes").doc(`${id}`)
+    async ({classes,roll}, {rejectWithValue})=>{
 
 
-        return await classDoc.get().then((result)=>{
-            return result.data() as Class
-        }).then((result)=>{
-            if(attendanceField === "Present" ) {
-                return classDoc.update ( {
-                    ...result,
-                    attendees : result?.attendees ?  [...result?.attendees,  roll ] : [roll]
-
-                } ).then ( () => console.log ( "doc updated successfully" ) )
-                    .catch ( error => {
-                        return rejectWithValue ( error.message )
-                    } )
-            }
-            else return classDoc.update( {
-                attendees : result?.attendees?.filter((items)=>items!=roll)
-            }).then(()=>console.log("doc updated successfully"))
-                .catch(error=> {
-                    return rejectWithValue ( error.message )
-                })
+        return  await  updateDoc(doc(database,"classes",`${classes?.id}`),{
+            attendees : classes?.attendees?.includes(roll) ? arrayRemove(roll) : arrayUnion(roll)
         })
-            .catch(error=>{return rejectWithValue(error.message)})
+            .then(()=> {
+                console.log("doc updated successfully")
+                setTimeout(()=>{
+                    toast("doc updated successfully",{
+                        type : "success",
+                        theme : "colored",
+                        position : "top-center",
+                        draggable: true,
+                        autoClose : 2000,
 
-
-        // if(attendanceField === "Present" ){
-        //     classDoc.get().then((result)=>{
-        //         return result.data() as Class
-        //     }).then((result)=>{
-        //         if (!result.attendees.includes(roll)) return classDoc.update({
-        //             attendees : result.attendees.push(roll)
-        //         }).then(()=>console.log("doc updated successfully"))
-        //             .catch(error=> {
-        //                 return rejectWithValue ( error )
-        //             })
-        //     })
-        // }
-        // else {
-        //
-        // }
-
-        // return database.collection("classes").doc(`${id}`)
-        //     .set((prevState)=>{
-        //         ...prevState,
-        //
-        //     })
+                    })
+                },300)
+                // return  "doc updated successfully"
+            })
+            .catch(error=> {
+                return rejectWithValue ( error.message )
+            })
     }
 )
 
@@ -154,7 +104,19 @@ export const deleteClassThunk = createAsyncThunk<
 
         return await database.collection("classes").doc(`${id}`)
             .delete()
-            .then(()=>console.log("class deleted successfully"))
+            .then(()=> {
+                setTimeout(()=>{
+                    toast("class deleted successfully",{
+                        type : "success",
+                        theme : "colored",
+                        position : "top-center",
+                        draggable: true,
+                        autoClose : 2000,
+
+                    })
+                },300)
+                console.log ( "class deleted successfully" )
+            })
             .catch((error)=> {
                 return rejectWithValue ( error )
             })
@@ -195,30 +157,17 @@ export const classesSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload || 'class not found'
             })
-            // .addCase(getClassByIdThunk.pending,(state : classState ) => {
-            //     state.loading = true;
-            //     state.error = null
-            // })
-            // .addCase(getClassByIdThunk.fulfilled,(state : classState, action : PayloadAction<Class> ) => {
-            //     state.loading = false;
-            //     state.error = null;
-            //     state.classes = action.payload
-            // })
-            // .addCase(getClassByIdThunk.rejected,(state : classState, action : PayloadAction<string | undefined> ) => {
-            //     state.loading = false;
-            //     state.error = action.payload || 'class not found'
-            // })
             .addCase(manualAttendanceThunk.pending,(state : classState ) => {
                 state.loading = true;
                 state.error = null
             })
-            .addCase(manualAttendanceThunk.fulfilled,(state : classState ) => {
+            .addCase(manualAttendanceThunk.fulfilled,  (state : classState ) => {
                 state.loading = false;
                 state.error = null;
             })
             .addCase(manualAttendanceThunk.rejected,(state : classState, action : PayloadAction<string | undefined> ) => {
                 state.loading = false;
-                state.error = action.payload || 'class not found'
+                state.error = action.payload || "attendance not updated'"
             })
             .addCase(deleteClassThunk.pending,(state : classState ) => {
                 state.loading = true;
@@ -227,6 +176,7 @@ export const classesSlice = createSlice({
             .addCase(deleteClassThunk.fulfilled,(state : classState ) => {
                 state.loading = false;
                 state.error = null;
+
             })
             .addCase(deleteClassThunk.rejected,(state : classState, action : PayloadAction<string | undefined> ) => {
                 state.loading = false;

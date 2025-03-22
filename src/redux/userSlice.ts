@@ -59,7 +59,7 @@ export const userByIdSlice = createSlice({
             })
             .addCase(getUsersByIdsThunk.rejected, (state: userState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
-                state.error = action.payload || 'subject not created'
+                state.error = action.payload || 'User not found'
             })
     }
 })

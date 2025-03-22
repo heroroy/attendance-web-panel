@@ -29,7 +29,7 @@ export const loginThunk = createAsyncThunk<
     'profile/login',
     async (_, {rejectWithValue}) => {
         const provider = new GoogleAuthProvider()
-        provider.addScope("https://www.googleapis.com/auth/youtube.force-ssl")
+        provider.addScope("https://www.googleapis.com/auth/contacts.readonly")
 
         return await auth.signInWithPopup(provider)
             .then(result => result.user)
@@ -131,7 +131,7 @@ export const profileSlice = createSlice({
             })
             .addCase(loginThunk.rejected, (state: ProfileState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
-                state.error = action.payload || "cannot load profile";
+                state.error = action.payload || "Login failure";
             })
             .addCase(getProfileThunk.pending, (state: ProfileState) => {
                 state.loading = true;
@@ -157,7 +157,7 @@ export const profileSlice = createSlice({
             })
             .addCase(logoutThunk.rejected, (state: ProfileState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
-                state.error = action.payload || "cannot load profile";
+                state.error = action.payload || "couldn't logout";
             })
     }
 })

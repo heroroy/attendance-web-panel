@@ -29,7 +29,9 @@ export const getSubjectByIdThunk = createAsyncThunk<
         return await database.collection("subjects").doc(id)
             .get()
             .then(result => result.data() as Subject)
-            .catch(rejectWithValue)
+            .catch((error)=> {
+                return rejectWithValue(error.message)
+            })
     }
 )
 export const subjectByIdSlice = createSlice({
@@ -53,7 +55,7 @@ export const subjectByIdSlice = createSlice({
             })
             .addCase(getSubjectByIdThunk.rejected, (state: SubjectByIdState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
-                state.error = action.payload || 'subject not created'
+                state.error = action.payload || "Invalid subject Id"
             })
     }
 })

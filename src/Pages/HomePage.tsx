@@ -1,20 +1,20 @@
-import {useEffect, useState} from "react";
+import {useEffect , useState} from "react";
 import {CreateSubjectModal} from "../Component/createSubjectModal.tsx";
-import {useAppDispatch, useAppSelector} from "../redux/store.ts";
+import {useAppDispatch , useAppSelector} from "../redux/store.ts";
 import {getSubjectThunk} from "../redux/subjectSlice.ts";
 import _ from 'lodash'
 import SubjectCard from "../Component/SubjectCard.tsx";
 import Department from "../Model/Department.ts";
 import {capitalizeWords} from "../Util/Naming_Conv.ts";
-import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
+import {ScreenComponent , ScreenState} from "../Component/ScreenComponent.tsx";
 
 export function HomePage() {
     const [open, setOpen] = useState<boolean>(false)
 
     const dispatch = useAppDispatch()
 
-    const {profile, loading, error} = useAppSelector(state => state.auth)
-    const {subjects} = useAppSelector(state => state.subject)
+    const {profile, loading, error : profileError} = useAppSelector(state => state.auth)
+    const {subjects, error : subjectError, loading : subjectsLoading} = useAppSelector(state => state.subject)
     console.log(subjects)
     const groupedSubjects = _.groupBy(subjects, 'department')
 
@@ -34,11 +34,21 @@ export function HomePage() {
 
     }, [profile, dispatch])
 
+    let errorstate : string | null | undefined
+    let screenState : ScreenState
+
+    if(profileError || subjectError) {
+        screenState = ScreenState.ERROR
+        errorstate = profileError || subjectError
+    }
+    else if(loading || subjectsLoading) screenState = ScreenState.LOADING
+    else  screenState = ScreenState.SUCCESS
+
 
 
     return (
 
-        <ScreenComponent state={loading ? ScreenState.LOADING : error ? ScreenState.ERROR : ScreenState.SUCCESS}>
+        <ScreenComponent error={errorstate} state={screenState}>
 
             <div  className="w-full h-full items-stretch flex flex-col gap-32 relative ">
                 <div className='flex w-full flex-row justify-between items-center'>
