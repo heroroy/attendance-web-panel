@@ -15,6 +15,8 @@ import {exportAttendance} from "../Util/exportAttendance.ts";
 import {DateRange} from "rsuite/DateRangePicker";
 import {deleteSubjectThunk} from "../redux/subjectSlice.ts";
 import {MdArrowCircleLeft} from "react-icons/md";
+import Toast from "../Util/Toast.ts";
+import {BiLoader} from "react-icons/bi";
 
 export function SubjectPage() {
     const params = useParams()
@@ -23,9 +25,9 @@ export function SubjectPage() {
 
     const [dateRange, setDateRange] = useState<DateRange | null>(null);
 
-    const {classes, loading: classLoading, error: classError} = useAppSelector(state => state.class)
+    const {classes, classloading: classLoading, classError: classError} = useAppSelector(state => state.class)
     const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
-    const {error} = useAppSelector(state => state.subject)
+    const {deleteSubError : error, deleteSubLoading} = useAppSelector(state => state.subject)
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -69,10 +71,18 @@ export function SubjectPage() {
         month: getDate((classes[item as keyof typeof classes] as Class).createdOn).month
     })), 'month')
 
-    function deleteSubject() {
+    async function deleteSubject() {
         if (!subject) return;
         const subjectId = subject.id
-        dispatch(deleteSubjectThunk({id: subjectId}))
+        await dispatch(deleteSubjectThunk({id: subjectId}))
+            .unwrap()
+            .then(()=>{
+                navigate(-1)
+            })
+            .catch((e)=>{
+                Toast.showError(e)
+                Toast.showError(error)
+            })
     }
 
 
@@ -105,7 +115,7 @@ export function SubjectPage() {
     let screenState: ScreenState
     let errorState: string | null | undefined
 
-    if (subjectError || classError || error) {
+    if (subjectError || classError ) {
         screenState = ScreenState.ERROR
         errorState = subjectError || classError
     } else if (subjectLoading || classLoading) {
@@ -124,9 +134,9 @@ export function SubjectPage() {
                             <p className="text-xl lg:text-xl text-neutral-400">Sem {subject?.semester} - {subject?.section}</p>
                             <h4 className="text-3xl lg:text-5xl mt-8">{subject?.title}</h4>
                         </div>
-                        <button className="btn btn-error btn-sm" onClick={deleteSubject}>
+                        {deleteSubLoading ? <BiLoader size={25}/> : <button className="btn btn-error btn-sm" onClick={ deleteSubject }>
                             Delete
-                        </button>
+                        </button> }
                     </div>
 
                     <div className="flex flex-row w-full justify-between">

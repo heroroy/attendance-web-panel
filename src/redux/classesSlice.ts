@@ -7,15 +7,28 @@ import FieldValue = firebase.firestore.FieldValue;
 
 interface classState {
     classes: Class[] | Class
-    loading?: boolean,
-    error?: string | null,
+    classloading?: boolean,
+    classError?: string | null,
+    toggleAttendanceLoading? : boolean,
+    toggleAttendanceError? : string | null,
+    deleteClassLoading? : boolean,
+    deleteClassError? : string | null,
+    classByIdLoading?: boolean,
+    classByIdError?: string | null,
+
 }
 
 const initialState: classState = {
     classes: [],
-    loading: false,
-    error: null,
-    deleteComplete: false,
+    classloading: false,
+    classError:  null,
+    toggleAttendanceLoading : false,
+    toggleAttendanceError : null,
+    deleteClassLoading : false,
+    deleteClassError :  null,
+    classByIdLoading: false,
+    classByIdError:  null,
+
 }
 
 export const getClassesThunk = createAsyncThunk<
@@ -53,13 +66,13 @@ export const getClassByIdThunk = createAsyncThunk<
 )
 
 export const manualAttendanceThunk = createAsyncThunk<
-    void,
+    Promise<void>,
     { class: Class, roll: string },
     { rejectValue: string }
 >(
     "class/manualAttendance",
     async ({class: classInfo, roll}, {rejectWithValue}) => {
-        const exists = classInfo.attendees.includes(roll)
+        const exists = classInfo?.attendees?.includes(roll)
         return await database.collection("classes")
             .doc(classInfo.id)
             .update({
@@ -73,17 +86,25 @@ export const manualAttendanceThunk = createAsyncThunk<
 )
 
 export const deleteClassThunk = createAsyncThunk<
-    void,
+    Promise<void>,
     { id: string },
     { rejectValue: string }
 >(
     "class/delete",
     async ({id}, {rejectWithValue}) => {
+
+        // try {
+        //     return await database.collection("classe").doc(id)
+        //         .delete()
+        // }catch (error){
+        //     return rejectWithValue(error.message)
+        // }
+
         return await database.collection("classes").doc(id)
             .delete()
             .catch(e => {
                 Toast.showError("Failed to delete class")
-                return rejectWithValue(e)
+                rejectWithValue(e.message)
             })
     }
 )
@@ -94,55 +115,57 @@ export const classesSlice = createSlice({
     initialState,
     reducers: {
         setPending(state: classState) {
-            state.loading = true;
-            state.error = null
+            state.classByIdLoading = true;
+            state.classByIdError = null
         },
         setClasses(state: classState, action: PayloadAction<Class>) {
-            state.loading = false;
-            state.error = null;
+            state.classByIdLoading = false;
+            state.classByIdError = null;
             state.classes = action.payload
         },
         setError(state: classState, action: PayloadAction<string | undefined>) {
-            state.loading = false;
-            state.error = action.payload
+            state.classByIdLoading = false;
+            state.classByIdError = action.payload
         }
     },
     extraReducers: (builder) => {
         builder
             .addCase(getClassesThunk.pending, (state: classState) => {
-                state.loading = true;
-                state.error = null
+                state.classloading = true;
+                state.classError = null
             })
             .addCase(getClassesThunk.fulfilled, (state: classState, action: PayloadAction<Class[]>) => {
-                state.loading = false;
-                state.error = null;
+                state.classloading = false;
+                state.classError = null;
                 state.classes = action.payload
             })
             .addCase(getClassesThunk.rejected, (state: classState, action: PayloadAction<string | undefined>) => {
-                state.loading = false;
-                state.error = action.payload || 'class not found'
+                state.classloading = false;
+                state.classError = action.payload || 'class not found'
             })
             .addCase(manualAttendanceThunk.pending, (state: classState) => {
-                state.loading = true;
-                state.error = null
+                state.toggleAttendanceLoading = true;
+                state.toggleAttendanceError = null
             })
             .addCase(manualAttendanceThunk.fulfilled, (state: classState) => {
-                state.loading = false;
-                state.error = null;
+                state.toggleAttendanceLoading = false;
+                state.toggleAttendanceError = null;
             })
             .addCase(manualAttendanceThunk.rejected, (state: classState, action: PayloadAction<string | undefined>) => {
-                state.loading = false;
+                state.toggleAttendanceLoading = false;
+                state.toggleAttendanceError = action.payload || "attendance couldn't updated";
             })
             .addCase(deleteClassThunk.pending, (state: classState) => {
-                state.loading = true;
-                state.error = null
+                state.deleteClassLoading = true;
+                state.deleteClassError = null
             })
             .addCase(deleteClassThunk.fulfilled, (state: classState) => {
-                state.loading = false;
-                state.error = null;
+                state.deleteClassLoading = false;
+                state.deleteClassError = null;
             })
             .addCase(deleteClassThunk.rejected, (state: classState, action: PayloadAction<string | undefined>) => {
-                state.loading = false;
+                state.deleteClassLoading = false;
+                state.deleteClassError = action.payload;
             })
     }
 })

@@ -6,19 +6,27 @@ import Toast from "../Util/Toast.ts";
 
 interface subjectState {
     subjects: Subject[]
-    loading?: boolean,
-    error?: string | null
+    subjectAddLoading?: boolean,
+    subjectAddError?: string | null,
+    getSubLoading?: boolean,
+    getSubError?: string | null,
+    deleteSubLoading?: boolean,
+    deleteSubError?: string | null,
 }
 
 const initialState: subjectState = {
     subjects: [],
-    loading: false,
-    error: null
+    subjectAddLoading: false,
+    subjectAddError:  null,
+    getSubLoading: false,
+    getSubError:  null,
+    deleteSubLoading: false,
+    deleteSubError:  null,
 }
 
 
 export const subjectAddThunk = createAsyncThunk<
-    void,
+    Promise<void>,
     Subject,
     { rejectValue: string }
 >(
@@ -56,7 +64,7 @@ export const getSubjectThunk = createAsyncThunk<
 )
 
 export const deleteSubjectThunk = createAsyncThunk<
-    void,
+    Promise<void>,
     { id: string },
     { rejectValue: string }
 >(
@@ -77,46 +85,46 @@ export const subjectSlice = createSlice({
     initialState,
     reducers: {
         setPending(state: subjectState) {
-            state.loading = true;
-            state.error = null;
+            state.getSubLoading = true;
+            state.getSubError = null;
         },
         setSubjects(state: subjectState, action: PayloadAction<Subject[]>) {
-            state.loading = false;
-            state.error = null;
+            state.getSubLoading = false;
+            state.getSubError = null;
             state.subjects = action.payload;
         },
         setError(state: subjectState, action: PayloadAction<string | undefined>) {
-            state.loading = false;
-            state.error = action.payload || "Subject not found";
+            state.getSubLoading = false;
+            state.getSubError = action.payload || "Subject not found";
         },
     },
     extraReducers: (builder) => {
         builder
             .addCase(subjectAddThunk.pending, (state: subjectState) => {
-                state.loading = true;
-                state.error = null
+                state.subjectAddLoading = true;
+                state.subjectAddError = null
             })
             .addCase(subjectAddThunk.fulfilled, (state: subjectState) => {
-                state.loading = false;
-                state.error = null;
+                state.subjectAddLoading = false;
+                state.subjectAddError = null;
 
             })
             .addCase(subjectAddThunk.rejected, (state: subjectState, action: PayloadAction<string | undefined>) => {
-                state.loading = false;
-                state.error = action.payload || 'subject not created'
+                state.subjectAddLoading = false;
+                state.subjectAddError = action.payload || 'subject not created'
             })
             .addCase(deleteSubjectThunk.pending, (state: subjectState) => {
-                state.loading = true;
-                state.error = null
+                state.deleteSubLoading = true;
+                state.deleteSubError = null
             })
             .addCase(deleteSubjectThunk.fulfilled, (state: subjectState) => {
-                state.loading = false;
-                state.error = null;
+                state.deleteSubLoading = false;
+                state.deleteSubError = null;
 
             })
             .addCase(deleteSubjectThunk.rejected, (state: subjectState, action: PayloadAction<string | undefined>) => {
-                state.loading = false;
-                state.error = action.payload || 'subject not deleted'
+                state.deleteSubLoading = false;
+                state.deleteSubError = action.payload || 'subject not deleted'
             })
     }
 })

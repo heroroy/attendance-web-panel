@@ -10,7 +10,7 @@ export default class Toast {
         toast(message, {type: "success", theme: "colored", autoClose: 2000})
     }
 
-    static showError(message: string) {
+    static showError(message: string | undefined | null) {
         toast(message, {type: "error", theme: "colored", autoClose: 2000})
     }
 }

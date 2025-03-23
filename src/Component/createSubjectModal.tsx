@@ -8,6 +8,8 @@ import Subject from "../Model/Subject.ts";
 import Department, {getDepartmentFromLabel} from "../Model/Department.ts";
 import {v4 as uuidv4} from 'uuid';
 import readCsv from "../Util/CsvReader.ts";
+import {BiLoader} from "react-icons/bi";
+import Toast from "../Util/Toast.ts";
 
 export interface inputModal {
     name: string,
@@ -33,6 +35,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
         sem : 0
     })
     const profile = useAppSelector(state => state.auth.profile)
+    const { subjectAddError, subjectAddLoading } = useAppSelector(state => state.subject)
 
     const dept: string[] = Object.values(Department)
     const sem: number[] = Object.values(Semester)
@@ -55,16 +58,16 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
 
     const dispatch = useAppDispatch()
 
-    function handleSubmit(e: FormEvent) {
+    async function handleSubmit(e: FormEvent) {
         e.preventDefault()
-        try {
+
 
             if (!input.name || input.students.length === 0 || !input.sec || !input.department || !input.paper_code || !input.sem) {
                 alert("All fields are required");
                 return
             }
 
-            dispatch(subjectAddThunk({
+            await dispatch(subjectAddThunk({
                 creatorName: profile?.name,
                 department: getDepartmentFromLabel(input.department),
                 section: input.sec,
@@ -76,12 +79,24 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                 createdBy: profile?.email?.split('@')[0],
                 created: new Date().getTime()
             } as Subject))
+                .unwrap()
+                .then(()=>{
+                    onDismiss()
+                })
+                .catch (error=>{
+                    Toast.showError(error)
+                    Toast.showError(subjectAddError)
+                    // alert(error)
+                })
 
-            onDismiss()
 
-        } catch (error) {
-            alert(error)
-        }
+
+        // } catch (error) {
+        //     Toast.showError(error)
+        //     Toast.showError(subjectAddError)
+        //     // alert(error)
+        // }
+
     }
 
 
@@ -209,8 +224,10 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                     </div>
                 </div>
                 <div className="sm:flex sm:flex-row-reverse">
-                    <button type="submit" form="addEditButton"
-                            className="inline-flex w-full justify-center bg-green-600 rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto">Save
+                    <button disabled={subjectAddLoading} type="submit" form="addEditButton"
+                            className="inline-flex w-full justify-center bg-green-600 rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto">
+                        {subjectAddLoading ? <BiLoader size={23}/> : "Save"}
+
                     </button>
                     <button onClick={onDismiss} type="button"
                             className="mt-3 inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel

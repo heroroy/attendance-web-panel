@@ -29,7 +29,7 @@ function Attendance() {
                         <Route path="/*" element={<HomePage/>}/>
                     </Routes>
                 </div>
-                <ToastContainer position='bottom-right' stacked autoClose={2000}/>
+                <ToastContainer className="z-50" position='bottom-right' stacked autoClose={2000}/>
             </BrowserRouter>
         </div>
 

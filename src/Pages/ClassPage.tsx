@@ -1,6 +1,6 @@
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate , useParams} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
-import {useEffect} from "react";
+import {useEffect , useState} from "react";
 import {deleteClassThunk, getClassByIdThunk, manualAttendanceThunk} from "../redux/classesSlice.ts";
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdsThunk} from "../redux/userSlice.ts";
@@ -10,8 +10,10 @@ import {exportAttendance} from "../Util/exportAttendance.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 import User from "../Model/User.ts";
 import {getDepartmentShort} from "../Model/Department.ts";
-import {MdArrowCircleLeft} from "react-icons/md";
+import {MdArrowCircleLeft } from "react-icons/md";
 import {Class} from "../Model/Class.ts";
+import {BiLoader } from "react-icons/bi";
+import Toast from "../Util/Toast.ts";
 
 
 export function ClassPage() {
@@ -23,12 +25,20 @@ export function ClassPage() {
 
     const {
         classes,
-        loading: classLoading,
-        error: classError,
+        classByIdLoading: classLoading,
+        classByIdError: classError,
+        deleteClassLoading,
+        deleteClassError
     } = useAppSelector(state => state.class)
 
-    const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
-    const {users, loading: usersLoading, error: usersError} = useAppSelector(state => state.userById)
+    const {subject,
+        // loading: subjectLoading,
+        error: subjectError
+    } = useAppSelector(state => state.subjectById)
+    const {users,
+        // loading: usersLoading,
+        error: usersError
+    } = useAppSelector(state => state.userById)
 
     useEffect(() => {
         if (!params.id) {
@@ -62,11 +72,30 @@ export function ClassPage() {
     }
 
 
-    function deleteClass() {
+    async function deleteClass() {
         const classId = params.id
         if (!classId) return
 
-       dispatch(deleteClassThunk({id: classId}))
+        // try {
+        //     await dispatch(deleteClassThunk({id: classId})).unwrap()
+        //         .then(()=>{
+        //             navigate(-1)
+        //         })
+        // }catch (error){
+        //     Toast.showError(error)
+        //     Toast.showError(deleteClassError)
+        // }
+
+
+        await dispatch(deleteClassThunk({id: classId}))
+           .unwrap()
+           .then(()=>{
+               navigate(-1)
+           })
+           .catch((error)=>{
+               Toast.showError(error)
+               deleteClassError && Toast.showError(deleteClassError)
+           })
     }
 
     if (!classes || isArray(classes))
@@ -75,17 +104,17 @@ export function ClassPage() {
     let screenState: ScreenState
     let errorState: string | null | undefined
 
-    if (subjectError || classError || usersError) {
+    if ( classError || subjectError || usersError) {
         screenState = ScreenState.ERROR
-        errorState = subjectError || classError || usersError
-    } else if (subjectLoading || classLoading || usersLoading) screenState = ScreenState.LOADING
+        errorState = classError
+    } else if ( classLoading  ) screenState = ScreenState.LOADING
     else screenState = ScreenState.SUCCESS
 
     const department = subject ? getDepartmentShort(subject.department) : 'null'
 
     return (
         <ScreenComponent error={errorState} state={screenState}>
-            <button onClick={() => navigate(-1)} title="Back" className=" btn-soft btn-secondary fixed left-10 top-24">
+            <button onClick={() => navigate(-1)} title="Back" className=" btn-soft btn-secondary fixed left-10 top-24" >
                 <MdArrowCircleLeft size={40}/></button>
             <div className='flex flex-col gap-16 w-full'>
                 <div className='flex flex-col'>
@@ -101,12 +130,15 @@ export function ClassPage() {
                             >
                                 Export
                             </button>
-                            <button
+                            {deleteClassLoading ?
+                                <BiLoader size={23}/>
+                                :
+                                <button
                                 className="btn btn-error px-8 btn-md"
-                                onClick={deleteClass}
+                                onClick={ deleteClass }
                             >
                                 Delete
-                            </button>
+                            </button> }
                         </div>
                     </div>
                 </div>
@@ -145,12 +177,27 @@ interface AttendeeRowProps {
 const AttendeeRow = ({index, roll, user, isPresent, classes}: AttendeeRowProps) => {
     const bgColor = index % 2 === 0 ? "bg-base-100" : "bg-base-200"
 
-    const {loading: attendanceLoading} = useAppSelector(state => state.class)
+    const {  toggleAttendanceError } = useAppSelector(state => state.class)
+    const [ changedAttendanceRoll , setChangedAttendanceRoll] = useState<string[]>([]);
 
     const dispatch = useAppDispatch()
 
-    function toggleAttendance(classes: Class, roll: string) {
-        dispatch(manualAttendanceThunk({class: classes, roll: roll}))
+    async  function toggleAttendance(classes: Class, roll: string) {
+        setChangedAttendanceRoll(prev => [...prev, roll]);
+
+
+        await  dispatch ( manualAttendanceThunk ( { class : classes , roll : roll } ) )
+            .unwrap()
+            .then(()=>{
+                setTimeout(()=>{
+                    setChangedAttendanceRoll(prev => prev.filter(item => item !== roll));
+                },200)
+            })
+            .catch((error)=>{
+                setChangedAttendanceRoll(prev => prev.filter(item => item !== roll));
+                Toast.showError(error);
+                Toast.showError(toggleAttendanceError);
+            })
     }
 
 
@@ -160,9 +207,14 @@ const AttendeeRow = ({index, roll, user, isPresent, classes}: AttendeeRowProps) 
             <td className="border border-slate-600 text-center p-4">{roll}</td>
             <td className="border border-slate-600 text-center p-4">{user?.name || "--"}</td>
             <td className={`flex items-center justify-center gap-4 border border-slate-600 relative text-center p-4 font-semibold ${isPresent ? 'text-green-600' : 'text-red-600'}`}>
-                <input disabled={attendanceLoading} readOnly checked={isPresent}
+                {(!changedAttendanceRoll.includes(roll)) ?
+
+                <input  readOnly checked={isPresent}
                        onClick={() => toggleAttendance(classes, roll)} color="inherit"
                        className="checkbox checkbox-success checkbox-sm" type="checkbox"/>
+                 :
+                   ( <BiLoader size={23}/> )
+                }
 
                 {isPresent ? "Present" : "Absent"}
 
