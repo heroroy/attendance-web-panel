@@ -1,7 +1,7 @@
 import { useNavigate , useParams} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {useEffect , useState} from "react";
-import {deleteClassThunk, getClassByIdThunk, manualAttendanceThunk} from "../redux/classesSlice.ts";
+import { getClassByIdThunk, manualAttendanceThunk} from "../redux/classesSlice.ts";
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdsThunk} from "../redux/userSlice.ts";
 import _, {isArray} from "lodash";
@@ -14,6 +14,7 @@ import {MdArrowCircleLeft } from "react-icons/md";
 import {Class} from "../Model/Class.ts";
 import {BiLoader } from "react-icons/bi";
 import Toast from "../Util/Toast.ts";
+import ClassDataStore from "../data/classDataStore.ts";
 
 
 export function ClassPage() {
@@ -27,8 +28,6 @@ export function ClassPage() {
         classes,
         classByIdLoading: classLoading,
         classByIdError: classError,
-        deleteClassLoading,
-        deleteClassError
     } = useAppSelector(state => state.class)
 
     const {subject,
@@ -39,6 +38,8 @@ export function ClassPage() {
         // loading: usersLoading,
         error: usersError
     } = useAppSelector(state => state.userById)
+
+    const [classLoader , serClassLoader] = useState(false)
 
     useEffect(() => {
         if (!params.id) {
@@ -76,26 +77,17 @@ export function ClassPage() {
         const classId = params.id
         if (!classId) return
 
-        // try {
-        //     await dispatch(deleteClassThunk({id: classId})).unwrap()
-        //         .then(()=>{
-        //             navigate(-1)
-        //         })
-        // }catch (error){
-        //     Toast.showError(error)
-        //     Toast.showError(deleteClassError)
-        // }
+        serClassLoader(true)
+        await ClassDataStore.deleteClass(classId)
+            .then(()=> {
+                navigate ( -1 )
+            })
+            .catch((error)=> {
+                Toast.showError ( error )
+                Toast.showError ( "Failed to delete class ")
+            })
+            .finally(()=>serClassLoader(false))
 
-
-        await dispatch(deleteClassThunk({id: classId}))
-           .unwrap()
-           .then(()=>{
-               navigate(-1)
-           })
-           .catch((error)=>{
-               Toast.showError(error)
-               deleteClassError && Toast.showError(deleteClassError)
-           })
     }
 
     if (!classes || isArray(classes))
@@ -130,15 +122,16 @@ export function ClassPage() {
                             >
                                 Export
                             </button>
-                            {deleteClassLoading ?
-                                <BiLoader size={23}/>
-                                :
-                                <button
-                                className="btn btn-error px-8 btn-md"
-                                onClick={ deleteClass }
-                            >
-                                Delete
-                            </button> }
+
+                            <button
+                            className="btn btn-error px-8 btn-md"
+                            onClick={ deleteClass }>
+                                {
+                                    classLoader ? <span className="loading loading-spinner loading-md"></span> : "Delete"
+                                }
+
+                            </button>
+
                         </div>
                     </div>
                 </div>
@@ -177,27 +170,22 @@ interface AttendeeRowProps {
 const AttendeeRow = ({index, roll, user, isPresent, classes}: AttendeeRowProps) => {
     const bgColor = index % 2 === 0 ? "bg-base-100" : "bg-base-200"
 
-    const {  toggleAttendanceError } = useAppSelector(state => state.class)
-    const [ changedAttendanceRoll , setChangedAttendanceRoll] = useState<string[]>([]);
+    // const {  toggleAttendanceError } = useAppSelector(state => state.class)
+    // const [ changedAttendanceRoll , setChangedAttendanceRoll] = useState<string[]>([]);
+    const [attendanceLoader, setAttendanceLoader] = useState(false)
 
-    const dispatch = useAppDispatch()
 
     async  function toggleAttendance(classes: Class, roll: string) {
-        setChangedAttendanceRoll(prev => [...prev, roll]);
 
-
-        await  dispatch ( manualAttendanceThunk ( { class : classes , roll : roll } ) )
-            .unwrap()
-            .then(()=>{
-                setTimeout(()=>{
-                    setChangedAttendanceRoll(prev => prev.filter(item => item !== roll));
-                },200)
-            })
+        setAttendanceLoader(true)
+        await ClassDataStore.attendanceToggle( classes , roll)
+            .then(()=>{})
             .catch((error)=>{
-                setChangedAttendanceRoll(prev => prev.filter(item => item !== roll));
-                Toast.showError(error);
-                Toast.showError(toggleAttendanceError);
+                Toast.showError(error)
+                Toast.showError("Failed to change attendance")
             })
+            .finally(()=>setAttendanceLoader(false))
+
     }
 
 
@@ -207,13 +195,13 @@ const AttendeeRow = ({index, roll, user, isPresent, classes}: AttendeeRowProps) 
             <td className="border border-slate-600 text-center p-4">{roll}</td>
             <td className="border border-slate-600 text-center p-4">{user?.name || "--"}</td>
             <td className={`flex items-center justify-center gap-4 border border-slate-600 relative text-center p-4 font-semibold ${isPresent ? 'text-green-600' : 'text-red-600'}`}>
-                {(!changedAttendanceRoll.includes(roll)) ?
+                {!attendanceLoader ?
 
                 <input  readOnly checked={isPresent}
                        onClick={() => toggleAttendance(classes, roll)} color="inherit"
                        className="checkbox checkbox-success checkbox-sm" type="checkbox"/>
                  :
-                   ( <BiLoader size={23}/> )
+                    <span className="loading loading-spinner loading-md"></span>
                 }
 
                 {isPresent ? "Present" : "Absent"}

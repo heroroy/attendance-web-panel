@@ -17,6 +17,7 @@ import {deleteSubjectThunk} from "../redux/subjectSlice.ts";
 import {MdArrowCircleLeft} from "react-icons/md";
 import Toast from "../Util/Toast.ts";
 import {BiLoader} from "react-icons/bi";
+import SubjectDataStore from "../data/SubjectDatastore.ts";
 
 export function SubjectPage() {
     const params = useParams()
@@ -27,7 +28,7 @@ export function SubjectPage() {
 
     const {classes, classloading: classLoading, classError: classError} = useAppSelector(state => state.class)
     const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
-    const {deleteSubError : error, deleteSubLoading} = useAppSelector(state => state.subject)
+
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -45,6 +46,7 @@ export function SubjectPage() {
     }, [dispatch, navigate, params.id]);
 
     const [avgAttendance, setAvgAttendance] = useState(0)
+    const [deleteClassLoader, setDeleteClassLoader] = useState(false)
 
     useEffect(() => {
         if (!subject || !isArray(classes) || classes.length === 0) return
@@ -74,15 +76,17 @@ export function SubjectPage() {
     async function deleteSubject() {
         if (!subject) return;
         const subjectId = subject.id
-        await dispatch(deleteSubjectThunk({id: subjectId}))
-            .unwrap()
+
+        setDeleteClassLoader(true)
+        await SubjectDataStore.deleteSubject(subjectId)
             .then(()=>{
                 navigate(-1)
             })
-            .catch((e)=>{
-                Toast.showError(e)
+            .catch((error)=>{
                 Toast.showError(error)
             })
+            .finally(()=>setDeleteClassLoader(false))
+
     }
 
 
@@ -134,9 +138,10 @@ export function SubjectPage() {
                             <p className="text-xl lg:text-xl text-neutral-400">Sem {subject?.semester} - {subject?.section}</p>
                             <h4 className="text-3xl lg:text-5xl mt-8">{subject?.title}</h4>
                         </div>
-                        {deleteSubLoading ? <BiLoader size={25}/> : <button className="btn btn-error btn-sm" onClick={ deleteSubject }>
-                            Delete
-                        </button> }
+                        <button className="btn btn-error btn-sm" onClick={ deleteSubject }>
+                            {deleteClassLoader ? <span className="loading loading-spinner loading-md"></span> : " Delete "}
+                        </button>
+
                     </div>
 
                     <div className="flex flex-row w-full justify-between">
