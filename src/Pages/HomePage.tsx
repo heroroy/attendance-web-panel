@@ -7,7 +7,6 @@ import SubjectCard from "../Component/SubjectCard.tsx";
 import Department from "../Model/Department.ts";
 import {capitalizeWords} from "../Util/Naming_Conv.ts";
 import {ScreenComponent , ScreenState} from "../Component/ScreenComponent.tsx";
-import {BiLoader} from "react-icons/bi";
 
 export function HomePage() {
     const [open, setOpen] = useState<boolean>(false)
@@ -16,7 +15,7 @@ export function HomePage() {
 
     const {profile, loading, error : profileError} = useAppSelector(state => state.auth)
     const {subjects, getSubError : subjectError, getSubLoading : subjectsLoading} = useAppSelector(state => state.subject)
-    const { subjectAddLoading } = useAppSelector(state => state.subject)
+
     console.log(subjects)
     const groupedSubjects = _.groupBy(subjects, 'department')
 
@@ -58,11 +57,11 @@ export function HomePage() {
                         <span className="text-gray-500 text-2xl font-semibold">Welcome Back</span>
                         {profile && <span className="text-5xl font-bold">{ capitalizeWords(profile.name) }</span> }
                     </div>
-                    {subjectAddLoading ? <BiLoader size={25}/> :
-                        <button onClick={() => setOpen(!open)} className="px-8 py-2 z-10 rounded-full text-lg text-white bg-primary hover:bg-secondary">
-                            + Subject
-                        </button>
-                    }
+
+                    <button onClick={() => setOpen(!open)} className="px-8 py-2 z-10 rounded-full text-lg text-white bg-primary hover:bg-secondary">
+                        + Subject
+                    </button>
+
                 </div>
 
                 <div className="">

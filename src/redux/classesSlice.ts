@@ -1,18 +1,11 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {database} from "../firebase.ts";
 import {Class} from "../Model/Class.ts";
-import firebase from "firebase/compat/app";
-import Toast from "../Util/Toast.ts";
-import FieldValue = firebase.firestore.FieldValue;
 
 interface classState {
     classes: Class[] | Class
     classloading?: boolean,
     classError?: string | null,
-    toggleAttendanceLoading? : boolean,
-    toggleAttendanceError? : string | null,
-    deleteClassLoading? : boolean,
-    deleteClassError? : string | null,
     classByIdLoading?: boolean,
     classByIdError?: string | null,
 
@@ -22,10 +15,6 @@ const initialState: classState = {
     classes: [],
     classloading: false,
     classError:  null,
-    toggleAttendanceLoading : false,
-    toggleAttendanceError : null,
-    deleteClassLoading : false,
-    deleteClassError :  null,
     classByIdLoading: false,
     classByIdError:  null,
 
@@ -65,49 +54,7 @@ export const getClassByIdThunk = createAsyncThunk<
     }
 )
 
-export const manualAttendanceThunk = createAsyncThunk<
-    Promise<void>,
-    { class: Class, roll: string },
-    { rejectValue: string }
->(
-    "class/manualAttendance",
-    async ({class: classInfo, roll}, {rejectWithValue}) => {
-        const exists = classInfo?.attendees?.includes(roll)
-        return await database.collection("classes")
-            .doc(classInfo.id)
-            .update({
-                attendees: exists ? FieldValue.arrayRemove(roll) : FieldValue.arrayUnion(roll)
-            })
-            .catch(e => {
-                Toast.showError("Failed to update attendance")
-                rejectWithValue(e)
-            })
-    }
-)
 
-export const deleteClassThunk = createAsyncThunk<
-    Promise<void>,
-    { id: string },
-    { rejectValue: string }
->(
-    "class/delete",
-    async ({id}, {rejectWithValue}) => {
-
-        // try {
-        //     return await database.collection("classe").doc(id)
-        //         .delete()
-        // }catch (error){
-        //     return rejectWithValue(error.message)
-        // }
-
-        return await database.collection("classes").doc(id)
-            .delete()
-            .catch(e => {
-                Toast.showError("Failed to delete class")
-                rejectWithValue(e.message)
-            })
-    }
-)
 
 
 export const classesSlice = createSlice({
@@ -142,30 +89,6 @@ export const classesSlice = createSlice({
             .addCase(getClassesThunk.rejected, (state: classState, action: PayloadAction<string | undefined>) => {
                 state.classloading = false;
                 state.classError = action.payload || 'class not found'
-            })
-            .addCase(manualAttendanceThunk.pending, (state: classState) => {
-                state.toggleAttendanceLoading = true;
-                state.toggleAttendanceError = null
-            })
-            .addCase(manualAttendanceThunk.fulfilled, (state: classState) => {
-                state.toggleAttendanceLoading = false;
-                state.toggleAttendanceError = null;
-            })
-            .addCase(manualAttendanceThunk.rejected, (state: classState, action: PayloadAction<string | undefined>) => {
-                state.toggleAttendanceLoading = false;
-                state.toggleAttendanceError = action.payload || "attendance couldn't updated";
-            })
-            .addCase(deleteClassThunk.pending, (state: classState) => {
-                state.deleteClassLoading = true;
-                state.deleteClassError = null
-            })
-            .addCase(deleteClassThunk.fulfilled, (state: classState) => {
-                state.deleteClassLoading = false;
-                state.deleteClassError = null;
-            })
-            .addCase(deleteClassThunk.rejected, (state: classState, action: PayloadAction<string | undefined>) => {
-                state.deleteClassLoading = false;
-                state.deleteClassError = action.payload;
             })
     }
 })
