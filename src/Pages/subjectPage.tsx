@@ -13,10 +13,8 @@ import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 import {exportAttendance} from "../Util/exportAttendance.ts";
 import {DateRange} from "rsuite/DateRangePicker";
-import {deleteSubjectThunk} from "../redux/subjectSlice.ts";
 import {MdArrowCircleLeft} from "react-icons/md";
 import Toast from "../Util/Toast.ts";
-import {BiLoader} from "react-icons/bi";
 import SubjectDataStore from "../data/SubjectDatastore.ts";
 
 export function SubjectPage() {

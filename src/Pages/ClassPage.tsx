@@ -1,7 +1,7 @@
 import { useNavigate , useParams} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {useEffect , useState} from "react";
-import { getClassByIdThunk, manualAttendanceThunk} from "../redux/classesSlice.ts";
+import { getClassByIdThunk} from "../redux/classesSlice.ts";
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdsThunk} from "../redux/userSlice.ts";
 import _, {isArray} from "lodash";
@@ -12,7 +12,6 @@ import User from "../Model/User.ts";
 import {getDepartmentShort} from "../Model/Department.ts";
 import {MdArrowCircleLeft } from "react-icons/md";
 import {Class} from "../Model/Class.ts";
-import {BiLoader } from "react-icons/bi";
 import Toast from "../Util/Toast.ts";
 import ClassDataStore from "../data/classDataStore.ts";
 
