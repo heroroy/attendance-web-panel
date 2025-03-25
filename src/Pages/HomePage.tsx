@@ -50,8 +50,10 @@ export function HomePage() {
                         {profile && <span className="text-5xl font-bold">{capitalizeWords(profile.name)}</span>}
                     </div>
 
-                    <button onClick={() => setOpen(!open)}
-                            className="px-8 py-2 z-10 rounded-full text-lg text-white bg-primary hover:bg-secondary">
+                    <button
+                        onClick={() => setOpen(!open)}
+                        className="px-8 py-2  rounded-full text-lg btn btn-primary"
+                    >
                         + Subject
                     </button>
 
