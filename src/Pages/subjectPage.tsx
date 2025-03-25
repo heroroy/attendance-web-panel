@@ -13,9 +13,9 @@ import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 import {exportAttendance} from "../Util/exportAttendance.ts";
 import {DateRange} from "rsuite/DateRangePicker";
-import {MdArrowCircleLeft} from "react-icons/md";
 import Toast from "../Util/Toast.ts";
 import SubjectDataStore from "../data/SubjectDatastore.ts";
+import {MdDeleteOutline} from "react-icons/md";
 
 export function SubjectPage() {
     const params = useParams()
@@ -44,7 +44,7 @@ export function SubjectPage() {
     }, [dispatch, navigate, params.id]);
 
     const [avgAttendance, setAvgAttendance] = useState(0)
-    const [deleteClassLoader, setDeleteClassLoader] = useState(false)
+    const [isSubjectDeleting, setIsSubjectDeleting] = useState(false)
 
     useEffect(() => {
         if (!subject || !isArray(classes) || classes.length === 0) return
@@ -75,16 +75,11 @@ export function SubjectPage() {
         if (!subject) return;
         const subjectId = subject.id
 
-        setDeleteClassLoader(true)
+        setIsSubjectDeleting(true)
         await SubjectDataStore.deleteSubject(subjectId)
-            .then(()=>{
-                navigate(-1)
-            })
-            .catch((error)=>{
-                Toast.showError(error)
-            })
-            .finally(()=>setDeleteClassLoader(false))
-
+            .then(() => navigate(-1))
+            .catch(() => Toast.showError("Failed to delete subject"))
+            .finally(() => setIsSubjectDeleting(false))
     }
 
 
@@ -117,7 +112,7 @@ export function SubjectPage() {
     let screenState: ScreenState
     let errorState: string | null | undefined
 
-    if (subjectError || classError ) {
+    if (subjectError || classError) {
         screenState = ScreenState.ERROR
         errorState = subjectError || classError
     } else if (subjectLoading || classLoading) {
@@ -126,8 +121,6 @@ export function SubjectPage() {
 
     return (
         <ScreenComponent error={errorState} state={screenState}>
-            <button onClick={() => navigate(-1)} title="Back" className=" btn-soft btn-secondary fixed left-10 top-24">
-                <MdArrowCircleLeft size={40}/></button>
             <div className="h-screen w-full flex flex-col">
                 <div className="mb-20 flex flex-col gap-8 lg:gap-16">
                     <div className='flex flex-row w-full justify-between'>
@@ -136,8 +129,17 @@ export function SubjectPage() {
                             <p className="text-xl lg:text-xl text-neutral-400">Sem {subject?.semester} - {subject?.section}</p>
                             <h4 className="text-3xl lg:text-5xl mt-8">{subject?.title}</h4>
                         </div>
-                        <button className="btn btn-error btn-sm" onClick={ deleteSubject }>
-                            {deleteClassLoader ? <span className="loading loading-spinner loading-md"></span> : " Delete "}
+
+                        <button
+                            className={`btn btn-sm ${isSubjectDeleting ? 'btn-disabled' : 'btn-error'}`}
+                            disabled={isSubjectDeleting} onClick={deleteSubject}
+                        >
+                            {
+                                isSubjectDeleting
+                                    ? <span className="loading loading-spinner loading-xs"/>
+                                    : <MdDeleteOutline size='1.2rem'/>
+                            }
+                            Delete
                         </button>
 
                     </div>

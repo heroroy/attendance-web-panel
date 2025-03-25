@@ -50,7 +50,6 @@ export function HomePage() {
     return (
 
         <ScreenComponent error={errorstate} state={screenState}>
-
             <div  className="w-full h-full items-stretch flex flex-col gap-32 relative ">
                 <div className='flex w-full flex-row justify-between items-center'>
                     <div className="flex flex-col gap-4">
