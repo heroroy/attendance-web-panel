@@ -34,7 +34,6 @@ export const getSubjectThunk = createAsyncThunk<
             .onSnapshot(
                 (querySnapshot) => {
                     dispatch(setSubjects(querySnapshot.docs.map(doc => doc.data() as Subject)))
-                    // resolve(sub)
                 },
                 error => dispatch(setError(error.message))
             )

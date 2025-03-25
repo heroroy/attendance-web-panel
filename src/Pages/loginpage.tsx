@@ -14,14 +14,8 @@ export function Loginpage() {
 
     const {profile, loading, error} = useAppSelector(state => state.auth)
 
-    // const navigate = useNavigate()
-
     const handleLogin = async () => {
-        try {
-            dispatch(loginThunk())
-        } catch (error) {
-            console.log(error)
-        }
+        dispatch(loginThunk()).catch()
     }
 
     useEffect(() => {

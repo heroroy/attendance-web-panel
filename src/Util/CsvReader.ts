@@ -6,7 +6,6 @@ export default function readCsv(file: File):Promise<string[]> {
             complete: (result) => {
                 // Extract roll numbers from the CSV data
                 const data = result.data.map((row: any) => row[0] as string);
-                console.log("result >>", data)
                 resolve(data)
             },
             header: false, // Treat the first row as the header

@@ -18,7 +18,6 @@ const AppBar = ({className}: { className: string }) => {
     function handleLogout() {
         try {
             dispatch(logoutThunk())
-            localStorage.setItem("user", JSON.stringify(null))
             setPopUp(false)
             navigate("/")
         } catch (e) {

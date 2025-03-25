@@ -31,12 +31,10 @@ export function ClassPage() {
 
     const {
         subject,
-        // loading: subjectLoading,
         error: subjectError
     } = useAppSelector(state => state.subjectById)
     const {
         users,
-        // loading: usersLoading,
         error: usersError
     } = useAppSelector(state => state.userById)
 

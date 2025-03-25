@@ -54,10 +54,7 @@ export function SubjectPage() {
         const avgAttendancePerClass = classes.map(classData => (classData.attendees?.length || 0) / enrolledStudentCount * 100)
 
         let averageAttendance = _.sum(avgAttendancePerClass) / classes.length
-        console.log(averageAttendance)
-        // averageAttendance = Math.round((averageAttendance + Number.EPSILON) * 100) / 100
         averageAttendance = (Math.round(averageAttendance + Number.EPSILON) / 100) * 100
-        console.log(averageAttendance)
 
         setAvgAttendance(averageAttendance)
     }, [classes, subject]);

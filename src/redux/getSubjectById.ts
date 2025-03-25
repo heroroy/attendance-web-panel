@@ -21,17 +21,10 @@ export const getSubjectByIdThunk = createAsyncThunk<
 >(
     "subjectId/getById",
     async ({id}, {rejectWithValue}) => {
-
-        // const {subject} = useAppSelector(state => state.subject)
-
-        // console.log(subject)
-
         return await database.collection("subjects").doc(id)
             .get()
             .then(result => result.data() as Subject)
-            .catch((error)=> {
-                return rejectWithValue(error.message)
-            })
+            .catch(rejectWithValue)
     }
 )
 export const subjectByIdSlice = createSlice({

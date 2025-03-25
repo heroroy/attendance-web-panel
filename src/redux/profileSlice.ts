@@ -38,7 +38,7 @@ export const loginThunk = createAsyncThunk<
                 return user
             })
             .then(user => {
-                if(!user.email) throw new Error("Email not found")
+                if (!user.email) throw new Error("Email not found")
                 return user
             })
             .then(user => {
@@ -47,7 +47,7 @@ export const loginThunk = createAsyncThunk<
                 return user
             })
             .then(async user => {
-                if(!(await isTeacher(user.email ?? "")))
+                if (!(await isTeacher(user.email ?? "")))
                     throw new Error('Only Registered teachers are allowed to sign in')
                 return user
             })
@@ -76,14 +76,12 @@ export const loginThunk = createAsyncThunk<
 export const logoutThunk = createAsyncThunk<
     void,
     void,
-    {rejectValue : string}
+    { rejectValue: string }
 >(
     'profile/logout',
     async (_, {rejectWithValue}) => {
-            return await auth.signOut()
-                    .then(()=>console.log("logged out"))
-                    .catch((e)=>rejectWithValue(e.message))
-
+        return await auth.signOut().catch(rejectWithValue)
+            .then(() => localStorage.removeItem('user'))
     }
 )
 
@@ -94,18 +92,18 @@ export const getProfileThunk = createAsyncThunk<User, void, { rejectValue: strin
             const userStr = localStorage.getItem('user')
             if (userStr == null) return rejectWithValue('User not found')
             return JSON.parse(userStr)
-        } catch (e : any) {
+        } catch (e: any) {
             return rejectWithValue(e.message)
         }
     }
 )
 
-function getProfileFromStorage(){
+function getProfileFromStorage() {
     const userStr = localStorage.getItem('user')
     if (userStr == null) return null
     try {
         return JSON.parse(userStr)
-    } catch(e){
+    } catch (e) {
         return null
     }
 }
