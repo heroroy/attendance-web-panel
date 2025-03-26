@@ -72,11 +72,15 @@ export function SubjectPage() {
         if (!subject) return;
         const subjectId = subject.id
 
-        setIsSubjectDeleting(true)
-        await SubjectDataStore.deleteSubject(subjectId)
-            .then(() => navigate(-1))
-            .catch(() => Toast.showError("Failed to delete subject"))
-            .finally(() => setIsSubjectDeleting(false))
+
+        if(!confirm ( `Do you want to delete subject : ${ subject?.title }` )) return
+
+        setIsSubjectDeleting ( true )
+        await SubjectDataStore.deleteSubject ( subjectId )
+            .then ( () => navigate ( -1 ) )
+            .catch ( () => Toast.showError ( "Failed to delete subject" ) )
+            .finally ( () => setIsSubjectDeleting ( false ) )
+
     }
 
 

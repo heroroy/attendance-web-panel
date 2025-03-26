@@ -13,10 +13,10 @@ export default class ClassDataStore{
     }
 
     static attendanceToggle(classInfo: Class, roll: string){
-        const exists = classInfo.attendees.includes(roll)
-        return this.classInstance.doc(classInfo.id)
+        const exists = classInfo?.attendees?.includes(roll)
+        return this.classInstance.doc(classInfo?.id)
             .update({
-                attendees: exists ? FieldValue.arrayRemove(roll) : FieldValue.arrayUnion(roll)
+                attendees: exists ? FieldValue?.arrayRemove(roll) : FieldValue?.arrayUnion(roll)
             })
     }
 

@@ -76,6 +76,8 @@ export function ClassPage() {
         const classId = params.id
         if (!classId) return
 
+        if(!confirm ( `Do you want to delete class : ${ subject?.title} ` )) return
+
         setIsClassDeleting(true)
         await ClassDataStore.deleteClass(classId)
             .then(() => navigate(-1))
