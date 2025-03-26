@@ -1,32 +1,33 @@
-import {useAppDispatch , useAppSelector} from "../redux/store.ts";
-import { useState} from "react";
+import {useAppDispatch, useAppSelector} from "../redux/store.ts";
+import {useState} from "react";
 import {capitalizeWords} from "../Util/Naming_Conv.ts";
 import {logoutThunk} from "../redux/profileSlice.ts";
 import {useNavigate} from "react-router-dom";
 import logo from "../assets/rcc_logo.png"
+import Toggle from "./Toggle.tsx";
 
-const AppBar = ({ className } : { className: string}) => {
+const AppBar = ({className}: { className: string }) => {
     const profile = useAppSelector(state => state.auth.profile)
-    const [ popUp, setPopUp] = useState(false)
+    const [popUp, setPopUp] = useState(false)
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
-    function handleProfileClick(){
+    function handleProfileClick() {
         setPopUp(!popUp)
     }
 
-    function handleLogout(){
+    function handleLogout() {
         try {
             dispatch(logoutThunk())
-            localStorage.setItem("user",JSON.stringify(null))
+            localStorage.setItem("user", JSON.stringify(null))
             setPopUp(false)
             navigate("/")
-        }catch (e){
+        } catch (e) {
             console.log(e)
         }
     }
 
-    function handleTitleClick(){
+    function handleTitleClick() {
         navigate("/home")
     }
 
@@ -39,15 +40,24 @@ const AppBar = ({ className } : { className: string}) => {
                     RCCIIT Attend
                     <span className="text-2xl text-primary font-extrabold">Ease</span>
                 </h3>
-                {profile?.profilePic && <img onClick={handleProfileClick} alt="profile" className="h-10 w-10 rounded-full justify-self-end mx-2 cursor-pointer" src={ profile.profilePic }/> }
+                {profile?.profilePic &&
+                    <div className="flex items-center">
+                        <Toggle/>
+                        <img onClick={handleProfileClick} alt="profile"
+                             className="h-10 w-10 rounded-full justify-self-end mx-2 cursor-pointer"
+                             src={profile.profilePic}/>
+
+                    </div>}
             </div>
             {popUp && profile &&
                 <div className="fixed inset-0 z-30 flex items-center justify-center"
                      aria-labelledby="modal-title"
                      role="dialog"
                      aria-modal="true">
-                    <div className="fixed inset-0 bg-base-300 transition-opacity opacity-0" onClick={()=>setPopUp(false) } aria-hidden="true"></div>
-                    <div  className="z-30 p-6 rounded-lg shadow-lg bg-base-300 top-16 absolute right-8 flex flex-col gap-8">
+                    <div className="fixed inset-0 bg-base-300 transition-opacity opacity-0"
+                         onClick={() => setPopUp(false)} aria-hidden="true"></div>
+                    <div
+                        className="z-30 p-6 rounded-lg shadow-lg bg-base-300 top-16 absolute right-8 flex flex-col gap-8">
                         <div className="card-title flex flex-col">
                             <p className='text-base'>{capitalizeWords(profile?.name)}</p>
                             <p className="text-sm font-light mt-0">{profile?.email}</p>
