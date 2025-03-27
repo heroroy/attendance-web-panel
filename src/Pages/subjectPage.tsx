@@ -59,9 +59,6 @@ export function SubjectPage() {
         setAvgAttendance(averageAttendance)
     }, [classes, subject]);
 
-    if (!classes || !(classes as Class))
-        return <h1>Loading...</h1>
-
 
     const groupedClass = _.groupBy(Object.keys(classes).map((item) => ({
         ...(classes[item as keyof typeof classes] as Class),
@@ -73,13 +70,14 @@ export function SubjectPage() {
         const subjectId = subject.id
 
 
-        if(!confirm ( `Do you want to delete subject : ${ subject?.title }` )) return
+        if (!confirm(`Are you sure you want to delete this subject? This action is permanent`))
+            return
 
-        setIsSubjectDeleting ( true )
-        await SubjectDataStore.deleteSubject ( subjectId )
-            .then ( () => navigate ( -1 ) )
-            .catch ( () => Toast.showError ( "Failed to delete subject" ) )
-            .finally ( () => setIsSubjectDeleting ( false ) )
+        setIsSubjectDeleting(true)
+        await SubjectDataStore.deleteSubject(subjectId)
+            .then(() => navigate(-1))
+            .catch(() => Toast.showError("Failed to delete subject"))
+            .finally(() => setIsSubjectDeleting(false))
 
     }
 
@@ -110,15 +108,21 @@ export function SubjectPage() {
         setDateRange(null)
     }
 
-    let screenState: ScreenState
-    let errorState: string | null | undefined
+    const [screenState, setScreenState] = useState(ScreenState.LOADING)
+    const [errorState, setErrorState] = useState<string | null>()
 
-    if (subjectError || classError) {
-        screenState = ScreenState.ERROR
-        errorState = subjectError || classError
-    } else if (subjectLoading || classLoading) {
-        screenState = ScreenState.LOADING
-    } else screenState = ScreenState.SUCCESS
+    useEffect(() => {
+        if (subjectLoading || classLoading) {
+            setScreenState(ScreenState.LOADING)
+        } else if (subjectError || classError) {
+            setScreenState(ScreenState.ERROR)
+            setErrorState(subjectError || classError)
+        } else setScreenState(ScreenState.SUCCESS)
+    }, [subjectLoading, classLoading, subjectError, classError]);
+
+    useEffect(() => {
+        console.log("VJ >> " + subjectError)
+    }, [subjectError]);
 
     return (
         <ScreenComponent error={errorState} state={screenState}>

@@ -76,7 +76,8 @@ export function ClassPage() {
         const classId = params.id
         if (!classId) return
 
-        if(!confirm ( `Do you want to delete class : ${ subject?.title} ` )) return
+        if (!confirm(`Are you sure you want to delete this class? This action is permanent`))
+            return
 
         setIsClassDeleting(true)
         await ClassDataStore.deleteClass(classId)
@@ -86,17 +87,17 @@ export function ClassPage() {
 
     }
 
-    if (!classes || isArray(classes))
-        return <h1>Loading...</h1>
+    const [screenState, setScreenState] = useState(ScreenState.LOADING)
+    const [errorState, setErrorState] = useState<string | null>()
 
-    let screenState: ScreenState
-    let errorState: string | null | undefined
+    useEffect(() => {
+        if (classError || subjectError || usersError) {
+            setScreenState(ScreenState.ERROR)
+            setErrorState(classError || subjectError || usersError)
+        } else if (classLoading) setScreenState(ScreenState.LOADING)
+        else if(subject && classes) setScreenState(ScreenState.SUCCESS)
+    }, [usersError, subjectError, classError, classLoading, classes, subject]);
 
-    if (classError || subjectError || usersError) {
-        screenState = ScreenState.ERROR
-        errorState = classError
-    } else if (classLoading) screenState = ScreenState.LOADING
-    else screenState = ScreenState.SUCCESS
 
     const department = subject ? getDepartmentShort(subject.department) : 'null'
 
@@ -117,7 +118,9 @@ export function ClassPage() {
                                 Export
                             </button>
 
-                            <button disabled={isClassDeleting} className={`btn px-8 btn-md ${isClassDeleting ? 'btn-disabled' : 'btn-error'}`} onClick={deleteClass}>
+                            <button disabled={isClassDeleting}
+                                    className={`btn px-8 btn-md ${isClassDeleting ? 'btn-disabled' : 'btn-error'}`}
+                                    onClick={deleteClass}>
                                 {isClassDeleting
                                     ? <span className="loading loading-spinner loading-xs mr-2"/>
                                     : <MdDeleteOutline size='1.7rem'/>

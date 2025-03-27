@@ -14,9 +14,9 @@ interface classState {
 const initialState: classState = {
     classes: [],
     classloading: false,
-    classError:  null,
+    classError: null,
     classByIdLoading: false,
-    classByIdError:  null,
+    classByIdError: null,
 
 }
 
@@ -32,7 +32,7 @@ export const getClassesThunk = createAsyncThunk<
             .get()
             .then(result => result.docs)
             .then(docs => docs.map(doc => doc.data() as Class))
-            .catch(rejectWithValue)
+            .catch(e => rejectWithValue(e.message))
     }
 )
 
@@ -46,15 +46,16 @@ export const getClassByIdThunk = createAsyncThunk<
         dispatch(setPending())
         database.collection("classes")
             .doc(`${id}`)
-            .onSnapshot((querySnapShot) => {
-                dispatch(setClasses(querySnapShot.data() as Class))
-            }, (error) => {
-                dispatch(setError(error.message))
-            })
+            .onSnapshot(
+                (querySnapShot) => {
+                    if (!querySnapShot.exists) dispatch(setError("Class does not exist"))
+                    dispatch(setClasses(querySnapShot.data() as Class))
+                }, (error) => {
+                    dispatch(setError(error.message))
+                }
+            )
     }
 )
-
-
 
 
 export const classesSlice = createSlice({

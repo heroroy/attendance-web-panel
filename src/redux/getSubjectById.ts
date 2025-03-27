@@ -23,8 +23,11 @@ export const getSubjectByIdThunk = createAsyncThunk<
     async ({id}, {rejectWithValue}) => {
         return await database.collection("subjects").doc(id)
             .get()
-            .then(result => result.data() as Subject)
-            .catch(rejectWithValue)
+            .then(result => {
+                if(!result.exists) throw new Error("Subject not found")
+                else return result.data() as Subject
+            })
+            .catch(e => rejectWithValue(e.message))
     }
 )
 export const subjectByIdSlice = createSlice({

@@ -7,6 +7,7 @@ import SubjectCard from "../Component/SubjectCard.tsx";
 import Department from "../Model/Department.ts";
 import {capitalizeWords} from "../Util/Naming_Conv.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
+import {MdAdd} from "react-icons/md";
 
 export function HomePage() {
     const [open, setOpen] = useState<boolean>(false)
@@ -54,7 +55,7 @@ export function HomePage() {
                         onClick={() => setOpen(!open)}
                         className="px-8 py-2  rounded-full text-lg btn btn-primary"
                     >
-                        + Subject
+                        <MdAdd/> Subject
                     </button>
 
                 </div>
