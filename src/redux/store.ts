@@ -5,7 +5,6 @@ import {subjectSlice} from "./subjectSlice.ts";
 import {classesSlice} from "./classesSlice.ts";
 import {subjectByIdSlice} from "./getSubjectById.ts";
 import {userByIdSlice} from "./userSlice.ts";
-import {themeSlice} from "./themeSlice.ts";
 
 export const store = configureStore({
     reducer: {
@@ -13,8 +12,7 @@ export const store = configureStore({
         subject: subjectSlice.reducer,
         class: classesSlice.reducer,
         subjectById: subjectByIdSlice.reducer,
-        userById: userByIdSlice.reducer,
-        theme: themeSlice.reducer,
+        userById: userByIdSlice.reducer
     },
     devTools: true
 })

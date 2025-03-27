@@ -4,7 +4,7 @@ import {capitalizeWords} from "../Util/Naming_Conv.ts";
 import {logoutThunk} from "../redux/profileSlice.ts";
 import {useNavigate} from "react-router-dom";
 import logo from "../assets/rcc_logo.png"
-import Toggle from "./Toggle.tsx";
+import ThemeToggle from "./ThemeToggle.tsx";
 
 const AppBar = ({className}: { className: string }) => {
     const profile = useAppSelector(state => state.auth.profile)
@@ -42,7 +42,7 @@ const AppBar = ({className}: { className: string }) => {
                 </h3>
                 {profile?.profilePic &&
                     <div className="flex items-center">
-                        <Toggle/>
+                        <ThemeToggle/>
                         <img onClick={handleProfileClick} alt="profile"
                              className="h-10 w-10 rounded-full justify-self-end mx-2 cursor-pointer"
                              src={profile.profilePic}/>
