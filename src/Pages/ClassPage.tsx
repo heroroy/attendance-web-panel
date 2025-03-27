@@ -95,12 +95,13 @@ export function ClassPage() {
             setScreenState(ScreenState.ERROR)
             setErrorState(classError || subjectError || usersError)
         } else if (classLoading) setScreenState(ScreenState.LOADING)
-        else if(subject && classes) setScreenState(ScreenState.SUCCESS)
+        else if (subject && classes) setScreenState(ScreenState.SUCCESS)
     }, [usersError, subjectError, classError, classLoading, classes, subject]);
 
 
     const department = subject ? getDepartmentShort(subject.department) : 'null'
 
+    const classInfo = classes as Class
     return (
         <ScreenComponent error={errorState} state={screenState}>
             <div className='flex flex-col gap-16 w-full'>
@@ -109,7 +110,7 @@ export function ClassPage() {
                     <p className='text-xl lg:text-2xl text-neutral-400'>Sem {subject?.semester} - {subject?.section}</p>
 
                     <div className="flex items-center justify-between w-full mt-8">
-                        <h4 className="text-3xl lg:text-5xl">{formatDate(new Date(classes?.createdOn))}</h4>
+                        <h4 className="text-3xl lg:text-5xl">{formatDate(new Date(classInfo.createdOn))}</h4>
                         <div className="flex gap-4">
                             <button
                                 className="btn btn-primary hover:bg-secondary px-8 btn-md"
@@ -142,8 +143,13 @@ export function ClassPage() {
                     </thead>
                     <tbody>
                     {subject?.studentsEnrolled?.map((item, index) => (
-                        <AttendeeRow index={index} roll={item} user={user[item] && user[item][0]}
-                                     isPresent={classes?.attendees?.includes(item)} classes={classes}/>
+                        <AttendeeRow
+                            index={index}
+                            roll={item}
+                            user={user[item] && user[item][0]}
+                            isPresent={classInfo.attendees.includes(item)}
+                            classes={classInfo}
+                        />
                     ))}
                     </tbody>
                 </table>
