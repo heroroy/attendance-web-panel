@@ -120,10 +120,6 @@ export function SubjectPage() {
         } else setScreenState(ScreenState.SUCCESS)
     }, [subjectLoading, classLoading, subjectError, classError]);
 
-    useEffect(() => {
-        console.log("VJ >> " + subjectError)
-    }, [subjectError]);
-
     return (
         <ScreenComponent error={errorState} state={screenState}>
             <div className="h-screen w-full flex flex-col">

@@ -49,7 +49,7 @@ export const getClassByIdThunk = createAsyncThunk<
             .onSnapshot(
                 (querySnapShot) => {
                     if (!querySnapShot.exists) dispatch(setError("Class does not exist"))
-                    dispatch(setClasses(querySnapShot.data() as Class))
+                    else dispatch(setClasses(querySnapShot.data() as Class))
                 }, (error) => {
                     dispatch(setError(error.message))
                 }
