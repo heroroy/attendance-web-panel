@@ -147,7 +147,7 @@ export function ClassPage() {
                             index={index}
                             roll={item}
                             user={user[item] && user[item][0]}
-                            isPresent={classInfo.attendees.includes(item)}
+                            isPresent={classInfo.attendees?.includes(item) ?? false}
                             classes={classInfo}
                         />
                     ))}
