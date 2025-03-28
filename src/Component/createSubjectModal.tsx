@@ -1,13 +1,14 @@
 import {TextInput} from "./textInput.tsx";
 import {FormEvent, useState} from "react";
 import {DropDown} from "./DropDown.tsx";
-import {useAppDispatch, useAppSelector} from "../redux/store.ts";
-import {subjectAddThunk} from "../redux/subjectSlice.ts";
+import {useAppSelector} from "../redux/store.ts";
 import Semester from "../Model/Semester.ts";
 import Subject from "../Model/Subject.ts";
 import Department, {getDepartmentFromLabel} from "../Model/Department.ts";
 import {v4 as uuidv4} from 'uuid';
 import readCsv from "../Util/CsvReader.ts";
+import Toast from "../Util/Toast.ts";
+import SubjectDataStore from "../data/SubjectDatastore.ts";
 
 export interface inputModal {
     name: string,
@@ -33,6 +34,7 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
         sem : 0
     })
     const profile = useAppSelector(state => state.auth.profile)
+    const [subjectSaving, setSubjectSaving] = useState(false)
 
     const dept: string[] = Object.values(Department)
     const sem: number[] = Object.values(Semester)
@@ -53,35 +55,42 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
             .catch(e => alert(e.message))
     }
 
-    const dispatch = useAppDispatch()
-
-    function handleSubmit(e: FormEvent) {
+    async function handleSubmit(e: FormEvent) {
         e.preventDefault()
-        try {
 
-            if (!input.name || input.students.length === 0 || !input.sec || !input.department || !input.paper_code || !input.sem) {
-                alert("All fields are required");
-                return
-            }
-
-            dispatch(subjectAddThunk({
-                creatorName: profile?.name,
-                department: getDepartmentFromLabel(input.department),
-                section: input.sec,
-                studentsEnrolled: input.students,
-                title: input.name,
-                paper_code : input.paper_code,
-                semester : input.sem.toString(),
-                id: uuidv4(),
-                createdBy: profile?.email?.split('@')[0],
-                created: new Date().getTime()
-            } as Subject))
-
-            onDismiss()
-
-        } catch (error) {
-            alert(error)
+        if (!input.name || input.students.length === 0 || !input.sec || !input.department || !input.paper_code || !input.sem) {
+            alert("All fields are required");
+            return
         }
+
+        if(!profile?.name) {
+            return alert("Not logged in")
+        }
+
+        const department = getDepartmentFromLabel(input.department)
+
+        if(!department) {
+            return alert("Invalid Department")
+        }
+
+        const subject:Subject = {
+            creatorName: profile?.name,
+            department: department,
+            section: input.sec,
+            studentsEnrolled: input.students,
+            title: input.name,
+            paper_code: input.paper_code,
+            semester: input.sem.toString(),
+            id: uuidv4(),
+            createdBy: profile?.email?.split('@')[0],
+            created: new Date().getTime()
+        }
+
+        setSubjectSaving(true)
+        await SubjectDataStore.addSubject(subject)
+            .then(onDismiss)
+            .catch(() => Toast.showError("Failed to add subject"))
+            .finally(() => setSubjectSaving(false))
     }
 
 
@@ -95,7 +104,8 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
             <div className="fixed inset-0 bg-black transition-opacity opacity-40" onClick={onDismiss}
                  aria-hidden="true"></div>
 
-            <div className="relative transform overflow-hidden rounded-lg bg-base-100 transition-all flex flex-col gap-8 p-8 m-8 lg:m-0">
+            <div
+                className="relative transform overflow-hidden rounded-lg bg-base-100 transition-all flex flex-col gap-8 p-8 m-8 lg:m-0">
                 <div className="text-center lg:text-start flex flex-col lg:flex-row gap-8">
                     <div className='flex flex-col gap-4 w-72'>
                         <h3 className="text-2xl font-semibold" id="modal-title">Create Subject</h3>
@@ -146,8 +156,10 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                                 required={true}
                             />
 
-                            <DropDown input={input} setInput={setInput} title="Department" items={dept} className='w-full'/>
-                            <DropDown input={input} setInput={setInput} title="Semester" items={sem} className='w-full'/>
+                            <DropDown input={input} setInput={setInput} title="Department" items={dept}
+                                      className='w-full'/>
+                            <DropDown input={input} setInput={setInput} title="Semester" items={sem}
+                                      className='w-full'/>
 
 
                             <div className="flex items-center justify-center w-full">
@@ -189,7 +201,8 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                     <div className="flex flex-col gap-4">
                         <h5 className='text-2xl'>Students</h5>
                         <div className="overflow-y-auto h-80 scroll-smooth w-full">
-                            <table className="table-zebra border-collapse border border-slate-500 w-96 h-64 scroll-auto">
+                            <table
+                                className="table-zebra border-collapse border border-slate-500 w-96 h-64 scroll-auto">
                                 <thead>
                                 <tr>
                                     <th className="border border-slate-600">Sl No.</th>
@@ -209,8 +222,13 @@ export function CreateSubjectModal({onDismiss}: OnDismissProps) {
                     </div>
                 </div>
                 <div className="sm:flex sm:flex-row-reverse">
-                    <button type="submit" form="addEditButton"
-                            className="inline-flex w-full justify-center bg-green-600 rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto">Save
+                    <button
+                        disabled={subjectSaving}
+                        type="submit"
+                        form="addEditButton"
+                        className="inline-flex w-full justify-center bg-green-600 rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto disabled:bg-gray-500"
+                    >
+                        {subjectSaving && <span className="loading loading-spinner loading-xs mr-2"/>} Save
                     </button>
                     <button onClick={onDismiss} type="button"
                             className="mt-3 inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel

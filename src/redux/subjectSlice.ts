@@ -5,33 +5,20 @@ import Subject from "../Model/Subject.ts";
 
 interface subjectState {
     subjects: Subject[]
-    loading?: boolean,
-    error?: string | null
+    getSubLoading?: boolean,
+    getSubError?: string | null,
+
 }
 
 const initialState: subjectState = {
     subjects: [],
-    loading: false,
-    error: null
+    getSubLoading: false,
+    getSubError:  null,
+
 }
 
 
-export const subjectAddThunk = createAsyncThunk<
-    void,
-    Subject,
-    { rejectValue: string }
->(
-    'subject/add',
-    async (subject: Subject, {rejectWithValue}) => {
-        await database.collection("subjects")
-            .doc(subject.id)
-            .set(subject)
-            .catch(error => {
-                console.error("error", error)
-                rejectWithValue(error)
-            })
-    }
-)
+
 
 export const getSubjectThunk = createAsyncThunk<
     void,
@@ -44,51 +31,36 @@ export const getSubjectThunk = createAsyncThunk<
         database.collection("subjects")
             .where('createdBy', '==', `${userId}`)
             .orderBy('created', 'desc')
-            .onSnapshot((querySnapshot) => {
-                console.log("Snapshot =", querySnapshot.docs)
-                dispatch(setSubjects(querySnapshot.docs.map(doc => doc.data() as Subject)))
-                // resolve(sub)
-            }, (error) => {
-                console.error("Error fetching subjects:", error);
-                dispatch(setError(error.message))
-            })
+            .onSnapshot(
+                (querySnapshot) => {
+                    dispatch(setSubjects(querySnapshot.docs.map(doc => doc.data() as Subject)))
+                },
+                error => dispatch(setError(error.message))
+            )
     }
 )
+
+
+
 
 export const subjectSlice = createSlice({
     name: 'subject',
     initialState,
     reducers: {
         setPending(state: subjectState) {
-            state.loading = true;
-            state.error = null;
+            state.getSubLoading = true;
+            state.getSubError = null;
         },
         setSubjects(state: subjectState, action: PayloadAction<Subject[]>) {
-            state.loading = false;
-            state.error = null;
+            state.getSubLoading = false;
+            state.getSubError = null;
             state.subjects = action.payload;
         },
         setError(state: subjectState, action: PayloadAction<string | undefined>) {
-            state.loading = false;
-            state.error = action.payload;
+            state.getSubLoading = false;
+            state.getSubError = action.payload || "Subject not found";
         },
     },
-    extraReducers: (builder) => {
-        builder
-            .addCase(subjectAddThunk.pending, (state: subjectState) => {
-                state.loading = true;
-                state.error = null
-            })
-            .addCase(subjectAddThunk.fulfilled, (state: subjectState) => {
-                state.loading = false;
-                state.error = null;
-
-            })
-            .addCase(subjectAddThunk.rejected, (state: subjectState, action: PayloadAction<string | undefined>) => {
-                state.loading = false;
-                state.error = action.payload || 'subject not created'
-            })
-    }
 })
 
 const {setSubjects, setError, setPending} = subjectSlice.actions

@@ -4,8 +4,6 @@ import "firebase/compat/firestore";
 
 const env = import.meta.env
 
-console.log(env.VITE_FIREBASE_API_KEY)
-
 const app = firebase.initializeApp({
     apiKey: env.VITE_FIREBASE_API_KEY,
     authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,

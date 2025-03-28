@@ -21,15 +21,13 @@ export const getSubjectByIdThunk = createAsyncThunk<
 >(
     "subjectId/getById",
     async ({id}, {rejectWithValue}) => {
-
-        // const {subject} = useAppSelector(state => state.subject)
-
-        // console.log(subject)
-
         return await database.collection("subjects").doc(id)
             .get()
-            .then(result => result.data() as Subject)
-            .catch(rejectWithValue)
+            .then(result => {
+                if(!result.exists) throw new Error("Subject not found")
+                else return result.data() as Subject
+            })
+            .catch(e => rejectWithValue(e.message))
     }
 )
 export const subjectByIdSlice = createSlice({
@@ -53,7 +51,7 @@ export const subjectByIdSlice = createSlice({
             })
             .addCase(getSubjectByIdThunk.rejected, (state: SubjectByIdState, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
-                state.error = action.payload || 'subject not created'
+                state.error = action.payload || "Invalid subject Id"
             })
     }
 })

@@ -6,6 +6,7 @@ import {HomePage} from "./Pages/HomePage.tsx";
 import {useAppSelector} from "./redux/store.ts";
 import AppBar from "./Component/AppBar.tsx";
 import {ClassPage} from "./Pages/ClassPage.tsx";
+import {ToastContainer} from "react-toastify";
 
 function Attendance() {
 
@@ -28,6 +29,7 @@ function Attendance() {
                         <Route path="/*" element={<HomePage/>}/>
                     </Routes>
                 </div>
+                <ToastContainer className="z-50" position='bottom-right' stacked autoClose={2000}/>
             </BrowserRouter>
         </div>
 

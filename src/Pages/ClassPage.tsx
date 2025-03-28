@@ -1,6 +1,6 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {getClassByIdThunk} from "../redux/classesSlice.ts";
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdsThunk} from "../redux/userSlice.ts";
@@ -10,6 +10,11 @@ import {exportAttendance} from "../Util/exportAttendance.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 import User from "../Model/User.ts";
 import {getDepartmentShort} from "../Model/Department.ts";
+import {Class} from "../Model/Class.ts";
+import Toast from "../Util/Toast.ts";
+import ClassDataStore from "../data/classDataStore.ts";
+import {MdDeleteOutline} from "react-icons/md";
+
 
 export function ClassPage() {
 
@@ -18,12 +23,22 @@ export function ClassPage() {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
 
-    const {classes, loading: classLoading, error: classError} = useAppSelector(state => state.class)
-    const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
-    const {users, loading: usersLoading, error: usersError} = useAppSelector(state => state.userById)
-    const {subjects} = useAppSelector(state => state.subject)
+    const {
+        classes,
+        classByIdLoading: classLoading,
+        classByIdError: classError,
+    } = useAppSelector(state => state.class)
 
-    console.log(subjects)
+    const {
+        subject,
+        error: subjectError
+    } = useAppSelector(state => state.subjectById)
+    const {
+        users,
+        error: usersError
+    } = useAppSelector(state => state.userById)
+
+    const [isClassDeleting, setIsClassDeleting] = useState(false)
 
     useEffect(() => {
         if (!params.id) {
@@ -56,34 +71,64 @@ export function ClassPage() {
             .catch(() => alert("Error Exporting Attendance"))
     }
 
-    if (!classes || isArray(classes))
-        return <h1>Loading...</h1>
 
-    let screenState: ScreenState
+    async function deleteClass() {
+        const classId = params.id
+        if (!classId) return
 
-    if (subjectError || classError || usersError) screenState = ScreenState.ERROR
-    else if (subjectLoading || classLoading || usersLoading) screenState = ScreenState.LOADING
-    else screenState = ScreenState.SUCCESS
+        if (!confirm(`Are you sure you want to delete this class? This action is permanent`))
+            return
+
+        setIsClassDeleting(true)
+        await ClassDataStore.deleteClass(classId)
+            .then(() => navigate(-1))
+            .catch(() => Toast.showError("Failed to delete class "))
+            .finally(() => setIsClassDeleting(false))
+
+    }
+
+    const [screenState, setScreenState] = useState(ScreenState.LOADING)
+    const [errorState, setErrorState] = useState<string | null>()
+
+    useEffect(() => {
+        if (classError || subjectError || usersError) {
+            setScreenState(ScreenState.ERROR)
+            setErrorState(classError || subjectError || usersError)
+        } else if (classLoading) setScreenState(ScreenState.LOADING)
+        else if (subject && classes) setScreenState(ScreenState.SUCCESS)
+    }, [usersError, subjectError, classError, classLoading, classes, subject]);
+
 
     const department = subject ? getDepartmentShort(subject.department) : 'null'
 
+    const classInfo = classes as Class
     return (
-        <ScreenComponent state={screenState}>
+        <ScreenComponent error={errorState} state={screenState}>
             <div className='flex flex-col gap-16 w-full'>
-
-
                 <div className='flex flex-col'>
                     <p className='text-xl lg:text-3xl text-neutral-500'>{subject?.title} - {department}</p>
                     <p className='text-xl lg:text-2xl text-neutral-400'>Sem {subject?.semester} - {subject?.section}</p>
 
                     <div className="flex items-center justify-between w-full mt-8">
-                        <h4 className="text-3xl lg:text-5xl">{formatDate(new Date(classes?.createdOn))}</h4>
-                        <button
-                            className="btn btn-primary hover:bg-secondary px-8 btn-md"
-                            onClick={exportFunc}
-                        >
-                            Export
-                        </button>
+                        <h4 className="text-3xl lg:text-5xl">{formatDate(new Date(classInfo.createdOn))}</h4>
+                        <div className="flex gap-4">
+                            <button
+                                className="btn btn-primary hover:bg-secondary px-8 btn-md"
+                                onClick={exportFunc}
+                            >
+                                Export
+                            </button>
+
+                            <button disabled={isClassDeleting}
+                                    className={`btn px-8 btn-md ${isClassDeleting ? 'btn-disabled' : 'btn-error'}`}
+                                    onClick={deleteClass}>
+                                {isClassDeleting
+                                    ? <span className="loading loading-spinner loading-xs mr-2"/>
+                                    : <MdDeleteOutline size='1.7rem'/>
+                                } Delete
+                            </button>
+
+                        </div>
                     </div>
                 </div>
                 <table
@@ -98,8 +143,13 @@ export function ClassPage() {
                     </thead>
                     <tbody>
                     {subject?.studentsEnrolled?.map((item, index) => (
-                        <AttendeeRow index={index} roll={item} user={user[item] && user[item][0]}
-                                     isPresent={classes.attendees.includes(item)}/>
+                        <AttendeeRow
+                            index={index}
+                            roll={item}
+                            user={user[item] && user[item][0]}
+                            isPresent={classInfo.attendees.includes(item)}
+                            classes={classInfo}
+                        />
                     ))}
                     </tbody>
                 </table>
@@ -114,18 +164,46 @@ interface AttendeeRowProps {
     index: number,
     roll: string,
     user?: User,
-    isPresent: boolean
+    isPresent: boolean,
+    classes: Class
 }
 
-const AttendeeRow = ({index, roll, user, isPresent}: AttendeeRowProps) => {
+const AttendeeRow = ({index, roll, user, isPresent, classes}: AttendeeRowProps) => {
     const bgColor = index % 2 === 0 ? "bg-base-100" : "bg-base-200"
+
+    const [attendanceLoader, setAttendanceLoader] = useState(false)
+
+
+    async function toggleAttendance(classes: Class, roll: string) {
+        setAttendanceLoader(true)
+        await ClassDataStore.attendanceToggle(classes, roll)
+            .catch(() => Toast.showError("Failed to toggle attendance"))
+            .finally(() => setAttendanceLoader(false))
+    }
+
 
     return (
         <tr key={index} className={`text-base h-6 text-base-content ${bgColor}`}>
-            <td className="border border-slate-600 text-center p-4">{index + 1}</td>
-            <td className="border border-slate-600 text-center p-4">{roll}</td>
-            <td className="border border-slate-600 text-center p-4">{user?.name || "-"}</td>
-            <td className={`border border-slate-600 text-center p-4 font-semibold ${isPresent ? 'text-green-600' : 'text-red-600'}`}>{isPresent ? "Present" : "Absent"}</td>
+            <td className="border border-slate-400 text-center p-4">{index + 1}</td>
+            <td className="border border-slate-400 text-center p-4">{roll}</td>
+            <td className="border border-slate-400 text-center p-4">{user?.name || "--"}</td>
+            <td className={`flex items-center justify-center gap-4 border border-slate-400 text-center p-4 font-semibold ${isPresent ? 'text-green-600' : 'text-red-600'}`}>
+
+                {!attendanceLoader
+                    ? <input
+                        readOnly
+                        checked={isPresent}
+                        onClick={() => toggleAttendance(classes, roll)}
+                        color="inherit"
+                        className="checkbox checkbox-success checkbox-sm my-auto"
+                        type="checkbox"/>
+                    :
+                    <span className="loading loading-spinner loading-sm text-gray-500"/>
+                }
+
+                {isPresent ? "Present" : "Absent"}
+
+            </td>
         </tr>
     )
 }

@@ -1,119 +1,98 @@
-import {createAsyncThunk , createSlice , PayloadAction} from "@reduxjs/toolkit";
-import { database} from "../firebase.ts";
+import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {database} from "../firebase.ts";
 import {Class} from "../Model/Class.ts";
 
 interface classState {
-    classes : Class[] | Class
-    loading? : boolean,
-    error? : string | null
+    classes: Class[] | Class
+    classloading?: boolean,
+    classError?: string | null,
+    classByIdLoading?: boolean,
+    classByIdError?: string | null,
+
 }
 
-const initialState: classState  = {
-    classes : [],
-    loading : false,
-    error : null
+const initialState: classState = {
+    classes: [],
+    classloading: false,
+    classError: null,
+    classByIdLoading: false,
+    classByIdError: null,
+
 }
 
-export const getClassesThunk= createAsyncThunk<
+export const getClassesThunk = createAsyncThunk<
     Class[],
-    { id : string },
-    {rejectValue : string}
+    { id: string },
+    { rejectValue: string }
 >(
     "class/get",
-    async ({id},{rejectWithValue})=>{
-        // const classArray = []
-        // try {
-
-        console.log(id)
-            return await database.collection("classes")
-                .where("subjectId" , "==" , id)
-                .get()
-                .then((result)=>{
-                    return result.docs.map(doc=>doc.data() as Class)
-                })
-                .then((classes)=>{
-                    console.log(classes)
-                    return classes
-                })
-                .catch(e=>{
-                    return rejectWithValue(e)
-                })
-            // querySnapshot.forEach((doc)=>{
-            //     querySnapshot_class.forEach((doc_class)=>{
-            //         Object.entries(doc_class.data()).map(([key, value])=>{
-            //             if(key==="subjectId"){
-            //                 if(value===id){
-            //                     classArray.push(doc_class.data())
-            //                 }
-            //             }
-            //         })
-            //     })
-            // })
-            // console.log(classArray)
-            // return { classArray : classArray }
-        // }catch (error){
-        //     return rejectWithValue(error)
-        // }
+    async ({id}, {rejectWithValue}) => {
+        return await database.collection("classes")
+            .where("subjectId", "==", id)
+            .get()
+            .then(result => result.docs)
+            .then(docs => docs.map(doc => doc.data() as Class))
+            .catch(e => rejectWithValue(e.message))
     }
 )
 
 export const getClassByIdThunk = createAsyncThunk<
-    Class,
-    {id : string},
-    {rejectValue : string}
+    void,
+    { id: string },
+    { rejectValue: string }
 >(
     "class/getById",
-    async ({id }, {rejectWithValue})=>{
-        return await database.collection("classes").doc(`${id}`)
-            .get()
-            .then((result)=>{
-                return result.data() as Class
-            }).then((classes)=>{
-                console.log(classes)
-                return classes
-            })
-            .catch(error=>{
-                return rejectWithValue(error)
-            })
+    async ({id}, {dispatch}) => {
+        dispatch(setPending())
+        database.collection("classes")
+            .doc(`${id}`)
+            .onSnapshot(
+                (querySnapShot) => {
+                    if (!querySnapShot.exists) dispatch(setError("Class does not exist"))
+                    else dispatch(setClasses(querySnapShot.data() as Class))
+                }, (error) => {
+                    dispatch(setError(error.message))
+                }
+            )
     }
 )
 
 
 export const classesSlice = createSlice({
-    name : 'class' ,
+    name: 'class',
     initialState,
-    reducers : {
-        display(initialState){
-            initialState
+    reducers: {
+        setPending(state: classState) {
+            state.classByIdLoading = true;
+            state.classByIdError = null
+        },
+        setClasses(state: classState, action: PayloadAction<Class>) {
+            state.classByIdLoading = false;
+            state.classByIdError = null;
+            state.classes = action.payload
+        },
+        setError(state: classState, action: PayloadAction<string | undefined>) {
+            state.classByIdLoading = false;
+            state.classByIdError = action.payload
         }
     },
-    extraReducers : (builder) => {
+    extraReducers: (builder) => {
         builder
-            .addCase(getClassesThunk.pending,(state : classState ) => {
-                state.loading = true;
-                state.error = null
+            .addCase(getClassesThunk.pending, (state: classState) => {
+                state.classloading = true;
+                state.classError = null
             })
-            .addCase(getClassesThunk.fulfilled,(state : classState, action : PayloadAction<Class[]> ) => {
-                state.loading = false;
-                state.error = null;
+            .addCase(getClassesThunk.fulfilled, (state: classState, action: PayloadAction<Class[]>) => {
+                state.classloading = false;
+                state.classError = null;
                 state.classes = action.payload
             })
-            .addCase(getClassesThunk.rejected,(state : classState, action : PayloadAction<string | undefined> ) => {
-                state.loading = false;
-                state.error = action.payload || 'class not found'
-            })
-            .addCase(getClassByIdThunk.pending,(state : classState ) => {
-                state.loading = true;
-                state.error = null
-            })
-            .addCase(getClassByIdThunk.fulfilled,(state : classState, action : PayloadAction<Class> ) => {
-                state.loading = false;
-                state.error = null;
-                state.classes = action.payload
-            })
-            .addCase(getClassByIdThunk.rejected,(state : classState, action : PayloadAction<string | undefined> ) => {
-                state.loading = false;
-                state.error = action.payload || 'class not found'
+            .addCase(getClassesThunk.rejected, (state: classState, action: PayloadAction<string | undefined>) => {
+                state.classloading = false;
+                state.classError = action.payload || 'class not found'
             })
     }
 })
+
+const {setClasses, setError, setPending} = classesSlice.actions
+

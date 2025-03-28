@@ -13,6 +13,9 @@ import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 import {exportAttendance} from "../Util/exportAttendance.ts";
 import {DateRange} from "rsuite/DateRangePicker";
+import Toast from "../Util/Toast.ts";
+import SubjectDataStore from "../data/SubjectDatastore.ts";
+import {MdDeleteOutline} from "react-icons/md";
 
 export function SubjectPage() {
     const params = useParams()
@@ -21,12 +24,13 @@ export function SubjectPage() {
 
     const [dateRange, setDateRange] = useState<DateRange | null>(null);
 
-    const {classes, loading: classLoading, error: classError} = useAppSelector(state => state.class)
+    const {classes, classloading: classLoading, classError: classError} = useAppSelector(state => state.class)
     const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
 
-    useEffect ( () => {
-        window.scrollTo(0,0)
-    } , [] );
+
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, []);
 
 
     useEffect(() => {
@@ -40,31 +44,42 @@ export function SubjectPage() {
     }, [dispatch, navigate, params.id]);
 
     const [avgAttendance, setAvgAttendance] = useState(0)
+    const [isSubjectDeleting, setIsSubjectDeleting] = useState(false)
 
     useEffect(() => {
         if (!subject || !isArray(classes) || classes.length === 0) return
 
         const enrolledStudentCount = subject.studentsEnrolled.length
 
-        const avgAttendancePerClass = classes.map(classData=> (classData.attendees?.length || 0) / enrolledStudentCount * 100)
+        const avgAttendancePerClass = classes.map(classData => (classData.attendees?.length || 0) / enrolledStudentCount * 100)
 
-        let averageAttendance = _.sum( avgAttendancePerClass) / classes.length
-        console.log(averageAttendance)
-        // averageAttendance = Math.round((averageAttendance + Number.EPSILON) * 100) / 100
-        averageAttendance = (Math.round(averageAttendance + Number.EPSILON ) / 100) * 100
-        console.log(averageAttendance)
+        let averageAttendance = _.sum(avgAttendancePerClass) / classes.length
+        averageAttendance = (Math.round(averageAttendance + Number.EPSILON) / 100) * 100
 
         setAvgAttendance(averageAttendance)
     }, [classes, subject]);
-
-    if (!classes || !(classes as Class))
-        return <h1>Loading...</h1>
 
 
     const groupedClass = _.groupBy(Object.keys(classes).map((item) => ({
         ...(classes[item as keyof typeof classes] as Class),
         month: getDate((classes[item as keyof typeof classes] as Class).createdOn).month
     })), 'month')
+
+    async function deleteSubject() {
+        if (!subject) return;
+        const subjectId = subject.id
+
+
+        if (!confirm(`Are you sure you want to delete this subject? This action is permanent`))
+            return
+
+        setIsSubjectDeleting(true)
+        await SubjectDataStore.deleteSubject(subjectId)
+            .then(() => navigate(-1))
+            .catch(() => Toast.showError("Failed to delete subject"))
+            .finally(() => setIsSubjectDeleting(false))
+
+    }
 
 
     async function handleExport() {
@@ -93,26 +108,45 @@ export function SubjectPage() {
         setDateRange(null)
     }
 
-    let screenState: ScreenState
+    const [screenState, setScreenState] = useState(ScreenState.LOADING)
+    const [errorState, setErrorState] = useState<string | null>()
 
-    if (subjectError || classError) {
-        screenState = ScreenState.ERROR
-    } else if (subjectLoading || classLoading) {
-        screenState = ScreenState.LOADING
-    } else screenState = ScreenState.SUCCESS
+    useEffect(() => {
+        if (subjectLoading || classLoading) {
+            setScreenState(ScreenState.LOADING)
+        } else if (subjectError || classError) {
+            setScreenState(ScreenState.ERROR)
+            setErrorState(subjectError || classError)
+        } else setScreenState(ScreenState.SUCCESS)
+    }, [subjectLoading, classLoading, subjectError, classError]);
 
     return (
-        <ScreenComponent state={screenState}>
+        <ScreenComponent error={errorState} state={screenState}>
             <div className="h-screen w-full flex flex-col">
                 <div className="mb-20 flex flex-col gap-8 lg:gap-16">
-                    <div className='flex flex-col'>
-                        <p className="text-xl lg:text-2xl text-neutral-500">{subject?.department}</p>
-                        <p className="text-xl lg:text-xl text-neutral-400">Sem {subject?.semester} - {subject?.section}</p>
-                        <h4 className="text-3xl lg:text-5xl mt-8">{subject?.title}</h4>
+                    <div className='flex flex-row w-full justify-between'>
+                        <div className='flex flex-col'>
+                            <p className="text-xl lg:text-2xl text-neutral-500">{subject?.department}</p>
+                            <p className="text-xl lg:text-xl text-neutral-400">Sem {subject?.semester} - {subject?.section}</p>
+                            <h4 className="text-3xl lg:text-5xl mt-8">{subject?.title}</h4>
+                        </div>
+
+                        <button
+                            className={`btn btn-sm ${isSubjectDeleting ? 'btn-disabled' : 'btn-error'}`}
+                            disabled={isSubjectDeleting} onClick={deleteSubject}
+                        >
+                            {
+                                isSubjectDeleting
+                                    ? <span className="loading loading-spinner loading-xs"/>
+                                    : <MdDeleteOutline size='1.2rem'/>
+                            }
+                            Delete
+                        </button>
+
                     </div>
 
                     <div className="flex flex-row w-full justify-between">
-                    <div className='flex flex-row gap-16 items-center'>
+                        <div className='flex flex-row gap-16 items-center'>
                             <p className="flex flex-col items-center"><span
                                 className="text-4xl">{size(classes)}</span> <span
                                 className="text-xl text-neutral-500">Classes</span>
@@ -126,7 +160,7 @@ export function SubjectPage() {
                             <div className="flex rounded-xl justify-self-start px-1 items-center gap-1">
                                 <DateRangePicker
                                     className="border-transparent focus:border-transparent focus:ring-0"
-                                     onChange={setDateRange}
+                                    onChange={setDateRange}
                                     placement="auto" placeholder="Export"/>
                                 <button className="btn btn-primary btn-sm" onClick={handleExport}>Export</button>
                             </div>}

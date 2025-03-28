@@ -13,8 +13,6 @@ export function formatDate(date: Date) {
      const month = dateObject.toLocaleString('default', { month: 'long' });
      const monthShort = dateObject.toLocaleString('default', { month: 'short' });
 
-    // console.log(month)
-
     return {month, date, monthShort}
 }
 
