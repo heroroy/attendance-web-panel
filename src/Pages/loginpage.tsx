@@ -29,7 +29,11 @@ export function Loginpage() {
 
     return (
 
-        <ScreenComponent error={error} state={loading ? ScreenState.LOADING : error ? ScreenState.ERROR : ScreenState.SUCCESS}>
+        <ScreenComponent
+            error={error}
+            state={loading ? ScreenState.LOADING : error ? ScreenState.ERROR : ScreenState.SUCCESS}
+            authRequired={false}
+        >
             <div className="flex h-full flex-col overflow-hidden justify-center items-center gap-12">
 
                 <div className="flex flex-col items-center gap-2">
