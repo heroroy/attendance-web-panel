@@ -8,11 +8,13 @@ import Department from "../Model/Department.ts";
 import {capitalizeWords} from "../Util/Naming_Conv.ts";
 import {ScreenComponent, ScreenState} from "../Component/ScreenComponent.tsx";
 import {MdAdd} from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 export function HomePage() {
     const [open, setOpen] = useState<boolean>(false)
 
     const dispatch = useAppDispatch()
+    const navigate = useNavigate();
 
     const {profile, loading, error: profileError} = useAppSelector(state => state.auth)
     const {subjects, getSubError: subjectError, getSubLoading: subjectsLoading} = useAppSelector(state => state.subject)
@@ -57,7 +59,7 @@ export function HomePage() {
                     >
                         <MdAdd/> Subject
                     </button>
-
+                    <button onClick={() => navigate("/settings")}>Click me to go to settings</button>
                 </div>
 
                 <div className="">
