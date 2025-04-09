@@ -86,8 +86,13 @@ export function SettingsPage() {
         {addTeacherError && (
           <p className="text-red-500 text-xs mb-2">{addTeacherError}</p>
         )}
+
         <Button fullWidth onClick={handleAddTeacher} disabled={loading}>
-          {loading ? "Adding..." : "Add"}
+          {loading ? (
+            <span className="loading loading-spinner loading-xs" />
+          ) : (
+            "Add"
+          )}
         </Button>
       </Modal>
 
