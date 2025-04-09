@@ -67,7 +67,6 @@ function useSettingsPageLogic() {
         setTeacherIds(filteredTeacherIds);
         setLoading(false);
         setError(null);
-        console.log("Emails updated (snapshot):", allEmails);
       },
       (err) => {
         console.error("Error listening for email updates:", err);
@@ -87,7 +86,6 @@ function useSettingsPageLogic() {
       const teacherDocRef = doc(database, "emails", teacherId);
       await deleteDoc(teacherDocRef);
       toast.success("Teacher removed successfully!");
-      console.log(`Teacher with ID ${teacherId} removed.`);
     } catch (err) {
       console.error("Error removing teacher:", err);
       toast.error("Failed to remove teacher.");
@@ -119,7 +117,7 @@ function useSettingsPageLogic() {
   const handleCloseClick = useCallback((index: number) => {
     setShowPopUp(true);
     setSelectedTeacherIndex(index);
-    console.log(`Close clicked for index: ${index}`);
+    
   }, []);
 
   const handlePopUpClose = useCallback(() => {
@@ -139,7 +137,6 @@ function useSettingsPageLogic() {
     const emailsCollection = collection(database, "emails");
     await addDoc(emailsCollection, { email });
     toast.success("Teacher added!");
-    console.log(`Teacher with email ${email} added.`);
   }, []);
 
   const handleAddTeacher = useCallback(async () => {
