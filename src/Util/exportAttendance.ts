@@ -102,7 +102,7 @@ function getAttendanceRows({classes, subject}: ExportExcelProps) {
         let attendance = 0
 
         classes.forEach(classData => {
-            const present = classData.attendees.includes(roll)
+            const present = classData.attendees && classData.attendees.includes(roll)
             row[classData.id] = present ? 'P' : 'A'
             if(present) attendance++
 
