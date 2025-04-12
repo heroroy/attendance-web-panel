@@ -102,8 +102,8 @@ export function SubjectPage() {
         })
 
         exportAttendance({classes: classesInRange, subject: subject})
-            .then(() => alert("Attendance Exported"))
-            .catch(() => alert("Error Exporting Attendance"))
+            .then(() => Toast.showSuccess("Attendance Exported"))
+            .catch(() => Toast.showError("Error Exporting Attendance"))
 
         setDateRange(null)
     }

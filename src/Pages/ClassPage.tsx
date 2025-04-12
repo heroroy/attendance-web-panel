@@ -67,8 +67,8 @@ export function ClassPage() {
         if (isArray(classes) || !subject) return
 
         exportAttendance({classes: [classes], subject: subject})
-            .then(() => alert("Attendance Exported"))
-            .catch(() => alert("Error Exporting Attendance"))
+            .then(() => Toast.showSuccess("Attendance Exported"))
+            .catch(() => Toast.showError("Error Exporting Attendance"))
     }
 
 
