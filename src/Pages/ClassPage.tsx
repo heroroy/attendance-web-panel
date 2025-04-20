@@ -66,7 +66,7 @@ export function ClassPage() {
     function exportFunc() {
         if (isArray(classes) || !subject) return
 
-        exportAttendance({classes: [classes], subject: subject})
+        exportAttendance({classes: [classes], subject: subject, students : user})
             .then(() => Toast.showSuccess("Attendance Exported"))
             .catch(() => Toast.showError("Error Exporting Attendance"))
     }
@@ -177,7 +177,10 @@ const AttendeeRow = ({index, roll, user, isPresent, classes}: AttendeeRowProps) 
     async function toggleAttendance(classes: Class, roll: string) {
         setAttendanceLoader(true)
         await ClassDataStore.attendanceToggle(classes, roll)
-            .catch(() => Toast.showError("Failed to toggle attendance"))
+            .catch((e) => {
+                console.log(e)
+                Toast.showError ( "Failed to toggle attendance" )
+            })
             .finally(() => setAttendanceLoader(false))
     }
 
