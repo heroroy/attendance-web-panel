@@ -29,7 +29,7 @@ export const getUsersByIdsThunk = createAsyncThunk<
     }
 )
 
-async function getUsersByIds(ids: string[]) {
+export async function getUsersByIds(ids: string[]) {
     return database.collection("users")
         .where('id', 'in', ids)
         .get()

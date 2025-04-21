@@ -1,5 +1,7 @@
 import Subject from "../Model/Subject.ts";
 import firebase from "../firebase.ts";
+import {getUsersByIds } from "../redux/userSlice.ts";
+import _  from "lodash";
 
 export default class SubjectDataStore {
 
@@ -12,5 +14,14 @@ export default class SubjectDataStore {
 
     static deleteSubject(subjectId: string) {
         return this.subjects.doc(subjectId).delete()
+    }
+
+    static getUser(id : string[]){
+
+        const operations = _.chunk(id, 25).map(ids => getUsersByIds(ids))
+        return Promise.all(operations).then(res=> {
+            return _.flatten ( res )
+        })
+
     }
 }

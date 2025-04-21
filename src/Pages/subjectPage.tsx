@@ -16,7 +16,6 @@ import {DateRange} from "rsuite/DateRangePicker";
 import Toast from "../Util/Toast.ts";
 import SubjectDataStore from "../data/SubjectDatastore.ts";
 import {MdDeleteOutline} from "react-icons/md";
-import {getUsersByIdsThunk} from "../redux/userSlice.ts";
 
 export function SubjectPage() {
     const params = useParams()
@@ -27,12 +26,6 @@ export function SubjectPage() {
 
     const {classes, classloading: classLoading, classError: classError} = useAppSelector(state => state.class)
     const {subject, loading: subjectLoading, error: subjectError} = useAppSelector(state => state.subjectById)
-    const {
-        users,
-        error: usersError
-    } = useAppSelector(state => state.userById)
-
-    const user = _.groupBy(users, 'id')
 
 
     useEffect(() => {
@@ -50,11 +43,6 @@ export function SubjectPage() {
         dispatch(getClassesThunk({id: `${params.id}`}))
     }, [dispatch, navigate, params.id]);
 
-    useEffect(() => {
-        if (!subject) return
-
-        dispatch(getUsersByIdsThunk({id: subject.studentsEnrolled}))
-    }, [dispatch, subject]);
 
     const [avgAttendance, setAvgAttendance] = useState(0)
     const [isSubjectDeleting, setIsSubjectDeleting] = useState(false)
@@ -114,6 +102,10 @@ export function SubjectPage() {
             return classDate >= startDate && classDate <= endDate
         }).sort((data1, data2)=>data1.createdOn - data2.createdOn)
 
+        const users = await SubjectDataStore.getUser(subject.studentsEnrolled)
+
+        const user = _.groupBy(users, 'id')
+
         console.log(user)
 
         exportAttendance({classes: classesInRange, subject: subject, students : user})
@@ -129,9 +121,9 @@ export function SubjectPage() {
     useEffect(() => {
         if (subjectLoading || classLoading) {
             setScreenState(ScreenState.LOADING)
-        } else if (subjectError || classError || usersError) {
+        } else if (subjectError || classError ) {
             setScreenState(ScreenState.ERROR)
-            setErrorState(subjectError || classError || usersError)
+            setErrorState(subjectError || classError )
         } else setScreenState(ScreenState.SUCCESS)
     }, [subjectLoading, classLoading, subjectError, classError]);
 

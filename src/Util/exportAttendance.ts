@@ -51,20 +51,14 @@ export function exportAttendance({classes, subject, students}: ExportExcelProps)
             getAttendanceRows({classes, subject, students})
                 .forEach(row => sheet.addRow(row))
 
-            const headerRow = sheet.getRow(1);
-
-            headerRow.eachCell((cell)=>{
-                cell.alignment = {
-                    wrapText: true // This enables text wrapping at white spaces
-                };
-            })
-
-            headerRow.height = 40;
+            // const headerRow = sheet.getRow(1);
+            //
+            // sheet.getRow(1).height = 40;
 
             sheet.eachRow(row=>{
                 row.eachCell(cell=>{
                     // cell.style = styles.textAlign
-                    cell.alignment = { vertical : "middle", horizontal: 'center' }
+                    cell.alignment = { vertical : "middle", horizontal: 'center', wrapText: true }
                     if(cell.text === 'P') {
                         cell.style = styles.present
                     }
