@@ -1,7 +1,6 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {database} from "../firebase.ts";
-import _ from "lodash";
 import User from "../Model/User.ts";
+import UserDataStore from "../data/UserDataStore.ts";
 
 interface userState {
     users: User[]
@@ -17,26 +16,14 @@ const initialState: userState = {
 
 export const getUsersByIdsThunk = createAsyncThunk<
     User[],
-    { id: string[] },
+    { ids: string[] },
     { rejectValue: string }
 >(
     "userId/getById",
-    async ({id}, { rejectWithValue }) => {
-        const operations = _.chunk(id, 25).map(ids => getUsersByIds(ids))
-        return await Promise.all(operations)
-            .then(result => _.flatten(result))
-            .catch(rejectWithValue)
+    async ({ids}, { rejectWithValue }) => {
+        return await UserDataStore.getUsersById(ids).catch(rejectWithValue)
     }
 )
-
-export async function getUsersByIds(ids: string[]) {
-    return database.collection("users")
-        .where('id', 'in', ids)
-        .get()
-        .then(result => result.docs)
-        .then(docs => docs.map(doc => doc.data() as User))
-}
-
 
 export const userByIdSlice = createSlice({
     name: 'userId',

@@ -1,11 +1,13 @@
 import ExcelJS from "exceljs";
 import {Class} from "../Model/Class.ts";
 import Subject from "../Model/Subject.ts";
+import User from "../Model/User.ts";
+import _ from "lodash";
 
 type ExportExcelProps = {
     classes: Class[],
     subject: Subject,
-    students : any
+    students : _.Dictionary<User[]>
 }
 
 
@@ -40,9 +42,10 @@ const styles = {
 
 
 
-export function exportAttendance({classes, subject, students}: ExportExcelProps): Promise<void> {
+export function exportAttendance({classes:classList, subject, students}: ExportExcelProps): Promise<void> {
     return new Promise((resolve, reject) => {
         try {
+            const classes = _.orderBy(classList, 'createdOn', 'asc')
             const workbook = new ExcelJS.Workbook();
             const sheet = workbook.addWorksheet('Attendance')
             sheet.properties.defaultRowHeight = 50
@@ -72,7 +75,7 @@ export function exportAttendance({classes, subject, students}: ExportExcelProps)
             reject(e)
         }
     })
-        .then((workbook : any ) => workbook.xlsx.writeBuffer())
+        .then((workbook:any) => workbook.xlsx.writeBuffer())
         .then((data : ArrayBuffer) => downloadFile(`${subject.title} - ${subject.section}`, data))
 }
 

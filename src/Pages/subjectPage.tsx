@@ -16,6 +16,7 @@ import {DateRange} from "rsuite/DateRangePicker";
 import Toast from "../Util/Toast.ts";
 import SubjectDataStore from "../data/SubjectDatastore.ts";
 import {MdDeleteOutline} from "react-icons/md";
+import UserDataStore from "../data/UserDataStore.ts";
 
 export function SubjectPage() {
     const params = useParams()
@@ -102,13 +103,10 @@ export function SubjectPage() {
             return classDate >= startDate && classDate <= endDate
         }).sort((data1, data2)=>data1.createdOn - data2.createdOn)
 
-        const users = await SubjectDataStore.getUser(subject.studentsEnrolled)
-
-        const user = _.groupBy(users, 'id')
-
-        console.log(user)
-
-        exportAttendance({classes: classesInRange, subject: subject, students : user})
+        UserDataStore.getUsersById(subject.studentsEnrolled)
+            .catch(() => [])
+            .then(users => _.groupBy(users))
+            .then(users => exportAttendance({classes: classesInRange, subject: subject, students : users}))
             .then(() => Toast.showSuccess("Attendance Exported"))
             .catch(() => Toast.showError("Error Exporting Attendance"))
 

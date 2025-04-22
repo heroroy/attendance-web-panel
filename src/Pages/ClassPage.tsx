@@ -1,6 +1,6 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {getClassByIdThunk} from "../redux/classesSlice.ts";
 import {getSubjectByIdThunk} from "../redux/getSubjectById.ts";
 import {getUsersByIdsThunk} from "../redux/userSlice.ts";
@@ -58,10 +58,10 @@ export function ClassPage() {
     useEffect(() => {
         if (!subject) return
 
-        dispatch(getUsersByIdsThunk({id: subject.studentsEnrolled}))
+        dispatch(getUsersByIdsThunk({ids: subject.studentsEnrolled}))
     }, [dispatch, subject]);
 
-    const user = _.groupBy(users, 'id')
+    const user = useMemo(() => _.groupBy(users, 'id'), [users])
 
     function exportFunc() {
         if (isArray(classes) || !subject) return
