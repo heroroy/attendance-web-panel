@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect , useMemo , useState} from "react";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {getClassesThunk} from "../redux/classesSlice.ts";
 import {useNavigate, useParams} from "react-router-dom";
@@ -43,22 +43,28 @@ export function SubjectPage() {
         dispatch(getClassesThunk({id: `${params.id}`}))
     }, [dispatch, navigate, params.id]);
 
-
-    const [avgAttendance, setAvgAttendance] = useState(0)
     const [isSubjectDeleting, setIsSubjectDeleting] = useState(false)
 
-    useEffect(() => {
-        if (!subject || !isArray(classes) || classes.length === 0) return
 
-        const enrolledStudentCount = subject.studentsEnrolled.length
+        const avgAttendance : number  = useMemo(()=>{
+            if (!subject || !isArray(classes) || classes.length === 0) return
 
-        const avgAttendancePerClass = classes.map(classData => (classData.attendees?.length || 0) / enrolledStudentCount * 100)
+            const enrolledStudentCount = subject.studentsEnrolled.length
 
-        let averageAttendance = _.sum(avgAttendancePerClass) / classes.length
-        averageAttendance = (Math.round(averageAttendance + Number.EPSILON) / 100) * 100
+            const avgAttendancePerClass = classes.map(classData => (classData.attendees?.length || 0) / enrolledStudentCount * 100)
 
-        setAvgAttendance(averageAttendance)
-    }, [classes, subject]);
+            let averageAttendance = _.sum(avgAttendancePerClass) / classes.length
+
+            console.log(averageAttendance)
+
+            averageAttendance = (Math.round(averageAttendance + Number.EPSILON) / 100) * 100
+
+            console.log(averageAttendance)
+
+            return averageAttendance
+
+        },[classes, subject])
+
 
 
     const groupedClass = _.groupBy(Object.keys(classes).map((item) => ({
@@ -159,7 +165,7 @@ export function SubjectPage() {
                                 className="text-xl text-neutral-500">Classes</span>
                             </p>
                             <p className="flex flex-col items-center"><span
-                                className="text-4xl">{avgAttendance}%</span> <span
+                                className="text-4xl">{avgAttendance | 0}%</span> <span
                                 className="text-xl text-gray-500">Avg Attendance</span>
                             </p>
                         </div>

@@ -61,9 +61,11 @@ export function exportAttendance({classes, subject, students}: ExportExcelProps)
                     cell.alignment = { vertical : "middle", horizontal: 'center', wrapText: true }
                     if(cell.text === 'P') {
                         cell.style = styles.present
+                        cell.alignment = { vertical : "middle", horizontal: 'center'}
                     }
                     else if(cell.text === 'A'){
                         cell.style = styles.absent
+                        cell.alignment = { vertical : "middle", horizontal: 'center'}
                     }
                 })
             })
