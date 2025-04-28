@@ -47,7 +47,7 @@ export function SubjectPage() {
     const [isSubjectDeleting, setIsSubjectDeleting] = useState(false)
 
 
-        const avgAttendance : number  = useMemo(()=>{
+        const avgAttendance   = useMemo(()=>{
             if (!subject || !isArray(classes) || classes.length === 0) return
 
             const enrolledStudentCount = subject.studentsEnrolled.length
@@ -56,11 +56,10 @@ export function SubjectPage() {
 
             let averageAttendance = _.sum(avgAttendancePerClass) / classes.length
 
-            console.log(averageAttendance)
 
-            averageAttendance = (Math.round(averageAttendance + Number.EPSILON) / 100) * 100
+            // averageAttendance = (Math.round(averageAttendance + Number.EPSILON) / 100) * 100
+            averageAttendance = Math.round(((averageAttendance + Number.EPSILON) / 100) * 100)
 
-            console.log(averageAttendance)
 
             return averageAttendance
 
@@ -163,7 +162,7 @@ export function SubjectPage() {
                                 className="text-xl text-neutral-500">Classes</span>
                             </p>
                             <p className="flex flex-col items-center"><span
-                                className="text-4xl">{avgAttendance | 0}%</span> <span
+                                className="text-4xl">{avgAttendance ? avgAttendance : 0}%</span> <span
                                 className="text-xl text-gray-500">Avg Attendance</span>
                             </p>
                         </div>
