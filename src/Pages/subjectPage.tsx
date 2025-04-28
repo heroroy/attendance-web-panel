@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect , useMemo , useState} from "react";
 import {useAppDispatch, useAppSelector} from "../redux/store.ts";
 import {getClassesThunk} from "../redux/classesSlice.ts";
 import {useNavigate, useParams} from "react-router-dom";
@@ -16,6 +16,7 @@ import {DateRange} from "rsuite/DateRangePicker";
 import Toast from "../Util/Toast.ts";
 import SubjectDataStore from "../data/SubjectDatastore.ts";
 import {MdDeleteOutline} from "react-icons/md";
+import UserDataStore from "../data/UserDataStore.ts";
 
 export function SubjectPage() {
     const params = useParams()
@@ -43,21 +44,27 @@ export function SubjectPage() {
         dispatch(getClassesThunk({id: `${params.id}`}))
     }, [dispatch, navigate, params.id]);
 
-    const [avgAttendance, setAvgAttendance] = useState(0)
     const [isSubjectDeleting, setIsSubjectDeleting] = useState(false)
 
-    useEffect(() => {
-        if (!subject || !isArray(classes) || classes.length === 0) return
 
-        const enrolledStudentCount = subject.studentsEnrolled.length
+        const avgAttendance   = useMemo(()=>{
+            if (!subject || !isArray(classes) || classes.length === 0) return
 
-        const avgAttendancePerClass = classes.map(classData => (classData.attendees?.length || 0) / enrolledStudentCount * 100)
+            const enrolledStudentCount = subject.studentsEnrolled.length
 
-        let averageAttendance = _.sum(avgAttendancePerClass) / classes.length
-        averageAttendance = (Math.round(averageAttendance + Number.EPSILON) / 100) * 100
+            const avgAttendancePerClass = classes.map(classData => (classData.attendees?.length || 0) / enrolledStudentCount * 100)
 
-        setAvgAttendance(averageAttendance)
-    }, [classes, subject]);
+            let averageAttendance = _.sum(avgAttendancePerClass) / classes.length
+
+
+            // averageAttendance = (Math.round(averageAttendance + Number.EPSILON) / 100) * 100
+            averageAttendance = Math.round(((averageAttendance + Number.EPSILON) / 100) * 100)
+
+
+            return averageAttendance
+
+        },[classes, subject])
+
 
 
     const groupedClass = _.groupBy(Object.keys(classes).map((item) => ({
@@ -99,9 +106,12 @@ export function SubjectPage() {
         const classesInRange = classes.filter(classInfo => {
             const classDate = new Date(classInfo.createdOn)
             return classDate >= startDate && classDate <= endDate
-        })
+        }).sort((data1, data2)=>data1.createdOn - data2.createdOn)
 
-        exportAttendance({classes: classesInRange, subject: subject})
+        UserDataStore.getUsersById(subject.studentsEnrolled)
+            .catch(() => [])
+            .then(users => _.groupBy(users))
+            .then(users => exportAttendance({classes: classesInRange, subject: subject, students : users}))
             .then(() => Toast.showSuccess("Attendance Exported"))
             .catch(() => Toast.showError("Error Exporting Attendance"))
 
@@ -114,9 +124,9 @@ export function SubjectPage() {
     useEffect(() => {
         if (subjectLoading || classLoading) {
             setScreenState(ScreenState.LOADING)
-        } else if (subjectError || classError) {
+        } else if (subjectError || classError ) {
             setScreenState(ScreenState.ERROR)
-            setErrorState(subjectError || classError)
+            setErrorState(subjectError || classError )
         } else setScreenState(ScreenState.SUCCESS)
     }, [subjectLoading, classLoading, subjectError, classError]);
 
@@ -152,7 +162,7 @@ export function SubjectPage() {
                                 className="text-xl text-neutral-500">Classes</span>
                             </p>
                             <p className="flex flex-col items-center"><span
-                                className="text-4xl">{avgAttendance}%</span> <span
+                                className="text-4xl">{avgAttendance ? avgAttendance : 0}%</span> <span
                                 className="text-xl text-gray-500">Avg Attendance</span>
                             </p>
                         </div>
